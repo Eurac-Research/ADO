@@ -1,0 +1,78 @@
+html,
+body {
+  position: relative;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+.controlpanel {
+  position: fixed;
+  z-index: 11;
+  background: #fff;
+  opacity: 0.9;
+  padding: 30px;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 250px;
+  padding-bottom: 30px;
+}
+
+.controlpanel input {
+  width: 100%;
+}
+
+.reactMap {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.tooltip {
+  position: absolute;
+  margin: 8px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  max-width: 300px;
+  font-size: 10px;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.overlayContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color:rgba(0, 0, 0, 0.4);
+  z-index: 100000;
+}
+
+.dataOverlay {
+  background: #fff;
+  width: 80vw;
+  height: 60vh;
+  padding: 30px;
+  padding-bottom: 80px;
+}
+
+.closeOverlay {
+  text-align: right;
+  display: block;
+  cursor: pointer;
+}
