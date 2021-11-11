@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { format } from 'date-format-parse';
+import Link from 'next/link'
 
 function ControlPanel(props) {
   const {day} = props;
 
-  const str = day ? day.toString() : "20180101"
-  const formattedDate = str.substr(0,4)+"-"+str.substr(4,2)+"-"+str.substr(6,2);
-  const timestamp = format(formattedDate, 'X');
+  console.log("day: ", day);
+  const timestamp = format(day, 'X');
 
   const dayFromTimestamp = timestamp / 60 / 60 / 24
 
@@ -21,7 +21,7 @@ function ControlPanel(props) {
           type="range"
           value={dayFromTimestamp}
           min={17532}
-          max={17896}
+          max={17562}
           step={1}
           onChange={evt => props.onChange(evt.target.value)}
         />
@@ -34,7 +34,7 @@ function ControlPanel(props) {
               -1 day (timestamp {dayFromTimestamp - 1})
           </button>
         )}
-        {dayFromTimestamp <= 17895 && (
+        {dayFromTimestamp < 17562 && (
           <button
             type="submit"
             value={dayFromTimestamp + 1}
@@ -42,6 +42,14 @@ function ControlPanel(props) {
               +1 day (timestamp {dayFromTimestamp + 1})
           </button>
         )}
+      </div>
+      <div className="navigation">
+        <Link href="/">
+          <a>spi3</a>
+        </Link>
+        <Link href="/cdi">
+          <a>cdi</a>
+        </Link>
       </div>
     </div>
   );

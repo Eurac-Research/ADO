@@ -64,7 +64,7 @@ export default function App() {
 
   useEffect(() => {
     fetch(
-      '/data/SPI3_2018_1_ts_NUTS3.geojson'
+      '/data/CDI_2018_1_ts_NUTS3.geojson'
     )
       .then(resp => resp.json())
       .then(json => setAllData(json));
