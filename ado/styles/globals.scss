@@ -34,6 +34,23 @@ body {
   box-sizing: border-box;
 }
 
+.eurac-logo {
+  position: absolute;
+  z-index: 1;
+  padding: 15px;
+  @media (min-width: 768px) {
+    padding: 30px;
+  }
+  g {
+    fill: #838b93;
+    transition: 500ms all;
+  }
+  &:hover {
+    g {
+      fill: #df1b12;
+    }
+  }
+}
 
 .controlpanel {
   position: fixed;
@@ -99,7 +116,6 @@ body {
   text-align: right;
   display: block;
   cursor: pointer;
-  color: red;
 }
 
 .navigation {
