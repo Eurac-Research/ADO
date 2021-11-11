@@ -32,14 +32,10 @@ export default function App() {
         property: 'value',
         stops: [
           [1, '#3288bd'],
-          [2, '#66c2a5'],
-          [3, '#abdda4'],
-          [4, '#e6f598'],
-          [5, '#ffffbf'],
-          [6, '#fee08b'],
-          [7, '#fdae61'],
-          [8, '#f46d43'],
-          [9, '#d53e4f'],
+          [2, '#abdda4'],
+          [3, '#fee08b'],
+          [4, '#f46d43'],
+          [5, '#d53e4f'],
         ]
       },
       'fill-opacity': 0.7

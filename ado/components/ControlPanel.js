@@ -4,17 +4,13 @@ import Link from 'next/link'
 
 function ControlPanel(props) {
   const {day} = props;
-
-  console.log("day: ", day);
   const timestamp = format(day, 'X');
-
   const dayFromTimestamp = timestamp / 60 / 60 / 24
 
   return (
     <div className="controlpanel">
       <h3>Interactive GeoJSON</h3>
       <hr />
-
       <div key={'day'} className="input">
         <label>Day: {day}</label>
         <input

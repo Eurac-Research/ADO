@@ -1,3 +1,25 @@
+.light-theme {
+  --primary-color: #007bff;
+  --disabled-color: #6c757d;
+}
+.dark-theme {
+  --primary-color: #000000;
+  --disabled-color: #4a4a4b;
+}
+
+.colors-spi3-scala {
+  --color-1: #3288bd;
+  --color-2: #66c2a5;
+  --color-3: #abdda4;
+  --color-4: #e6f598;
+  --color-5: #ffffbf;
+  --color-6: #fee08b;
+  --color-7: #fdae61;
+  --color-8: #f46d43;
+  --color-9: #d53e4f;
+}
+
+
 html,
 body {
   position: relative;
@@ -22,9 +44,12 @@ body {
   top: auto;
   bottom: 0;
   left: 0;
-  width: 50%;
-  height: 220px;
+  width: 100%;
   padding-bottom: 30px;
+  @media (min-width: 768px) {
+    width: 40%;
+    height: 220px;
+  }
 }
 
 .controlpanel input {
@@ -74,11 +99,12 @@ body {
   text-align: right;
   display: block;
   cursor: pointer;
+  color: red;
 }
 
 .navigation {
   display: flex;
-}
-.navigation a {
-  padding-right: 10px;
+  a {
+    padding: 4px 10px 4px 0;
+  }
 }
