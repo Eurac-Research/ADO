@@ -34,21 +34,49 @@ body {
   box-sizing: border-box;
 }
 
-.eurac-logo {
+.header {
   position: absolute;
   z-index: 1;
   padding: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: #838b938c;
+  background-color: rgba(138, 152, 154, 0.6);
+  align-items: center;
+
   @media (min-width: 768px) {
-    padding: 30px;
+    padding: 20px;
+  }
+  .ado-logo {
+    display: block;
+    height: 62px;
+    margin-right: 30px;
+    path {
+      transition: 500ms all;
+      fill: #838b93;
+      fill: #fff;
+    }
+    &:hover {
+      path {
+        fill: #838b93;
+      }
+    }
+
+  }
+  .eurac-logo {
+    display: block;
+    &:hover {
+      g {
+        fill: #df1b12;
+        fill: #838b93;
+      }
+    }
   }
   g {
     fill: #838b93;
+    fill: #fff;
     transition: 500ms all;
-  }
-  &:hover {
-    g {
-      fill: #df1b12;
-    }
   }
 }
 
