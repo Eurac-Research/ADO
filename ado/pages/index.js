@@ -54,7 +54,7 @@ export default function App() {
     bearing: 0,
     pitch: 0
   });
-  const [day, setDay] = useState('2018-01-01');
+  const [day, setDay] = useState('2017-09-24');
   const [allData, setAllData] = useState(null);
   const [hoverInfo, setHoverInfo] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
