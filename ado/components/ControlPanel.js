@@ -41,6 +41,9 @@ function ControlPanel(props) {
         )}
       </div>
       <div className="navigation">
+        <Link href="/">
+          <a>cdi initial data</a>
+        </Link>
         <Link href="/spi3">
           <a>spi3</a>
         </Link>
