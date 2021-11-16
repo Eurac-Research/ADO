@@ -23,7 +23,8 @@ const MAPBOX_TOKEN = ''; // Set your mapbox token here
 
 
 export default function App() {
-  const datatype = 'CDI'
+
+  const datatype = 'VCI'
   const dataLayer = {
     id: 'data',
     type: 'fill',
@@ -31,15 +32,15 @@ export default function App() {
       'fill-color': {
         property: 'value',
         stops: [
-          [1, '#3288bd'],
-          [2, '#66c2a5'],
-          [3, '#abdda4'],
-          [4, '#e6f598'],
-          [5, '#ffffbf'],
-          [6, '#fee08b'],
-          [7, '#fdae61'],
-          [8, '#f46d43'],
-          [9, '#d53e4f'],
+          [10, '#3288bd'],
+          [20, '#66c2a5'],
+          [30, '#abdda4'],
+          [40, '#e6f598'],
+          [50, '#ffffbf'],
+          [60, '#fee08b'],
+          [70, '#fdae61'],
+          [80, '#f46d43'],
+          [90, '#d53e4f'],
         ]
       },
       'fill-opacity': 0.7
@@ -54,7 +55,7 @@ export default function App() {
     bearing: 0,
     pitch: 0
   });
-  const [day, setDay] = useState('2018-01-01');
+  const [day, setDay] = useState('2017-09-24');
   const [allData, setAllData] = useState(null);
   const [hoverInfo, setHoverInfo] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
@@ -64,7 +65,7 @@ export default function App() {
 
   useEffect(() => {
     fetch(
-      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/CDI-latest.geojson'
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/VCI-latest.geojson'
     )
       .then(resp => resp.json())
       .then(json => setAllData(json));
@@ -93,6 +94,7 @@ export default function App() {
       features
     } = event;
     const hoveredFeature = features && features[0];
+
     setClickInfo(
       hoveredFeature
         ? {
@@ -108,12 +110,18 @@ export default function App() {
     return allData && updatePercentiles(allData, f => f.properties[`${datatype}`][day]);
   }, [allData, day]);
 
+
   async function getNutsData(overlayNutsId) {
+    console.log("id: ", overlayNutsId);
+    const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_${overlayNutsId ? `${overlayNutsId}` : ''}.json`
+    
+    console.log(url);
+    
     const fetchData = async () => {
       setIsError(false);
       setIsLoading(true);
       try {
-        const result = await axios(`/data/overlaydata${overlayNutsId ? `-${overlayNutsId}` : ''}.json`);
+        const result = await axios(url);
         setNutsData(result.data) ;
       } catch (error) {
         setIsError(true);

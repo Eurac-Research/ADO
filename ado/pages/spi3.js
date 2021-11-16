@@ -23,7 +23,7 @@ const MAPBOX_TOKEN = ''; // Set your mapbox token here
 
 
 export default function App() {
-  const datatype = 'CDI'
+  const datatype = 'SPI-3'
   const dataLayer = {
     id: 'data',
     type: 'fill',
@@ -54,7 +54,7 @@ export default function App() {
     bearing: 0,
     pitch: 0
   });
-  const [day, setDay] = useState('2018-01-01');
+  const [day, setDay] = useState('2017-09-24');
   const [allData, setAllData] = useState(null);
   const [hoverInfo, setHoverInfo] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
@@ -64,7 +64,7 @@ export default function App() {
 
   useEffect(() => {
     fetch(
-      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/CDI-latest.geojson'
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/SPI-3-latest.geojson'
     )
       .then(resp => resp.json())
       .then(json => setAllData(json));
@@ -93,6 +93,7 @@ export default function App() {
       features
     } = event;
     const hoveredFeature = features && features[0];
+
     setClickInfo(
       hoveredFeature
         ? {
@@ -107,6 +108,7 @@ export default function App() {
   const data = useMemo(() => {
     return allData && updatePercentiles(allData, f => f.properties[`${datatype}`][day]);
   }, [allData, day]);
+
 
   async function getNutsData(overlayNutsId) {
     const fetchData = async () => {

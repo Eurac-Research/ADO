@@ -23,6 +23,7 @@ const MAPBOX_TOKEN = ''; // Set your mapbox token here
 
 
 export default function App() {
+  const datatype = 'CDI'
 
   const dataLayer = {
     id: 'data',
@@ -50,7 +51,7 @@ export default function App() {
     bearing: 0,
     pitch: 0
   });
-  const [day, setDay] = useState('2018-01-01');
+  const [day, setDay] = useState('2017-09-24');
   const [allData, setAllData] = useState(null);
   const [hoverInfo, setHoverInfo] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
@@ -60,7 +61,7 @@ export default function App() {
 
   useEffect(() => {
     fetch(
-      '/data/CDI_2018_1_ts_NUTS3.geojson'
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/CDI-latest.geojson'
     )
       .then(resp => resp.json())
       .then(json => setAllData(json));
@@ -101,7 +102,7 @@ export default function App() {
   }, []);
 
   const data = useMemo(() => {
-    return allData && updatePercentiles(allData, f => f.properties.SPI3[day]);
+    return allData && updatePercentiles(allData, f => f.properties[`${datatype}`][day]);
   }, [allData, day]);
 
   async function getNutsData(overlayNutsId) {
@@ -144,12 +145,12 @@ export default function App() {
               {day}
               <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
               <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-              <div>SPI3: {hoverInfo.feature.properties.value}</div>
+              <div>CDI: {hoverInfo.feature.properties.value}</div>
             </div>
           )}
         </MapGL>
         
-        <ControlPanel day={day} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
+        <ControlPanel title={datatype} day={day} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
       </div>
 
       {clickInfo && (
@@ -161,7 +162,7 @@ export default function App() {
             )}
             just static data from one region! - 
             {day}, State: {clickInfo.feature.properties.NUTS_NAME}, NUTS_ID: {clickInfo.feature.properties.NUTS_ID}
-            <div>SPI3: {clickInfo.feature.properties.value}</div>
+            <div>CDI: {clickInfo.feature.properties.value}</div>
 
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
