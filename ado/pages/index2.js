@@ -24,7 +24,6 @@ const MAPBOX_TOKEN = ''; // Set your mapbox token here
 
 export default function App() {
   const datatype = 'CDI'
-
   const dataLayer = {
     id: 'data',
     type: 'fill',
@@ -33,10 +32,14 @@ export default function App() {
         property: 'value',
         stops: [
           [1, '#3288bd'],
-          [2, '#abdda4'],
-          [3, '#fee08b'],
-          [4, '#f46d43'],
-          [5, '#d53e4f'],
+          [2, '#66c2a5'],
+          [3, '#abdda4'],
+          [4, '#e6f598'],
+          [5, '#ffffbf'],
+          [6, '#fee08b'],
+          [7, '#fdae61'],
+          [8, '#f46d43'],
+          [9, '#d53e4f'],
         ]
       },
       'fill-opacity': 0.7
@@ -145,7 +148,7 @@ export default function App() {
               {day}
               <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
               <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-              <div>CDI: {hoverInfo.feature.properties.value}</div>
+              <div>SPI3: {hoverInfo.feature.properties.value}</div>
             </div>
           )}
         </MapGL>
@@ -162,7 +165,7 @@ export default function App() {
             )}
             just static data from one region! - 
             {day}, State: {clickInfo.feature.properties.NUTS_NAME}, NUTS_ID: {clickInfo.feature.properties.NUTS_ID}
-            <div>CDI: {clickInfo.feature.properties.value}</div>
+            <div>SPI3: {clickInfo.feature.properties.value}</div>
 
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
