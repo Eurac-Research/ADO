@@ -42,40 +42,40 @@ function ControlPanel(props) {
         )}
       </div>
       <div className="navigation">
-        <Link href="/cdi">
+        <Link prefetch={false} href="/cdi">
           <a>cdi</a>
         </Link>
-        <Link href="/vci">
+        <Link prefetch={false} href="/vci">
           <a>vci</a>
         </Link>
-        <Link href="/vhi">
+        <Link prefetch={false} href="/vhi">
           <a>vhi</a>
         </Link>
-        <Link href="/sma">
+        <Link prefetch={false} href="/sma">
           <a>sma</a>
         </Link>
-        <Link href="/spei-1">
+        <Link prefetch={false} href="/spei-1">
           <a>spei-1</a>
         </Link>
-        <Link href="/spei-3">
+        <Link prefetch={false} href="/spei-3">
           <a>spei-3</a>
         </Link>
-        <Link href="/spei-6">
+        <Link prefetch={false} href="/spei-6">
           <a>spei-6</a>
         </Link>
-        <Link href="/spei-12">
+        <Link prefetch={false} href="/spei-12">
           <a>spei-12</a>
         </Link>
-        <Link href="/spi-1">
+        <Link prefetch={false} href="/spi-1">
           <a>spi-1</a>
         </Link>
-        <Link href="/spi-3">
+        <Link prefetch={false} href="/spi-3">
           <a>spi-3</a>
         </Link>
-        <Link href="/spi-6">
+        <Link prefetch={false} href="/spi-6">
           <a>spi-6</a>
         </Link>
-        <Link href="/spi-12">
+        <Link prefetch={false} href="/spi-12">
           <a>spei-12</a>
         </Link>
       </div>
