@@ -12,7 +12,7 @@ class MyDocument extends Document {
         <Head />
         <body className="light-theme">
           <div className="header">
-            <a href="https://www.eurac.edu/en">
+            <a href="/cdi">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 243.23 66" className="ado-logo">
                 <path fill="#404649" d="M86.73 25.91 82.41 39h3.83l.76-2.5h4.32l.75 2.5h3.84l-4.32-13.09Zm1.07 7.93 1.31-4.32h.1l1.31 4.32Z" data-name="Tracciato 4138"/>
                 <path fill="#404649" d="M106.01 36.14h-5.29V25.91h-3.56V39h8.85Z" data-name="Tracciato 4139"/>
