@@ -4,10 +4,11 @@ import Link from 'next/link'
 
 function ControlPanel(props) {
 
-  const {day} = props;
-  const {title} = props;
+  const {day, title, firstDay, lastDay} = props;
   const timestamp = format(day, 'X');
   const dayFromTimestamp = timestamp / 60 / 60 / 24
+  const firstDayTimestamp = format(firstDay, 'X') / 60 / 60 / 24
+  const lastDayTimestamp = format(lastDay, 'X') / 60 / 60 / 24
 
   return (
     <div className="controlpanel">
@@ -18,12 +19,12 @@ function ControlPanel(props) {
         <input
           type="range"
           value={dayFromTimestamp}
-          min={17434}
-          max={17533}
+          min={firstDayTimestamp}
+          max={lastDayTimestamp}
           step={1}
           onChange={evt => props.onChange(evt.target.value)}
         />
-        {dayFromTimestamp >= 17434 && (
+        {dayFromTimestamp > firstDayTimestamp && (
           <button
             type="submit"
             value={dayFromTimestamp - 1}
@@ -31,7 +32,7 @@ function ControlPanel(props) {
             -1 day (timestamp {dayFromTimestamp - 1})
           </button>
         )}
-        {dayFromTimestamp < 17533 && (
+        {dayFromTimestamp < lastDayTimestamp && (
           <button
             type="submit"
             value={dayFromTimestamp + 1}
@@ -41,17 +42,41 @@ function ControlPanel(props) {
         )}
       </div>
       <div className="navigation">
-        <Link href="/">
-          <a>cdi initial data</a>
-        </Link>
-        <Link href="/spi3">
-          <a>spi3</a>
-        </Link>
         <Link href="/cdi">
           <a>cdi</a>
         </Link>
         <Link href="/vci">
           <a>vci</a>
+        </Link>
+        <Link href="/vhi">
+          <a>vhi</a>
+        </Link>
+        <Link href="/sma">
+          <a>sma</a>
+        </Link>
+        <Link href="/spei-1">
+          <a>spei-1</a>
+        </Link>
+        <Link href="/spei-3">
+          <a>spei-3</a>
+        </Link>
+        <Link href="/spei-6">
+          <a>spei-6</a>
+        </Link>
+        <Link href="/spei-12">
+          <a>spei-12</a>
+        </Link>
+        <Link href="/spi-1">
+          <a>spi-1</a>
+        </Link>
+        <Link href="/spi-3">
+          <a>spi-3</a>
+        </Link>
+        <Link href="/spi-6">
+          <a>spi-6</a>
+        </Link>
+        <Link href="/spi-12">
+          <a>spei-12</a>
         </Link>
       </div>
     </div>
