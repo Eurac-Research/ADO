@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useRouter } from 'next/router'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import MapGL, {Source, Layer } from 'react-map-gl'
 import ControlPanel from '../components/ControlPanel'
@@ -36,36 +35,21 @@ export async function getStaticProps({params}) {
   return { props: { datatype, staticData, staticMetaData } };
 }
 
-
 // This function gets called at build time
 export async function getStaticPaths() {
-  // Call an external API endpoint to get posts
-  // const res = await fetch('https://.../posts')
-  // const posts = await res.json()
-
   const indices = ['cdi','sma','spei-1','spei-12','spei-2','spei-3','spei-6','spi-1', 'spi-12', 'spi-3', 'spi-6', 'vci', 'vhi']
   // Get the paths we want to pre-render based on posts
   const paths = indices.map((index) => ({
     params: { slug: index },
   }))
-
-
-  // console.log("path", paths);
-
-  // We'll pre-render only these paths at build time.
   // { fallback: false } means other routes should 404.
   return { paths, fallback: false }
 }
 
 export default function App( { datatype, staticData, staticMetaData } ) {
 
-  //console.log("staticdata in app: ", staticData);
-  console.log(staticMetaData.colormap);
-
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
-
-  console.log("datalayer: ", dataLayer)
 
   const [viewport, setViewport] = useState({
     latitude: 46,
@@ -166,7 +150,7 @@ export default function App( { datatype, staticData, staticMetaData } ) {
           {...viewport}
           width="100vw"
           height="100vh"
-          mapStyle="mapbox://styles/mapbox/light-v9"
+          mapStyle="mapbox://styles/tiacop/ckw6cfy6i9f0z14pa9stfjqom"
           onViewportChange={setViewport}
           mapboxApiAccessToken={'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'}
           interactiveLayerIds={['data']}

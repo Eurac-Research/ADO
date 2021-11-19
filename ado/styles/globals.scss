@@ -100,8 +100,12 @@ body {
     min-width: 40%;
     max-width: 55%;
   }
-  input {
+  .timerangeSlider {
     width: 100%;
+    margin-bottom: 20px;
+    input {
+      width: 100%;
+    }
   }
   h1 {
     font-size: 28px;
@@ -110,6 +114,24 @@ body {
   h2 {
     font-size: 16px;
     font-weight: 500;
+  }
+  .buttonBox {
+    display: flex;
+    justify-content: space-between;
+    button {
+      font-size: 22px;
+      font-weight: 500;
+      color: #666;
+      border: none;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      &[disabled] {
+        color: #ccc;
+      }  
+    }
   }
 }
 

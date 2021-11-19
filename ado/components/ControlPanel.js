@@ -14,8 +14,7 @@ function ControlPanel(props) {
     <div className="controlpanel">
       <h2>{metadata?.short_name} - {metadata?.long_name}</h2>
       <h1>{day}</h1>
-      <hr />
-      <div key={'day'} className="input">
+      <div key={'day'} className="timerangeSlider">
         <input
           type="range"
           value={dayFromTimestamp}
@@ -24,22 +23,32 @@ function ControlPanel(props) {
           step={1}
           onChange={evt => props.onChange(evt.target.value)}
         />
-        {dayFromTimestamp > firstDayTimestamp && (
-          <button
-            type="submit"
-            value={dayFromTimestamp - 1}
-            onClick={evt => props.onChange(evt.target.value)}>
-            -1 day (timestamp {dayFromTimestamp - 1})
-          </button>
-        )}
-        {dayFromTimestamp < lastDayTimestamp && (
-          <button
-            type="submit"
-            value={dayFromTimestamp + 1}
-            onClick={evt => props.onChange(evt.target.value)}>
-            +1 day (timestamp {dayFromTimestamp + 1})
-          </button>
-        )}
+        <div className="buttonBox">
+          {dayFromTimestamp > firstDayTimestamp 
+            ? (
+                <button
+                  title="prev"
+                  type="submit"
+                  value={dayFromTimestamp - 1}
+                  onClick={evt => props.onChange(evt.target.value)}>
+                  &lt;
+                </button>
+              )
+            : <button disabled={true}>&lt;</button>
+          }
+          {dayFromTimestamp < lastDayTimestamp 
+            ? (
+                <button
+                  title="next"
+                  type="submit"
+                  value={dayFromTimestamp + 1}
+                  onClick={evt => props.onChange(evt.target.value)}>
+                    &gt;
+                </button>
+              )
+            : <button disabled={true}>&gt;</button>
+          }
+        </div>
       </div>
       <div className="navigation">
         <Link prefetch={false} href="/cdi">
