@@ -80,11 +80,16 @@ body {
   }
 }
 
+.reactMap {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
 .controlpanel {
   position: fixed;
   z-index: 11;
-  background: #fff;
-  opacity: 0.9;
+  background: rgba(255,255,255, 0.9);
   padding: 30px;
   top: auto;
   bottom: 0;
@@ -92,19 +97,20 @@ body {
   width: 100%;
   padding-bottom: 30px;
   @media (min-width: 768px) {
-    width: 40%;
-    height: 220px;
+    min-width: 40%;
+    max-width: 55%;
   }
-}
-
-.controlpanel input {
-  width: 100%;
-}
-
-.reactMap {
-  position: relative;
-  top: 0;
-  left: 0;
+  input {
+    width: 100%;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+  h2 {
+    font-size: 16px;
+    font-weight: 500;
+  }
 }
 
 .tooltip {
@@ -150,5 +156,26 @@ body {
   display: flex;
   a {
     padding: 4px 10px 4px 0;
+  }
+}
+
+.legend {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  z-index: 2;
+  min-width: 80px;
+  background-color: rgba(255,255,255, 0.6);
+  padding: 4px;
+  div {
+    border: 1px solid #ccc;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px;
+    text-shadow: rgba(255,255,255, 0.8) 0px 0px 3px;
   }
 }

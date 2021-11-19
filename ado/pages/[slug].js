@@ -27,7 +27,6 @@ const MAPBOX_TOKEN = ''; // Set your mapbox token here
 export async function getStaticProps({params}) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
 
-  //console.log("slug: ", params.slug);
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/${datatype}-latest.geojson`)
   const staticData = await response.json()
 
@@ -61,25 +60,12 @@ export async function getStaticPaths() {
 export default function App( { datatype, staticData, staticMetaData } ) {
 
   //console.log("staticdata in app: ", staticData);
+  console.log(staticMetaData.colormap);
 
+  const paint = staticMetaData ? staticMetaData?.colormap : []
+  const dataLayer = paint
 
-  const dataLayer = {
-    id: 'data',
-    type: 'fill',
-    paint: {
-      'fill-color': {
-        property: 'value',
-        stops: [
-          [1, '#3288bd'],
-          [2, '#abdda4'],
-          [3, '#fee08b'],
-          [4, '#f46d43'],
-          [5, '#d53e4f'],
-        ]
-      },
-      'fill-opacity': 0.7
-    }
-  };
+  console.log("datalayer: ", dataLayer)
 
   const [viewport, setViewport] = useState({
     latitude: 46,
@@ -203,7 +189,14 @@ export default function App( { datatype, staticData, staticMetaData } ) {
           )}
         </MapGL>
         
-        <ControlPanel title={datatype} day={day} firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''} lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
+        <div className="legend">
+            {staticMetaData.colormap.legend.stops.map((item, index) => {
+              return <div key={`legend${index}`} style={{ background:  item['2']}}>{item['1']}</div>
+            })}
+        </div>
+
+
+        <ControlPanel metadata={staticMetaData} day={day} firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''} lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
       </div>
 
       {clickInfo && (

@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 function ControlPanel(props) {
 
-  const {day, title, firstDay, lastDay} = props;
+  const {day, metadata, firstDay, lastDay} = props;
   const timestamp = format(day, 'X');
   const dayFromTimestamp = timestamp / 60 / 60 / 24
   const firstDayTimestamp = format(firstDay, 'X') / 60 / 60 / 24
@@ -12,10 +12,10 @@ function ControlPanel(props) {
 
   return (
     <div className="controlpanel">
-      <h3>{title} prototype</h3>
+      <h2>{metadata?.short_name} - {metadata?.long_name}</h2>
+      <h1>{day}</h1>
       <hr />
       <div key={'day'} className="input">
-        <label>Day: {day}</label>
         <input
           type="range"
           value={dayFromTimestamp}
