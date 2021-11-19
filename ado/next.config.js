@@ -4,4 +4,12 @@ module.exports = {
     locales: ['en', 'de', 'it'],
     defaultLocale: 'en',
   },
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/cdi"
+      }
+    ]
+  }
 }

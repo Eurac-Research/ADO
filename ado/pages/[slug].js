@@ -146,11 +146,11 @@ export default function App( { datatype, staticData, staticMetaData } ) {
   
   const data = useMemo(() => {
     return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
-  }, [staticMetaData, day]);
+  }, [datatype, staticData, day]);
 
   const metadata = useMemo(() => {
     return staticMetaData;
-  });
+  }, [staticMetaData]);
 
   async function getNutsData(overlayNutsId) {
     const fetchData = async () => {
