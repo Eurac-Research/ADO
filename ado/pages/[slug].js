@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import MapGL, {Source, Layer } from 'react-map-gl'
+import MapGL, {Source, Layer, ScaleControl, NavigationControl} from 'react-map-gl'
 import ControlPanel from '../components/ControlPanel'
 import {updatePercentiles} from '../components/utils'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -8,6 +8,7 @@ import axios from 'axios'
 import { format }  from 'date-format-parse'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 
 import {
@@ -50,7 +51,6 @@ export async function getStaticPaths() {
 
 export default function App( { datatype, staticData, staticMetaData, href } ) {
   const router = useRouter()
-
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
 
@@ -63,19 +63,15 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
     pitch: 0
   });
 
-
-  const [metaData, setMetaData] = useState();
+  const [metaData, setMetaData] = useState()
   const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : '2018-08-20');
-  const [allData, setAllData] = useState(null);
-  const [hoverInfo, setHoverInfo] = useState(null);
-  const [clickInfo, setClickInfo] = useState(null);
+  const [allData, setAllData] = useState(null)
+  const [hoverInfo, setHoverInfo] = useState(null)
+  const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
   const [isFetching, setIsFetching] = useState(true)
-
-
 
   const onHover = useCallback(event => {
     const {
@@ -141,19 +137,30 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
     fetchData();
   }
 
-
   if (metadata === undefined) {
     return <>Loading...</>;
   }
 
+  const scaleControlStyle= {
+    right: 10,
+    bottom: 80
+  };
+  const navControlStyle= {
+    right: 10,
+    bottom: 120
+  };
+
   return (
     <>
+      <Head>
+        <title>{staticMetaData?.short_name} - {staticMetaData?.long_name} | Eurac Research</title>
+      </Head>
       <div className="reactMap">
         <MapGL
           {...viewport}
           width="100vw"
           height="100vh"
-          mapStyle="mapbox://styles/mapbox/light-v9"
+          mapStyle="mapbox://styles/mapbox/light-v10"
           onViewportChange={setViewport}
           mapboxApiAccessToken={'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'}
           interactiveLayerIds={['data']}
@@ -163,6 +170,8 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
           <Source type="geojson" data={data}>
             <Layer {...dataLayer} />
           </Source>
+          <NavigationControl style={navControlStyle} />
+          <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} />
           {hoverInfo && (
             <div className="tooltip" style={{left: hoverInfo.x, top: hoverInfo.y}}>
               click to open timeline
@@ -192,7 +201,13 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
           </div>
 
           {console.log(router.query.slug)}
-          <ControlPanel metadata={staticMetaData} day={day} firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''} lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
+          <ControlPanel 
+            metadata={staticMetaData} 
+            day={day} 
+            firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''} 
+            lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''} 
+            onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} 
+          />
           <div className="navigation">
             <p>Indices</p>
             <Link prefetch={false} href="/cdi">
