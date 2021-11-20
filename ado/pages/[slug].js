@@ -226,7 +226,7 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
               <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
             </Link>
             <Link prefetch={false} href="/spi-6">
-              <a className={router.query.slug === 'smaspi-6' ? 'active' : ''}>spi-6</a>
+              <a className={router.query.slug === 'spi-6' ? 'active' : ''}>spi-6</a>
             </Link>
             <Link prefetch={false} href="/spi-12">
               <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
