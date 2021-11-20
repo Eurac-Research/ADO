@@ -6,6 +6,8 @@ import {updatePercentiles} from '../components/utils'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import axios from 'axios'
 import { format }  from 'date-format-parse'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 
 import {
@@ -46,7 +48,8 @@ export async function getStaticPaths() {
   return { paths, fallback: false }
 }
 
-export default function App( { datatype, staticData, staticMetaData } ) {
+export default function App( { datatype, staticData, staticMetaData, href } ) {
+  const router = useRouter()
 
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
@@ -150,7 +153,7 @@ export default function App( { datatype, staticData, staticMetaData } ) {
           {...viewport}
           width="100vw"
           height="100vh"
-          mapStyle="mapbox://styles/tiacop/ckw6cfy6i9f0z14pa9stfjqom"
+          mapStyle="mapbox://styles/mapbox/light-v9"
           onViewportChange={setViewport}
           mapboxApiAccessToken={'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'}
           interactiveLayerIds={['data']}
@@ -173,14 +176,63 @@ export default function App( { datatype, staticData, staticMetaData } ) {
           )}
         </MapGL>
         
-        <div className="legend">
-            {staticMetaData.colormap.legend.stops.map((item, index) => {
-              return <div key={`legend${index}`} style={{ background:  item['2']}}>{item['1']}</div>
-            })}
+        <div className="controlContainer">
+          <div className="legend">
+              {staticMetaData.colormap.legend.stops.map((item, index) => {
+                return (
+                  <div key={`legend${index}`} className="legendItem">
+                    <div
+                      className="legendColor" 
+                      style={{ background:  item['2']}}>
+                    </div>
+                    <p className="legendLabel">{item['1']}</p>
+                  </div>
+                )
+              })}
+          </div>
+
+          {console.log(router.query.slug)}
+          <ControlPanel metadata={staticMetaData} day={day} firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''} lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
+          <div className="navigation">
+            <p>Indices</p>
+            <Link prefetch={false} href="/cdi">
+              <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
+            </Link>
+            <Link prefetch={false} href="/vci">
+              <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
+            </Link>
+            <Link prefetch={false} href="/vhi">
+              <a className={router.query.slug === 'vhi' ? 'active' : ''}>vhi</a>
+            </Link>
+            <Link prefetch={false} href="/sma">
+              <a className={router.query.slug === 'sma' ? 'active' : ''}>sma</a>
+            </Link>
+            <Link prefetch={false} href="/spei-1">
+              <a className={router.query.slug === 'spei-1' ? 'active' : ''}>spei-1</a>
+            </Link>
+            <Link prefetch={false} href="/spei-3">
+              <a className={router.query.slug === 'spei-3' ? 'active' : ''}>spei-3</a>
+            </Link>
+            <Link prefetch={false} href="/spei-6">
+              <a className={router.query.slug === 'spei-6' ? 'active' : ''}>spei-6</a>
+            </Link>
+            <Link prefetch={false} href="/spei-12">
+              <a className={router.query.slug === 'spei-12' ? 'active' : ''}>spei-12</a>
+            </Link>
+            <Link prefetch={false} href="/spi-1">
+              <a className={router.query.slug === 'spi-1' ? 'active' : ''}>spi-1</a>
+            </Link>
+            <Link prefetch={false} href="/spi-3">
+              <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
+            </Link>
+            <Link prefetch={false} href="/spi-6">
+              <a className={router.query.slug === 'smaspi-6' ? 'active' : ''}>spi-6</a>
+            </Link>
+            <Link prefetch={false} href="/spi-12">
+              <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
+            </Link>
+          </div>
         </div>
-
-
-        <ControlPanel metadata={staticMetaData} day={day} firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''} lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''} onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))} />
       </div>
 
       {clickInfo && (
