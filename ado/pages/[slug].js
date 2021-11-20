@@ -150,10 +150,41 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
     bottom: 120
   };
 
+  const yaxis = (datatype === 'VHI' || datatype === 'VCI') ?
+      <YAxis 
+      type="number" 
+      domain={[0, 100]} />
+    : (datatype === 'CDI') ?
+      <YAxis 
+      type="number"
+      domain={[0, 5]} />
+    : (datatype === 'SMA' || 
+        datatype === 'SPEI-1' || 
+        datatype === 'SPEI-2' || 
+        datatype === 'SPEI-3' || 
+        datatype === 'SPEI-6' || 
+        datatype === 'SPEI-12' || 
+        datatype === 'SPI-1' || 
+        datatype === 'SPI-3' || 
+        datatype === 'SPI-6' ||
+        datatype === 'SPI-12') ? 
+      <>
+        <ReferenceLine y={0} label="long term medium" stroke="#aaa" strokeDasharray="4 4" />
+        <YAxis
+        type="number" 
+        domain={[-4, 4]} />
+      </>
+    : <YAxis 
+      type="number" 
+      domain={[dataMin => (Math.round(dataMin) - 3), dataMax => (Math.round(dataMax) + 3)]}
+      allowDecimals={false} />
+
+
+
   return (
     <>
       <Head>
-        <title>{staticMetaData?.short_name} - {staticMetaData?.long_name} | Eurac Research</title>
+        <title>{staticMetaData?.long_name} - Alpine Drought Observatoriy | Eurac Research</title>
       </Head>
       <div className="reactMap">
         <MapGL
@@ -272,7 +303,7 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
               >
                 <CartesianGrid strokeDasharray="1 1" />
                 <XAxis dataKey="date" />
-                <YAxis />
+                {yaxis}
                 <Tooltip />
                 <Legend />
                 <Brush dataKey="date" height={30} stroke="#4e9589" />
