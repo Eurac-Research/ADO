@@ -184,7 +184,7 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
   return (
     <>
       <Head>
-        <title>{staticMetaData?.long_name} - Alpine Drought Observatoriy | Eurac Research</title>
+        <title>{staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research</title>
       </Head>
       <div className="reactMap">
         <MapGL
