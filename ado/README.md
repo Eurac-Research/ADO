@@ -1,34 +1,38 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is the website project repository for the "Alpine Drought Observatory" (https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment/projects/ado). It consists of a map showing diffenrent indices and charts regarding drought.
 
-## Getting Started
+Enjoy on https://ado-eurac.vercel.app
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
+## Stack
+[Next.js](https://nextjs.org/) frontend with a [Mapbox](https://mapbox.com/) map and [Recharts](https://recharts.org/) charts. The project fetches data (geojson, json, md) from https://github.com/Eurac-Research/ado-data. "Hosted" on [Vercel](https://vercel.com).
+
+
+## Workflow / Dataflow 
+
+1. Data is pushed to https://github.com/Eurac-Research/ado-data on a daily basis (geojson, json)
+2. In the "ado-data" repo a "Github Action" triggers a deploy to [Vercel](https://vercel.com) on every push. 
+3. The frontend is build and instantly published with the new geojson data. Until the next build the data (more precise the map-data) stays the same. The map-data is part of the frontend due to nextjs [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation). Note: the overlay chart data (json with historical data for every region) is fetched directly from the github repo "ado-data".
+
+## FAQ
+
+### How to add a new index?
+
+1. Add the new data to the ado-data repo (one geojson file for the new index). Update the "timeseries" json files to reflect the new index
+2. In the frontend code update the [getStaticPath](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation) section to allow the new index to be processed as "slug". **Note** this could be made dynamic in case by adding the inices list to the ado-data repo and fetch it from there instead of this static list.
+
+
+```js
+export async function getStaticPaths() {
+  const indices = ['cdi','sma','spei-1','spei-12','spei-2','spei-3','spei-6','spi-1', 'spi-12', 'spi-3', 'spi-6', 'vci', 'vhi']
+  // Get the paths we want to pre-render based on posts
+  const paths = indices.map((index) => ({
+    params: { slug: index },
+  }))
+  // { fallback: false } means other routes should 404.
+  return { paths, fallback: false }
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Add the new index to the navigation bar (the slug is the equivalent to the geojson file - it's a simple name-convention)
+4. Update the ```const yaxis``` to refelct the right yaxis domain range for the data (used for the charts).
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

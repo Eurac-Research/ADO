@@ -55,13 +55,11 @@ export default function App( { datatype, staticData, staticMetaData, href } ) {
   });
   const [metaData, setMetaData] = useState()
   const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : '2018-08-20');
-  const [allData, setAllData] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
 
   const onHover = useCallback(event => {
     const {
