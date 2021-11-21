@@ -50,21 +50,28 @@ table {
 
 
 :root {
+  --bg-9-dark: rgba(0,0,0, 0.9);
   --bg-light: rgba(255,255,255, 0.6);
   --bg-6-light: rgba(255,255,255, 0.6);
   --bg-8-light: rgba(255,255,255, 0.8);
   --bg-10-light: rgba(255,255,255, 1);
   --text-light: #666;
   --text-strong-light: #222;
+  --text-dark: #fff;
 }
 
-.light-theme {
-  --primary-color: #007bff;
-  --disabled-color: #6c757d;
-}
-.dark-theme {
-  --primary-color: #000000;
-  --disabled-color: #4a4a4b;
+
+:root {
+  .dark {
+    --bg-9-dark: rgba(255,255,255, 0.9);
+    --bg-light: rgba(0,0,0, 0.6);
+    --bg-6-light: rgba(0,0,0, 0.6);
+    --bg-8-light: rgba(2, 2, 2, 0.7);
+    --bg-10-light: rgba(10, 10, 10, 1);
+    --text-light: #ccc;
+    --text-strong-light: #eee;
+    --text-dark: #111; 
+  }
 }
 
 .colors-spi3-scala {
@@ -78,7 +85,6 @@ table {
   --color-8: #f46d43;
   --color-9: #d53e4f;
 }
-
 
 html,
 body {
@@ -110,11 +116,10 @@ body {
   .ado-logo {
     display: block;
     height: 36px;
-    margin-right: 30px;
     @media (min-width: 768px) {
       height: 62px;
     }
-      path {
+    path {
       transition: 500ms all;
       fill: #666;
     }
@@ -123,10 +128,13 @@ body {
         fill: #111;
       }
     }
-
   }
   .eurac-logo {
     display: block;
+    g {
+      fill: #666;
+      transition: 500ms all;
+    }
     &:hover {
       g {
         fill: #111;
@@ -139,10 +147,6 @@ body {
       }
     }
   }
-  g {
-    fill: #666;
-    transition: 500ms all;
-  }
 }
 
 .reactMap {
@@ -151,13 +155,12 @@ body {
   left: 0;
 }
 
-
 .tooltip {
   position: absolute;
   margin: 8px;
   padding: 4px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  background: var(--bg-9-dark);
+  color: var(--text-dark);
   max-width: 300px;
   font-size: 10px;
   z-index: 9;
@@ -178,11 +181,16 @@ body {
 }
 
 .dataOverlay {
-  background: #fff;
+  background: var(--bg-10-light);
+  color: var(--text-strong-light);
   width: 80vw;
   height: 65vh;
   padding: 30px;
   padding-bottom: 80px;
+
+  .recharts-tooltip-label {
+    color: #222;
+  }
 }
 
 .closeOverlay {
@@ -231,6 +239,7 @@ body {
         border: 1px solid #999;
       }
       .legendLabel {
+        color: var(--text-strong-light);
         font-size: 12px;
         font-weight: 400;
       }
@@ -249,7 +258,7 @@ body {
       padding: 20px;
     }
     h1 {
-      color: #111;
+      color: var(--text-strong-light);
       font-size: 18px;
       font-weight: 500;
       margin-bottom: 14px;
@@ -260,7 +269,7 @@ body {
     
     }
     h2 {
-      color: #111;
+      color: var(--text-strong-light);
       font-size: 14px;
       line-height: 1.3;
       font-weight: 500;
@@ -349,3 +358,44 @@ body {
 
   }
 }
+
+.darkModeToggle {
+  position: absolute;
+  bottom: 260px;
+  right: 10px;
+  background-color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+  padding: 6px;
+  cursor: pointer;
+}
+
+
+
+/* darkmode */
+
+.dark {
+  .ado-logo {
+      path {
+      fill: #ccc;
+    }
+    &:hover {
+      path {
+        fill: #fff;
+      }
+    }
+  }
+  .eurac-logo {
+    g {
+      fill: #ccc;
+    }
+    &:hover {
+      g {
+        fill: #fff;
+      }
+    }
+  }
+}
+
+
