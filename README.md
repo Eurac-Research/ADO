@@ -8,7 +8,7 @@ Enjoy on https://ado-eurac.vercel.app
 
 
 ## Branching
-We use the DEV and featurebranches and pull requests to master. Master is never changed directly.
+We use the "dev" (https://github.com/Eurac-Research/ADO/tree/dev) and featurebranches and pull requests to the "main" branch (https://github.com/Eurac-Research/ADO/tree/main). "Main" is never changed directly.
 
 
 ## Workflow / Dataflow 
