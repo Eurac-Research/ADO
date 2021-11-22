@@ -7,6 +7,10 @@ Enjoy on https://ado-eurac.vercel.app
 [Next.js](https://nextjs.org/) frontend with a [Mapbox](https://mapbox.com/) map and [Recharts](https://recharts.org/) charts. The project fetches data (geojson, json, md) from https://github.com/Eurac-Research/ado-data. "Hosted" on [Vercel](https://vercel.com).
 
 
+## Branching
+We use the DEV and featurebranches and pull requests to master. Master is never changed directly.
+
+
 ## Workflow / Dataflow 
 
 1. Data is pushed to https://github.com/Eurac-Research/ado-data on a daily basis (geojson, json)
