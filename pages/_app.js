@@ -1,5 +1,7 @@
 import '../styles/globals.scss'
-import * as gtag from '@/lib/gtag'
+import { useEffect } from 'react'
+import Router from 'next/router'
+import * as gtag from '../lib/gtag'
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
