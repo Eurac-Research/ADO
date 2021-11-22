@@ -32,8 +32,11 @@ class MyDocument extends Document {
           />
         </Head>
         <body className="light-theme">
+
           <Main />
           <NextScript />
+
+
         </body>
       </Html>
     )
