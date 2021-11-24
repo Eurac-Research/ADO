@@ -200,7 +200,23 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
     }
     return dataMax / (dataMax - dataMin);
   };
-  const off = nutsData ? gradientOffset() : false;
+  const off = nutsData ? gradientOffset() : 0;
+
+  function CustomTooltip({ payload, label, active }) {
+    if (active && payload && payload.length) {
+      const valueStyle = {
+        color: payload[0].value > 0 ? `#000` : `#d73232`
+      }
+      return (
+        <div className="custom-tooltip">
+          <p className="label">{`${label}`}</p>
+          <p>{payload[0].name}: <span style={valueStyle}>{payload[0].value}</span></p>
+        </div >
+      );
+    }
+
+    return null;
+  }
 
 
   return (
@@ -414,7 +430,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
                   <CartesianGrid strokeDasharray="1 1" />
                   <XAxis dataKey="date" />
                   {yaxis}
-                  <Tooltip />
+                  <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   <Brush dataKey="date" height={30} stroke="#4e9589" />
                   <defs>
