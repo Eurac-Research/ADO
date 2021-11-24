@@ -58,6 +58,7 @@ table {
   --text-light: #666;
   --text-strong-light: #222;
   --text-dark: #fff;
+  --tooltipBg: #fff;
 }
 
 
@@ -71,6 +72,7 @@ table {
     --text-light: #ccc;
     --text-strong-light: #eee;
     --text-dark: #111; 
+    --tooltipBg: #fff;
   }
 }
 
@@ -438,8 +440,13 @@ body {
         opacity: 1;
       }
     }
-  }
-  
-  
+  }  
+}
+
+.custom-tooltip {
+  border: 1px solid #ccc;
+  background-color: var(--tooltipBg);
+  color: #222;
+  padding: 6px;
 }
 
