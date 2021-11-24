@@ -95,6 +95,8 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
     );
     const nutsId = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
     getNutsData(nutsId)
+
+
   }, []);
   const onClose = useCallback(async (event) => {
     setClickInfo()
@@ -179,6 +181,27 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   if (metadata === undefined) {
     return <>Loading...</>;
   }
+
+
+
+
+  const gradientOffset = () => {
+    if (!nutsData) {
+      return false
+    }
+    const dataMax = Math.max(...nutsData.map((i) => i[`${datatype}`]));
+    const dataMin = Math.min(...nutsData.map((i) => i[`${datatype}`]));
+
+    if (dataMax <= 0) {
+      return 0;
+    }
+    if (dataMin >= 0) {
+      return 1;
+    }
+    return dataMax / (dataMax - dataMin);
+  };
+  const off = nutsData ? gradientOffset() : false;
+
 
   return (
     <Layout>
@@ -372,11 +395,11 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
           <div className="overlayContainer">
             <div className="dataOverlay">
               <span className="closeOverlay" onClick={onClose}>close X</span>
-              <h3>{datatype} - {clickInfo.feature.properties.NUTS_NAME}</h3>
+              <h3>{datatype} - {staticMetaData?.long_name}</h3>
               {isError && (
                 <p>file https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_{clickInfo.feature.properties.NUTS_ID}.json - errors in file</p>
               )}
-              <p>NUTS_ID: {clickInfo.feature.properties.NUTS_ID}</p>
+              <p>{clickInfo.feature.properties.NUTS_NAME} (nuts id: {clickInfo.feature.properties.NUTS_ID})</p>
 
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
@@ -394,7 +417,20 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
                   <Tooltip />
                   <Legend />
                   <Brush dataKey="date" height={30} stroke="#4e9589" />
-                  <Line type="monotone" dataKey={datatype} strokeWidth="3" dot={false} stroke="#4e9589" />
+                  <defs>
+                    <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset={off} stopColor="#4e9589" stopOpacity={1} />
+                      <stop offset={off} stopColor="#d73232" stopOpacity={1} /> {/* negative values */}
+                    </linearGradient>
+                  </defs>
+                  <Line
+                    type="monotone"
+                    dataKey={datatype}
+                    strokeWidth="3"
+                    stroke="url(#splitColor)"
+                    dot={false}
+                    activeDot={{ fill: '#fff', stroke: '#666', strokeWidth: 2, r: 4 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>

@@ -187,8 +187,12 @@ body {
   height: 65vh;
   padding: 30px;
   padding-bottom: 80px;
+  line-height: 1.5;
 
   .recharts-tooltip-label {
+    color: #222;
+  }
+  .recharts-tooltip-item {
     color: #222;
   }
 }
