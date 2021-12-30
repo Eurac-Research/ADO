@@ -65,6 +65,9 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
+
+
+
   const onHover = useCallback(event => {
     const {
       features,
@@ -218,7 +221,6 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
     return null;
   }
 
-
   return (
     <Layout>
       <Head>
@@ -312,7 +314,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             onClick={onClick}
           >
             <Source type="geojson" data={data}>
-              <Layer {...dataLayer} />
+              <Layer {...dataLayer} beforeId="waterway-label" />
             </Source>
             <NavigationControl style={navControlStyle} />
             <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} />
