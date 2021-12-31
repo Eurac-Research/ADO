@@ -37,7 +37,7 @@ export async function getStaticProps({ params }) {
 // This function gets called at build time
 export async function getStaticPaths() {
   const indices = ['cdi', 'sma', 'spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'vci', 'vhi']
-  // Get the paths we want to pre-render based on posts
+  // Get the paths we want to pre-render based on index
   const paths = indices.map((index) => ({
     params: { slug: index },
   }))
@@ -207,15 +207,17 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
 
   function CustomTooltip({ payload, label, active }) {
     if (active && payload && payload.length) {
-      const valueStyle = {
-        color: payload[0].value > 0 ? `#000` : `#d73232`
-      }
       return (
         <div className="custom-tooltip">
           <p className="label">{`${label}`}</p>
-          <p>{payload[0].name}: <span style={valueStyle}>{payload[0].value}</span></p>
+          {payload?.map((item, i) => {
+            return (
+              <p key={`${i}-${item.value}-${item.name}`}>{item.name}: <span style={{ color: item.value > 0 ? `#000` : `#d73232` }}>{item.value}</span></p>
+            )
+          })
+          }
         </div >
-      );
+      )
     }
 
     return null;
@@ -418,6 +420,9 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
                 <p>file https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_{clickInfo.feature.properties.NUTS_ID}.json - errors in file</p>
               )}
               <p>{clickInfo.feature.properties.NUTS_NAME} (nuts id: {clickInfo.feature.properties.NUTS_ID})</p>
+              {console.log("staticmetadata: ", staticMetaData)}
+              {console.log("clickinfo: ", clickInfo.feature)}
+              {console.log("nutsdata: ", nutsData)}
 
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
@@ -440,6 +445,10 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
                       <stop offset={off} stopColor="#4e9589" stopOpacity={1} />
                       <stop offset={off} stopColor="#d73232" stopOpacity={1} /> {/* negative values */}
                     </linearGradient>
+                    <linearGradient id="splitColorSecundary" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset={off} stopColor="#aaa" stopOpacity={0.4} />
+                      <stop offset={off} stopColor="#d73232" stopOpacity={0.2} /> {/* negative values */}
+                    </linearGradient>
                   </defs>
                   <Line
                     type="monotone"
@@ -449,6 +458,28 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
                     dot={false}
                     activeDot={{ fill: '#fff', stroke: '#666', strokeWidth: 2, r: 4 }}
                   />
+                  {/* TODO - show all SPI or all SPEI values combined. let the legend be interactive - https://github.com/recharts/recharts/issues/2557? or provide a custom solution with checkboxes? */}
+                  {/^SPEI/.test(datatype) && (
+                    <>
+                      <Line
+                        type="monotone"
+                        dataKey={`SPEI-1`}
+                        strokeWidth="2"
+                        stroke="url(#splitColorSecundary)"
+                        dot={false}
+                        activeDot={{ fill: '#fff', stroke: '#666', strokeWidth: 2, r: 4 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={`SPEI-6`}
+                        strokeWidth="2"
+                        stroke="url(#splitColorSecundary)"
+                        dot={false}
+                        activeDot={{ fill: '#fff', stroke: '#666', strokeWidth: 2, r: 4 }}
+                      />
+                    </>
+                  )}
+
                 </LineChart>
               </ResponsiveContainer>
             </div>
