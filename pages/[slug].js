@@ -306,7 +306,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             {...viewport}
             width="100vw"
             height="100vh"
-            mapStyle={theme === 'dark' ? 'mapbox://styles/mapbox/dark-v10' : 'mapbox://styles/mapbox/light-v10'}
+            mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             onViewportChange={setViewport}
             mapboxApiAccessToken={'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'}
             interactiveLayerIds={['data']}
@@ -314,7 +314,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             onClick={onClick}
           >
             <Source type="geojson" data={data}>
-              <Layer {...dataLayer} beforeId="waterway-label" />
+              <Layer {...dataLayer} beforeId="waterway-shadow" />
             </Source>
             <NavigationControl style={navControlStyle} />
             <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} />
