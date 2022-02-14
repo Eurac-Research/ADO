@@ -3,7 +3,7 @@ import { format } from 'date-format-parse'
 import { useState, useCallback } from 'react'
 
 
-function ControlPanel(props) {
+function ControlPanelImpact(props) {
 
   const { day, metadata, firstDay, lastDay } = props;
   const timestamp = format(day, 'X');
@@ -39,14 +39,19 @@ function ControlPanel(props) {
           )
           : <button disabled={true}>&lt;</button>
         }
+
         <input
           type="range"
+          list="tickmarks"
           value={dayFromTimestamp}
           min={firstDayTimestamp}
           max={lastDayTimestamp}
           step={1}
           onChange={evt => props.onChange(evt.target.value)}
         />
+        <datalist id="tickmarks">
+          {rows}
+        </datalist>
 
         {dayFromTimestamp < lastDayTimestamp
           ? (
@@ -75,4 +80,4 @@ function ControlPanel(props) {
   );
 }
 
-export default React.memo(ControlPanel);
+export default React.memo(ControlPanelImpact);

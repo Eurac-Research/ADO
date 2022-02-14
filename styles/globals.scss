@@ -177,19 +177,35 @@ body {
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   background-color:rgba(0, 0, 0, 0.4);
   z-index: 100000;
+  overflow: auto;
+
+  @media (min-width: 768px) {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .overlayTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
 }
 
 .dataOverlay {
   background: var(--bg-10-light);
   color: var(--text-strong-light);
-  width: 80vw;
-  height: 65vh;
+  width: 90vw;
+  height: 90vh;
   padding: 30px;
   padding-bottom: 80px;
   line-height: 1.5;
+
+  @media (min-width: 768px) {
+    height: 65vh;
+  }
 
   .recharts-tooltip-label {
     color: #222;
@@ -198,6 +214,17 @@ body {
     color: #222;
   }
 }
+
+.textOverlay {
+  background: var(--bg-10-light);
+  color: var(--text-strong-light);
+  width: 80vw;
+  height: auto;
+  padding: 30px;
+  padding-bottom: 80px;
+  line-height: 1.5;
+}
+
 
 .closeOverlay {
   text-align: right;
@@ -311,7 +338,27 @@ body {
         }  
       }
     }
-  }  
+    .getMoreInfoIcon {
+      display: inline-block;
+      background:rgba(255, 255, 255, 0.8);
+      padding: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 300ms ease-in-out;
+      border: 1px solid rgba(0, 0, 0, 0.2); 
+      cursor: pointer;
+      margin-left: 10px;
+      &:hover {
+        background:rgba(0, 0, 0, 0.8);
+        color: #fff;
+      }
+    }
+
+  }
 }
 
 .navigation {
@@ -450,3 +497,108 @@ body {
   padding: 6px;
 }
 
+
+.sideBar {
+  position: fixed;
+  top: 30%;
+  right: 0;
+  z-index: 3;
+  transform: translateY(-30%);
+
+  .sideBarItem {
+    width: auto;
+    height: auto;
+    text-align: right;
+    margin-bottom: 10px;
+
+    a {
+      display: inline-block;
+      height: 100%;
+      width: auto;
+      padding: 10px 15px 10px 10px;
+      background-color: var(--bg-8-light);
+      color: var(--text-strong-light);
+      text-decoration: none;
+      transition: all 100ms ease-in-out;
+      &:hover {
+        font-weight: bold;
+      }
+    }
+
+    &.active {
+      font-weight: bold;
+      font-size: 20px;
+    }
+  }
+}
+
+
+.impactsWrapper {
+  position: fixed;
+  top: 50px;
+  left: 20px;
+  width: 360px;
+  background-color: #fff;
+  height: 90vh;
+  overflow: auto;
+  padding: 10px 20px 10px 20px;
+  z-index: 3;
+
+  .impactsItem {
+    margin-bottom: 30px;
+    p {
+      font-size: 14px;
+      line-height: 1.2;
+    }
+  }
+}
+
+.impactsYearRange {
+  position: absolute;
+  bottom: 50px;
+  left: 400px;
+  display: flex;
+  height: 50px;
+}
+
+.selectYear {
+  position: relative;
+  width: 20px;
+  text-align: left;
+  font-size: 14px;
+  padding: 0;
+  padding-left: 10px;
+  cursor: pointer;
+  transform: rotate(-60deg);
+  transition: all 100ms ease-in-out;
+  &:after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 0;
+    background-color: #111;
+    border-radius: 50%;
+    width: 6px;
+    height: 6px;
+  }
+
+  &.active {
+    font-size: 18px;
+    font-weight: bold;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: -4px;
+      background-color: #111;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+    }
+    }
+
+  &:hover {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
