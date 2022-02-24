@@ -322,16 +322,6 @@ body {
       input {
         flex-shrink: 0;
         width: 80%;
-
-        &:-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 25px;
-          height: 25px;
-          border-radius: 50%; 
-          background: #04AA6D;
-          cursor: pointer;
-        }
       }
       button {
         font-size: 22px;
