@@ -29,7 +29,7 @@ import {
 
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
-  const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/${datatype}-latest.geojson`)
+  const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`)
   const staticData = await response.json()
   const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/metadata/${datatype}.json`)
   const staticMetaData = await responseMeta.json()
@@ -131,7 +131,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
       setIsError(false);
       setIsLoading(true);
       try {
-        const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_${overlayNutsId ? `${overlayNutsId}` : ''}.json`
+        const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/timeseries/NUTS3_${overlayNutsId ? `${overlayNutsId}` : ''}.json`
         const result = await axios(url);
         setNutsData(result.data);
       } catch (error) {
@@ -143,8 +143,6 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   }
 
   const scaleControlStyle = {
-    right: 10,
-    bottom: 80
   };
   const navControlStyle = {
     right: 10,
@@ -241,8 +239,8 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             <Source type="geojson" data={data}>
               <Layer {...dataLayer} />
             </Source>
-            <NavigationControl style={navControlStyle} />
-            <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} />
+            <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
+            <NavigationControl style={navControlStyle} position={"bottom-right"} />
             {hoverInfo && (
               <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
                 click to open timeline
