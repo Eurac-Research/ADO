@@ -39,14 +39,19 @@ function ControlPanel(props) {
           )
           : <button disabled={true}>&lt;</button>
         }
+
         <input
           type="range"
+          list="tickmarks"
           value={dayFromTimestamp}
           min={firstDayTimestamp}
           max={lastDayTimestamp}
           step={1}
           onChange={evt => props.onChange(evt.target.value)}
         />
+        <datalist id="tickmarks">
+          {rows}
+        </datalist>
 
         {dayFromTimestamp < lastDayTimestamp
           ? (
