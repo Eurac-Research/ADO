@@ -64,14 +64,7 @@ export default function App({ impactData }) {
     }
   }
 
-  const [viewport, setViewport] = useState({
-    latitude: 46,
-    longitude: 9,
-    minZoom: 5,
-    zoom: 5,
-    bearing: 0,
-    pitch: 0
-  });
+
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
@@ -104,7 +97,14 @@ export default function App({ impactData }) {
 
         <div className="reactMap">
           <Map
-            {...viewport}
+            initialViewState={{
+              latitude: 46,
+              longitude: 9,
+              minZoom: 5,
+              zoom: 5,
+              bearing: 0,
+              pitch: 0
+            }}
             style={{ width: "100vw", height: "100vh" }}
             mapStyle={'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}

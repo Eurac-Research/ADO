@@ -51,14 +51,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const router = useRouter()
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
-  const [viewport, setViewport] = useState({
-    latitude: 46,
-    longitude: 9,
-    minZoom: 5,
-    zoom: 5,
-    bearing: 0,
-    pitch: 0
-  });
+
   const [metaData, setMetaData] = useState()
   const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : '2018-08-20');
   const [hoverInfo, setHoverInfo] = useState(null)
@@ -228,7 +221,14 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
 
         <div className="reactMap">
           <Map
-            {...viewport}
+            initialViewState={{
+              latitude: 46,
+              longitude: 9,
+              minZoom: 5,
+              zoom: 5,
+              bearing: 0,
+              pitch: 0
+            }}
             style={{ width: "100vw", height: "100vh" }}
             mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}
