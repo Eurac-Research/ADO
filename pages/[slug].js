@@ -60,21 +60,20 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
+
   const onHover = useCallback(event => {
     const {
       features,
-      srcEvent: { offsetX, offsetY }
+      point: { x, y }
     } = event;
     const hoveredFeature = features && features[0];
-    setHoverInfo(
-      hoveredFeature
-        ? {
-          feature: hoveredFeature,
-          x: offsetX,
-          y: offsetY
-        }
-        : null
-    );
+
+    // prettier-ignore
+    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+  }, []);
+
+  const onOut = useCallback(event => {
+    setHoverInfo(null)
   }, []);
 
   const onClick = useCallback(async (event) => {
@@ -233,7 +232,8 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}
             interactiveLayerIds={['data']}
-            onHover={onHover}
+            onMouseMove={onHover}
+            onMouseLeave={onOut}
             onClick={onClick}
           >
             <Source type="geojson" data={data}>

@@ -546,11 +546,11 @@ body {
 
 .impactsWrapper {
   position: fixed;
-  top: 50px;
+  top: 120px;
   left: 20px;
   width: 360px;
   background-color: #fff;
-  height: 90vh;
+  height: calc(100% - 260px);
   overflow: auto;
   padding: 10px 20px 10px 20px;
   z-index: 3;
@@ -566,10 +566,14 @@ body {
 
 .impactsYearRange {
   position: absolute;
-  bottom: 50px;
-  left: 400px;
+  bottom: 20px;
+  left: 40px;
   display: flex;
-  height: 50px;
+  align-items: flex-end;
+  height: 100px;
+  width: calc(100% - 130px);
+  overflow: auto;
+  padding-bottom: 20px;
 }
 
 .selectYear {
@@ -612,4 +616,8 @@ body {
     font-size: 18px;
     font-weight: bold;
   }
+}
+
+b {
+  font-weight: bold;
 }

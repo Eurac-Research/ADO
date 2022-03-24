@@ -36,54 +36,141 @@ export async function getStaticProps({ params }) {
 
 export default function App({ impactData }) {
   const router = useRouter()
-  const [year, setYear] = useState("");
-
-  const uniqueYears = [...new Set(impactData.map(item => item.Year_start))];
-
-  console.log("year: ", year);
 
   const dataLayer = {
-    id: 'data',
     type: 'fill',
+    id: 'data',
     paint: {
-      'fill-color': {
-        property: 'percentile',
-        stops: [
-          [0, '#3288bd'],
-          [1, '#66c2a5'],
-          [2, '#abdda4'],
-          [3, '#e6f598'],
-          [4, '#ffffbf'],
-          [5, '#fee08b'],
-          [6, '#fdae61'],
-          [7, '#f46d43'],
-          [8, '#d53e4f']
-        ]
-      },
-      'fill-opacity': 0.8
+      'fill-color': "#fee08b",
+      'fill-opacity': 0.6,
+      'fill-outline-color': "#666"
     }
   }
 
 
+  /* 
+    const geojson = {
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', geometry: { type: 'Point', coordinates: [11.3548, 46.4983] } }
+      ]
+    };
+  
+    const layerStyle = {
+      id: 'point',
+      type: 'circle',
+      paint: {
+        'circle-radius': 10,
+        'circle-color': '#000000'
+      }
+    };
+   */
+  const scaleControlStyle = {
+  };
+  const navControlStyle = {
+    right: 10,
+    bottom: 120
+  };
+
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
+  const [nutsMap, setNutsMap] = useState(null);
+  const [hoverInfo, setHoverInfo] = useState(null)
+  const [nutsData, setNutsData] = useState(null)
+  const [clickInfo, setClickInfo] = useState(null)
+
+  const [nutsid, setNutsid] = useState(null)
+  const [nutsName, setNutsName] = useState(null)
+  const [year, setYear] = useState("");
+  const uniqueYears = [...new Set(impactData.map(item => item.Year_start))];
+
 
 
   const NewComponent = () => (
-
     <div className='impactsWrapper'>
-      {impactData && impactData
+      {year && (
+        <h1 style={{ fontSize: "30px", marginBottom: "20px", marginTop: "10px" }}> {year}</h1>
+      )}
+      {(year && impactData) && impactData
         .filter(item => item.Year_start === parseInt(year))
         .map((item, index) => (
           <div key={item.ID} className="impactsItem">
-            <p>{item?.Year_start}</p>
-            <p>{item?.Impact_category}</p>
-            <p>{item?.Impact_description}</p>
+            <p><b>impact category:</b><br /> {item?.Impact_category}</p>
+            <p><b>description:</b><br /> {item?.Impact_description}</p>
+            <p><b>nuts:</b><br /> {item?.NUTS1_ID} / {item?.NUTS2_ID} / {item?.NUTS3_ID}</p>
+            <p><b>year:</b><br /> {item?.Year_start}</p>
+          </div>
+        ))
+      }
+
+      {(nutsName && nutsid) && (
+        <>
+          <h1 style={{ fontSize: "30px", marginBottom: "10px", marginTop: "10px" }}>{nutsName}</h1>
+          <h2 style={{ fontSize: "18px", marginBottom: "30px", marginTop: "10px" }}>{nutsid}</h2>
+        </>
+      )}
+      {(nutsid && impactData) && impactData
+        .filter(item => item.NUTS3_ID === nutsid)
+        .reverse()
+        .map((item, index) => (
+          <div key={item.ID} className="impactsItem">
+            <p><b>impact category:</b><br /> {item?.Impact_category}</p>
+            <p><b>description:</b><br /> {item?.Impact_description}</p>
+            <p><b>nuts:</b><br /> {item?.NUTS1_ID} / {item?.NUTS2_ID} / {item?.NUTS3_ID}</p>
+            <p><b>year:</b><br /> {item?.Year_start}</p>
           </div>
         ))
       }
     </div>
   )
+
+  const onClick = useCallback(async (event) => {
+    const {
+      features
+    } = event;
+    const hoveredFeature = features && features[0];
+    const clickedNutsid = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
+    const clickedNutsName = hoveredFeature ? hoveredFeature?.properties?.NUTS_NAME : null
+    setYear("")
+    setNutsName(clickedNutsName)
+    setNutsid(clickedNutsid)
+  }, []);
+
+
+
+  useEffect(() => {
+    /* global fetch */
+    fetch('https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts3_simple_4326.geojson')
+      .then(resp => resp.json())
+      .then(json => {
+        // Note: In a real application you would do a validation of JSON data before doing anything with it,
+        // but for demonstration purposes we ingore this part here and just trying to select needed data...
+        const features = json;
+        setNutsMap(features)
+      })
+      .catch(err => console.error('Could not load data', err)); // eslint-disable-line
+  }, []);
+
+  /*   const data = useMemo(() => {
+      return allDays ? earthquakes : filterFeaturesByDay(earthquakes, selectedTime);
+    }, [earthquakes, allDays, selectedTime]);
+  
+   */
+
+  const onHover = useCallback(event => {
+    const {
+      features,
+      point: { x, y }
+    } = event;
+    const hoveredFeature = features && features[0];
+
+    // prettier-ignore
+    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+  }, []);
+
+  const onOut = useCallback(event => {
+    setHoverInfo(null)
+  }, []);
 
 
   return (
@@ -100,30 +187,60 @@ export default function App({ impactData }) {
             initialViewState={{
               latitude: 46,
               longitude: 9,
+              bearing: 0,
+              pitch: 0,
               minZoom: 5,
               zoom: 5,
-              bearing: 0,
-              pitch: 0
             }}
             style={{ width: "100vw", height: "100vh" }}
             mapStyle={'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}
+            interactiveLayerIds={['data']}
+            onMouseMove={onHover}
+            onMouseLeave={onOut}
+            onClick={onClick}
           >
+
+            {nutsMap && (
+              <>
+                <Source id="geojson" type="geojson" data={nutsMap}>
+                  <Layer {...dataLayer} />
+                </Source>
+                {/*                 <Source id="my-data" type="geojson" data={geojson}>
+                  <Layer {...layerStyle} />
+                </Source>
+ */}              </>
+            )}
+            <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
+            <NavigationControl style={navControlStyle} position={"bottom-right"} />
+            {hoverInfo && (
+              <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
+                click to open impact
+                <br />
+                <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
+                <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
+              </div>
+            )}
           </Map>
         </div>
 
         <div className="impactsYearRange">
           {uniqueYears && uniqueYears.map((yearitem) => (
-            <div className={`selectYear${yearitem === year ? ` active` : ``}`} key={`year-${yearitem}`} onClick={() => setYear(yearitem)}>
+            <div className={`selectYear${yearitem === year ? ` active` : ``}`} key={`year-${yearitem}`} onClick={() => setYear(yearitem) + setNutsid(null)}>
               {yearitem}
             </div>
           ))
           }
         </div>
 
-        <NewComponent />
+        {year && (
+          <NewComponent />
+        )}
+        {nutsid && (
+          <NewComponent />
+        )}
 
       </div>
-    </Layout>
+    </Layout >
   );
 }
