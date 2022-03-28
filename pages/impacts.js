@@ -11,6 +11,9 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from "../components/layout"
 import Header from "../components/Header"
+import uniqolor from 'uniqolor'
+const { Color, ColorImmutable } = require('frostcolor')
+
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'
 
@@ -26,6 +29,7 @@ import {
   ReferenceLine,
   ResponsiveContainer
 } from 'recharts'
+import { match } from 'assert'
 
 export async function getStaticProps({ params }) {
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/EDIIALPS_V1.0-minified.json`)
@@ -37,11 +41,64 @@ export async function getStaticProps({ params }) {
 export default function App({ impactData }) {
   const router = useRouter()
 
-  const dataLayer = {
+
+  function impactAmountByNutsId(NUTS_ID) {
+    const result = impactEntries.find(item => item[0] === NUTS_ID)
+    if (result) {
+      return result[1] // amount of impact items
+    }
+    return null
+  }
+
+
+  // Build a GL match expression that defines the color for every vector tile feature
+  // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
+  const matchExpression = ['match', ['get', 'NUTS_ID']];
+
+
+  // count number of distict values AKA number of impacts for a given nutsid
+  // result: [ITC18: 4, ITC14: 11]
+  console.log("impactData", impactData)
+
+  const uniqueImpactsByNutsID = impactData.reduce((acc, o) => (acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1, acc), {});
+  // console.log("unique arr", uniqueImpactsByNutsID);
+
+  // create array
+  const impactEntries = Object.entries(uniqueImpactsByNutsID);
+  // console.log("impactEntries", impactEntries);
+
+
+  // Calculate color values for each country based on 'hdi' value
+  for (const row of impactEntries) {
+    const amount = row['1']
+    const color = uniqolor(amount, {
+      saturation: [50, 75],
+      lightness: [50, 70],
+      differencePoint: 90,
+    })
+
+    // get color by basecolor - darken color by amount of impacts per nutsregion
+    const mycolor = Color.fromString("#FFCEC3").darken((amount / 100)).toHexString()
+    // console.log(`mycolor amount ${mycolor}, ${amount / 100}`);
+
+    matchExpression.push(row['0'], mycolor)
+  }
+
+  // Last value is the default, used where there is no data
+  matchExpression.push('rgba(0, 0, 0, 0)')
+
+  // Add layer from the vector tile source to create the choropleth
+  // Insert it below the 'admin-1-boundary-bg' layer in the style
+
+
+  // console.log("matchExpression", matchExpression);
+
+
+  const nutsLayer = {
     type: 'fill',
-    id: 'data',
+    id: 'nuts',
     paint: {
-      'fill-color': "#fee08b",
+      'fill-color': matchExpression,
       'fill-opacity': 0.6,
       'fill-outline-color': "#666"
     }
@@ -55,7 +112,7 @@ export default function App({ impactData }) {
         { type: 'Feature', geometry: { type: 'Point', coordinates: [11.3548, 46.4983] } }
       ]
     };
-  
+   
     const layerStyle = {
       id: 'point',
       type: 'circle',
@@ -81,10 +138,16 @@ export default function App({ impactData }) {
 
   const [nutsid, setNutsid] = useState(null)
   const [nutsName, setNutsName] = useState(null)
-  const [year, setYear] = useState("");
-  const uniqueYears = [...new Set(impactData.map(item => item.Year_start))];
+  const [year, setYear] = useState("")
 
 
+  const uniqueYears = [...new Set(impactData.map(item => item.Year_start))]
+
+  const yearAndAmount = uniqueYears.map(yearOfImpact => {
+    return { impactYear: yearOfImpact, impactAmount: impactData.filter(item => item.Year_start === yearOfImpact).length }
+  })
+
+  console.log("yearAndAmount", yearAndAmount);
 
   const NewComponent = () => (
     <div className='impactsWrapper'>
@@ -154,7 +217,7 @@ export default function App({ impactData }) {
   /*   const data = useMemo(() => {
       return allDays ? earthquakes : filterFeaturesByDay(earthquakes, selectedTime);
     }, [earthquakes, allDays, selectedTime]);
-  
+   
    */
 
   const onHover = useCallback(event => {
@@ -171,6 +234,8 @@ export default function App({ impactData }) {
   const onOut = useCallback(event => {
     setHoverInfo(null)
   }, []);
+
+
 
 
   return (
@@ -195,7 +260,7 @@ export default function App({ impactData }) {
             style={{ width: "100vw", height: "100vh" }}
             mapStyle={'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}
-            interactiveLayerIds={['data']}
+            interactiveLayerIds={['nuts']}
             onMouseMove={onHover}
             onMouseLeave={onOut}
             onClick={onClick}
@@ -204,7 +269,7 @@ export default function App({ impactData }) {
             {nutsMap && (
               <>
                 <Source id="geojson" type="geojson" data={nutsMap}>
-                  <Layer {...dataLayer} />
+                  <Layer {...nutsLayer} />
                 </Source>
                 {/*                 <Source id="my-data" type="geojson" data={geojson}>
                   <Layer {...layerStyle} />
@@ -219,28 +284,34 @@ export default function App({ impactData }) {
                 <br />
                 <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
                 <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
+
+                amount:
               </div>
             )}
           </Map>
         </div>
 
         <div className="impactsYearRange">
-          {uniqueYears && uniqueYears.map((yearitem) => (
-            <div className={`selectYear${yearitem === year ? ` active` : ``}`} key={`year-${yearitem}`} onClick={() => setYear(yearitem) + setNutsid(null)}>
-              {yearitem}
+          {yearAndAmount && yearAndAmount.map((yearitem) => (
+            <div className={`selectYear${yearitem.impactYear === year ? ` active` : ``}`} key={`year-${yearitem.impactYear}`} onClick={() => setYear(yearitem.impactYear) + setNutsid(null)}>
+              <span>{yearitem.impactYear}{" "}({yearitem.impactAmount})</span>
             </div>
           ))
           }
         </div>
 
-        {year && (
-          <NewComponent />
-        )}
-        {nutsid && (
-          <NewComponent />
-        )}
+        {
+          year && (
+            <NewComponent />
+          )
+        }
+        {
+          nutsid && (
+            <NewComponent />
+          )
+        }
 
-      </div>
+      </div >
     </Layout >
   );
 }
