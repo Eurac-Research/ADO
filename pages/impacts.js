@@ -147,7 +147,7 @@ export default function App({ impactData }) {
     return { impactYear: yearOfImpact, impactAmount: impactData.filter(item => item.Year_start === yearOfImpact).length }
   })
 
-  console.log("yearAndAmount", yearAndAmount);
+  // console.log("yearAndAmount", yearAndAmount);
 
   const NewComponent = () => (
     <div className='impactsWrapper'>
@@ -284,8 +284,7 @@ export default function App({ impactData }) {
                 <br />
                 <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
                 <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-
-                amount:
+                amount: {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}
               </div>
             )}
           </Map>
