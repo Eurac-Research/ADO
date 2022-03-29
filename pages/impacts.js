@@ -58,7 +58,7 @@ export default function App({ impactData }) {
 
   // count number of distict values AKA number of impacts for a given nutsid
   // result: [ITC18: 4, ITC14: 11]
-  console.log("impactData", impactData)
+  // console.log("impactData", impactData)
 
   const uniqueImpactsByNutsID = impactData.reduce((acc, o) => (acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1, acc), {});
   // console.log("unique arr", uniqueImpactsByNutsID);
@@ -294,7 +294,7 @@ export default function App({ impactData }) {
         <div className="impactsYearRange">
           {yearAndAmount && yearAndAmount.map((yearitem) => (
             <div className={`selectYear${yearitem.impactYear === year ? ` active` : ``}`} key={`year-${yearitem.impactYear}`} onClick={() => setYear(yearitem.impactYear) + setNutsid(null)}>
-              <span>{yearitem.impactYear}{" "}({yearitem.impactAmount})</span>
+              <span>{yearitem.impactYear}<br />({yearitem.impactAmount} impacts)</span>
             </div>
           ))
           }
