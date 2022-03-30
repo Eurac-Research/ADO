@@ -14,7 +14,12 @@ function SideBar() {
       </div>
       <div className={router.pathname == "/impacts" ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/impacts">
-          <a>Impacts</a>
+          <a>Impacts (nuts3)</a>
+        </Link>
+      </div>
+      <div className={router.pathname == "/impacts-nuts2" ? "sideBarItem active" : "sideBarItem"}>
+        <Link href="/impacts-nuts2">
+          <a>Impacts (nuts2)</a>
         </Link>
       </div>
     </div>
