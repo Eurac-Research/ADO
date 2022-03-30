@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Map, { Source, Layer, ScaleControl, NavigationControl } from 'react-map-gl'
-import ControlPanel from '../components/ControlPanel'
+import ControlPanelImpacts from '../components/ControlPanelImpacts'
 import { updatePercentiles } from '../components/utils'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import axios from 'axios'
@@ -41,7 +41,6 @@ export async function getStaticProps({ params }) {
 export default function App({ impactData }) {
   const router = useRouter()
 
-
   function impactAmountByNutsId(NUTS_ID) {
     const result = impactEntries.find(item => item[0] === NUTS_ID)
     if (result) {
@@ -51,6 +50,35 @@ export default function App({ impactData }) {
   }
 
 
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
+  const [nutsMap, setNutsMap] = useState(null);
+  const [hoverInfo, setHoverInfo] = useState(null)
+  const [nutsData, setNutsData] = useState(null)
+  const [clickInfo, setClickInfo] = useState(null)
+
+  const [nutsid, setNutsid] = useState(null)
+  const [nutsName, setNutsName] = useState(null)
+  const [year, setYear] = useState("")
+
+
+
+  const impactDataByYear = impactData.filter(item => item.Year_start == year);
+
+  console.log("impactDataByYear", impactDataByYear);
+
+
+  const uniqueYears = [...new Set(impactData.map(item => item.Year_start))]
+
+  // console.log("uniqueYears ", uniqueYears);
+
+  const yearAndAmount = uniqueYears.map(yearOfImpact => {
+    return { impactYear: yearOfImpact, impactAmount: impactData.filter(item => item.Year_start === yearOfImpact).length }
+  })
+
+  // console.log("yearAndAmount", yearAndAmount);
+
+
   // Build a GL match expression that defines the color for every vector tile feature
   // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
   const matchExpression = ['match', ['get', 'NUTS_ID']];
@@ -58,17 +86,23 @@ export default function App({ impactData }) {
 
   // count number of distict values AKA number of impacts for a given nutsid
   // result: [ITC18: 4, ITC14: 11]
-  // console.log("impactData", impactData)
+  //console.log("impactData", impactData)
 
-  const uniqueImpactsByNutsID = impactData.reduce((acc, o) => (acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1, acc), {});
+
+  const impactsByYearForMap = year ? impactDataByYear : impactData
+
+
+  const uniqueImpactsByNutsID = impactsByYearForMap.reduce((acc, o) => (acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1, acc), {});
   // console.log("unique arr", uniqueImpactsByNutsID);
+
+
 
   // create array
   const impactEntries = Object.entries(uniqueImpactsByNutsID);
-  // console.log("impactEntries", impactEntries);
+  console.log("impactEntries", impactEntries);
 
 
-  // Calculate color values for each country based on 'hdi' value
+  // Calculate color values for each nuts3id
   for (const row of impactEntries) {
     const amount = row['1']
     const color = uniqolor(amount, {
@@ -104,24 +138,6 @@ export default function App({ impactData }) {
     }
   }
 
-
-  /* 
-    const geojson = {
-      type: 'FeatureCollection',
-      features: [
-        { type: 'Feature', geometry: { type: 'Point', coordinates: [11.3548, 46.4983] } }
-      ]
-    };
-   
-    const layerStyle = {
-      id: 'point',
-      type: 'circle',
-      paint: {
-        'circle-radius': 10,
-        'circle-color': '#000000'
-      }
-    };
-   */
   const scaleControlStyle = {
   };
   const navControlStyle = {
@@ -129,25 +145,7 @@ export default function App({ impactData }) {
     bottom: 120
   };
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
-  const [nutsMap, setNutsMap] = useState(null);
-  const [hoverInfo, setHoverInfo] = useState(null)
-  const [nutsData, setNutsData] = useState(null)
-  const [clickInfo, setClickInfo] = useState(null)
 
-  const [nutsid, setNutsid] = useState(null)
-  const [nutsName, setNutsName] = useState(null)
-  const [year, setYear] = useState("")
-
-
-  const uniqueYears = [...new Set(impactData.map(item => item.Year_start))]
-
-  const yearAndAmount = uniqueYears.map(yearOfImpact => {
-    return { impactYear: yearOfImpact, impactAmount: impactData.filter(item => item.Year_start === yearOfImpact).length }
-  })
-
-  // console.log("yearAndAmount", yearAndAmount);
 
   const NewComponent = () => (
     <div className='impactsWrapper'>
@@ -290,6 +288,33 @@ export default function App({ impactData }) {
           </Map>
         </div>
 
+        <div className="controlContainer">
+          <ControlPanelImpacts
+            year={year}
+            yearRange={uniqueYears}
+            yearAndAmount={yearAndAmount}
+            onChange={value => setYear(value)}
+          />
+
+          <select
+            value={year}
+            onChange={evt => setYear(evt.target.value) + setNutsid(null)}>
+            {yearAndAmount && yearAndAmount.map((yearitem) => (
+              <option
+                key={`year-${yearitem.impactYear}`}
+                value={yearitem.impactYear}>
+                {yearitem.impactYear} ({yearitem.impactAmount} impacts)
+              </option>
+            ))
+            }
+          </select>
+
+        </div>
+
+
+
+
+        {/* 
         <div className="impactsYearRange">
           {yearAndAmount && yearAndAmount.map((yearitem) => (
             <div className={`selectYear${yearitem.impactYear === year ? ` active` : ``}`} key={`year-${yearitem.impactYear}`} onClick={() => setYear(yearitem.impactYear) + setNutsid(null)}>
@@ -297,7 +322,7 @@ export default function App({ impactData }) {
             </div>
           ))
           }
-        </div>
+        </div> */}
 
         {
           year && (
