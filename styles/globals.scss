@@ -164,7 +164,7 @@ body {
   background: var(--bg-9-dark);
   color: var(--text-dark);
   max-width: 300px;
-  font-size: 10px;
+  font-size: 11px;
   z-index: 9;
   pointer-events: none;
 }
@@ -177,19 +177,35 @@ body {
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   background-color:rgba(0, 0, 0, 0.4);
   z-index: 100000;
+  overflow: auto;
+
+  @media (min-width: 768px) {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .overlayTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
 }
 
 .dataOverlay {
   background: var(--bg-10-light);
   color: var(--text-strong-light);
-  width: 80vw;
-  height: 65vh;
+  width: 90vw;
+  height: 90vh;
   padding: 30px;
   padding-bottom: 80px;
   line-height: 1.5;
+
+  @media (min-width: 768px) {
+    height: 65vh;
+  }
 
   .recharts-tooltip-label {
     color: #222;
@@ -198,6 +214,17 @@ body {
     color: #222;
   }
 }
+
+.textOverlay {
+  background: var(--bg-10-light);
+  color: var(--text-strong-light);
+  width: 80vw;
+  height: auto;
+  padding: 30px;
+  padding-bottom: 80px;
+  line-height: 1.5;
+}
+
 
 .closeOverlay {
   text-align: right;
@@ -305,6 +332,7 @@ body {
           background: #04AA6D;
           cursor: pointer;
         }
+
       }
       button {
         font-size: 22px;
@@ -321,7 +349,27 @@ body {
         }  
       }
     }
-  }  
+    .getMoreInfoIcon {
+      display: inline-block;
+      background:rgba(255, 255, 255, 0.8);
+      padding: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 300ms ease-in-out;
+      border: 1px solid rgba(0, 0, 0, 0.2); 
+      cursor: pointer;
+      margin-left: 10px;
+      &:hover {
+        background:rgba(0, 0, 0, 0.8);
+        color: #fff;
+      }
+    }
+
+  }
 }
 
 .navigation {
@@ -460,3 +508,120 @@ body {
   padding: 6px;
 }
 
+
+.sideBar {
+  position: fixed;
+  top: 30%;
+  right: 0;
+  z-index: 3;
+  transform: translateY(-30%);
+
+  .sideBarItem {
+    width: auto;
+    height: auto;
+    text-align: right;
+    margin-bottom: 10px;
+
+    a {
+      display: inline-block;
+      height: 100%;
+      width: auto;
+      padding: 10px 15px 10px 10px;
+      background-color: var(--bg-8-light);
+      color: var(--text-strong-light);
+      text-decoration: none;
+      transition: all 100ms ease-in-out;
+      &:hover {
+        font-weight: bold;
+      }
+    }
+
+    &.active {
+      font-weight: bold;
+      font-size: 20px;
+    }
+  }
+}
+
+
+.impactsWrapper {
+  position: fixed;
+  top: 120px;
+  left: 20px;
+  width: 360px;
+  background-color: #fff;
+  height: calc(100% - 460px);
+  overflow: auto;
+  padding: 10px 20px 10px 20px;
+  z-index: 3;
+
+  .impactsItem {
+    margin-bottom: 30px;
+    p {
+      font-size: 14px;
+      line-height: 1.2;
+    }
+  }
+}
+
+.impactsYearRange {
+  position: absolute;
+  bottom: 20px;
+  left: 40px;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  height: 100px;
+  width: calc(100% - 130px);
+  overflow: auto;
+  padding-bottom: 20px;
+}
+
+.selectYear {
+  flex-shrink: 0;
+  flex-grow: 1;
+  position: relative;
+  width: 88px;
+  text-align: left;
+  font-size: 14px;
+  padding: 0;
+  padding-left: 10px;
+  cursor: pointer;
+  transform: rotate(-40deg);
+  transition: all 100ms ease-in-out;
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 0;
+    background-color: #111;
+    border-radius: 50%;
+    width: 6px;
+    height: 6px;
+  }
+
+  &.active {
+    font-size: 18px;
+    font-weight: bold;
+    &:after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: -4px;
+      background-color: #111;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &:hover {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
+
+b {
+  font-weight: bold;
+}
