@@ -23,7 +23,7 @@ function ControlPanel(props) {
 
   return (
     <div className="controlpanel">
-      <h2>{metadata?.short_name} - {metadata?.long_name} <span className="getMoreInfoIcon" onClick={setOverlay}>i</span></h2>
+      <h2 onClick={setOverlay}>{metadata?.short_name} - {metadata?.long_name} <span className="getMoreInfoIcon">i</span></h2>
       <h1>{day}</h1>
       <div key={'day'} className="timerangeSlider">
 

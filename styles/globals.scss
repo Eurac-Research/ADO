@@ -3,58 +3,146 @@
    License: none (public domain)
 */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
+
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
 }
+
 body {
-	line-height: 1;
+  line-height: 1;
 }
-ol, ul {
-	list-style: none;
+
+ol,
+ul {
+  list-style: none;
 }
-blockquote, q {
-	quotes: none;
+
+blockquote,
+q {
+  quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
 }
+
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
+
 /* end reset css */
 
 
 :root {
-  --bg-9-dark: rgba(0,0,0, 0.9);
-  --bg-light: rgba(255,255,255, 0.6);
-  --bg-6-light: rgba(255,255,255, 0.6);
-  --bg-8-light: rgba(255,255,255, 0.8);
-  --bg-10-light: rgba(255,255,255, 1);
+  --bg-9-dark: rgba(0, 0, 0, 0.9);
+  --bg-light: rgba(255, 255, 255, 0.6);
+  --bg-6-light: rgba(255, 255, 255, 0.6);
+  --bg-8-light: rgba(255, 255, 255, 0.8);
+  --bg-10-light: rgba(255, 255, 255, 1);
   --text-light: #666;
   --text-strong-light: #222;
   --text-dark: #fff;
@@ -64,14 +152,14 @@ table {
 
 :root {
   .dark {
-    --bg-9-dark: rgba(255,255,255, 0.9);
-    --bg-light: rgba(0,0,0, 0.6);
-    --bg-6-light: rgba(0,0,0, 0.6);
+    --bg-9-dark: rgba(255, 255, 255, 0.9);
+    --bg-light: rgba(0, 0, 0, 0.6);
+    --bg-6-light: rgba(0, 0, 0, 0.6);
     --bg-8-light: rgba(2, 2, 2, 0.7);
     --bg-10-light: rgba(10, 10, 10, 1);
     --text-light: #ccc;
     --text-strong-light: #eee;
-    --text-dark: #111; 
+    --text-dark: #111;
     --tooltipBg: #fff;
   }
 }
@@ -115,35 +203,44 @@ body {
   @media (min-width: 768px) {
     padding: 20px;
   }
+
   .ado-logo {
     display: block;
     height: 36px;
+
     @media (min-width: 768px) {
       height: 62px;
     }
+
     path {
       transition: 500ms all;
       fill: #666;
     }
+
     &:hover {
       path {
         fill: #111;
       }
     }
   }
+
   .eurac-logo {
     display: block;
+
     g {
       fill: #666;
       transition: 500ms all;
     }
+
     &:hover {
       g {
         fill: #111;
       }
     }
+
     svg {
       transform: scale(0.76);
+
       @media (min-width: 768px) {
         transform: scale(1);
       }
@@ -178,7 +275,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background-color:rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 100000;
   overflow: auto;
 
@@ -210,6 +307,7 @@ body {
   .recharts-tooltip-label {
     color: #222;
   }
+
   .recharts-tooltip-item {
     color: #222;
   }
@@ -245,6 +343,7 @@ body {
   max-height: 100%;
   z-index: 3;
   user-select: none;
+
   @media (min-width: 768px) {
     bottom: 80px;
     left: 20px;
@@ -265,12 +364,14 @@ body {
       display: flex;
       justify-content: flex-start;
       align-items: center;
+
       .legendColor {
         width: 16px;
         height: 16px;
         margin-right: 6px;
         border: 1px solid #999;
       }
+
       .legendLabel {
         color: var(--text-strong-light);
         font-size: 12px;
@@ -285,33 +386,40 @@ body {
     background-color: var(--bg-8-light);
     padding: 15px;
     width: 90vw;
+
     @media (min-width: 768px) {
       width: 35vw;
       max-width: 55vw;
       padding: 20px;
     }
+
     h1 {
       color: var(--text-strong-light);
       font-size: 18px;
       font-weight: 500;
       margin-bottom: 14px;
+
       @media (min-width: 768px) {
         font-size: 28px;
         margin-bottom: 24px;
       }
-    
+
     }
+
     h2 {
       color: var(--text-strong-light);
       font-size: 14px;
       line-height: 1.3;
       font-weight: 500;
       margin-bottom: 10px;
+      cursor: pointer;
+
       @media (min-width: 768px) {
         font-size: 16px;
         margin-bottom: 20px;
       }
     }
+
     .timerangeSlider {
       width: 100%;
       display: flex;
@@ -319,6 +427,7 @@ body {
       align-items: center;
       justify-content: space-between;
       flex-wrap: nowrap;
+
       input {
         flex-shrink: 0;
         width: 80%;
@@ -328,12 +437,13 @@ body {
           appearance: none;
           width: 25px;
           height: 25px;
-          border-radius: 50%; 
+          border-radius: 50%;
           background: #04AA6D;
           cursor: pointer;
         }
 
       }
+
       button {
         font-size: 22px;
         font-weight: 500;
@@ -344,14 +454,16 @@ body {
         align-items: center;
         justify-content: center;
         cursor: pointer;
+
         &[disabled] {
           color: #ccc;
-        }  
+        }
       }
     }
+
     .getMoreInfoIcon {
       display: inline-block;
-      background:rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.8);
       padding: 4px;
       width: 22px;
       height: 22px;
@@ -360,11 +472,12 @@ body {
       justify-content: center;
       align-items: center;
       transition: all 300ms ease-in-out;
-      border: 1px solid rgba(0, 0, 0, 0.2); 
+      border: 1px solid rgba(0, 0, 0, 0.2);
       cursor: pointer;
       margin-left: 10px;
+
       &:hover {
-        background:rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.8);
         color: #fff;
       }
     }
@@ -383,6 +496,7 @@ body {
   overflow-x: auto;
   overflow-wrap: normal;
   align-items: center;
+
   @media (min-width: 768px) {
     height: 50px;
     width: 100%;
@@ -394,6 +508,7 @@ body {
     margin-right: 40px;
     display: none;
   }
+
   a {
     background: var(--bg-8-light);
     padding: 0;
@@ -408,6 +523,7 @@ body {
     align-items: center;
     color: var(--text-light);
     transition: background-color 300ms ease-in-out, color 300ms;
+
     &:hover {
       background-color: var(--bg-light);
       color: var(--text-strong-light);
@@ -415,7 +531,7 @@ body {
     }
 
     &.active {
-      background-color:rgba(102,102,102, 0.5);
+      background-color: rgba(102, 102, 102, 0.5);
       color: #fff;
       font-weight: 500;
     }
@@ -441,19 +557,22 @@ body {
 
 .dark {
   .ado-logo {
-      path {
+    path {
       fill: #ccc;
     }
+
     &:hover {
       path {
         fill: #fff;
       }
     }
   }
+
   .eurac-logo {
     g {
       fill: #ccc;
     }
+
     &:hover {
       g {
         fill: #fff;
@@ -466,14 +585,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color:  rgba(0,0,0,0.2) !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
   padding: 10%;
+
   .cookieConsent {
     max-height: 500px !important;
     min-height: 300px !important;
     max-width: 500px !important;
     position: relative !important;
-    background: rgba(0,0,0,0.8) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
     display: flex;
     justify-content: center !important;
     align-items: center !important;
@@ -484,21 +604,23 @@ body {
       text-align: center;
       line-height: 1.8;
     }
-  
+
     a {
       color: #eee;
     }
+
     button {
       font-size: 18px !important;
       padding: 15px !important;
       background: #4e9589 !important;
       color: #fff !important;
       opacity: 0.9;
+
       &:hover {
         opacity: 1;
       }
     }
-  }  
+  }
 }
 
 .custom-tooltip {
@@ -531,6 +653,7 @@ body {
       color: var(--text-strong-light);
       text-decoration: none;
       transition: all 100ms ease-in-out;
+
       &:hover {
         font-weight: bold;
       }
@@ -539,6 +662,22 @@ body {
     &.active {
       font-weight: bold;
       font-size: 20px;
+    }
+  }
+
+  .sideBarItemSub {
+    font-size: 13px;
+    margin-top: 5px;
+    font-weight: normal;
+
+    a {
+      padding: 5px 15px 5px 5px;
+      background-color: var(--bg-8-light);
+      color: var(--text-strong-light);
+    }
+
+    &.active {
+      font-weight: bold;
     }
   }
 }
@@ -557,6 +696,7 @@ body {
 
   .impactsItem {
     margin-bottom: 30px;
+
     p {
       font-size: 14px;
       line-height: 1.2;
@@ -604,6 +744,7 @@ body {
   &.active {
     font-size: 18px;
     font-weight: bold;
+
     &:after {
       content: "";
       position: absolute;
@@ -624,4 +765,21 @@ body {
 
 b {
   font-weight: bold;
+}
+
+.alphaInfo {
+  width: 200px;
+  font-size: 13px;
+  line-height: 1.2;
+  margin-top: 30px;
+  background: #fff;
+  background-color: var(--bg-8-light);
+  color: var(--text-strong-light);
+  padding: 15px;
+
+  h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
 }

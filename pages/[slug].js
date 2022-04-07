@@ -27,7 +27,7 @@ import {
   ResponsiveContainer
 } from 'recharts'
 
-const indices = ['cdi', 'sma', 'vci', 'vhi', 'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10']
+const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10', 'cdi', 'sma', 'vci', 'vhi']
 
 
 export async function getStaticProps({ params }) {
@@ -55,7 +55,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const dataLayer = paint
 
   const [metaData, setMetaData] = useState()
-  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : staticMetaData?.timerange?.properties?.firstDate);
+  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.lastDate : staticMetaData?.timerange?.properties?.lastDate);
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)

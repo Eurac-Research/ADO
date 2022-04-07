@@ -12,22 +12,47 @@ function SideBar() {
           <a>Indicies</a>
         </Link>
       </div>
-      <div className={router.pathname === "/impacts" ? "sideBarItem active" : "sideBarItem"}>
+
+
+      <div className={(router.pathname === "/impacts" || router.pathname === "/impacts-nuts2") ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/impacts">
-          <a>Impacts (nuts3)</a>
+          <a>Impacts</a>
         </Link>
+
+        <div className={router.pathname === "/impacts" ? "sideBarItemSub active" : "sideBarItemSub"}>
+          <Link href="/impacts">
+            <a>Nuts 3 Level</a>
+          </Link>
+        </div>
+        <div className={router.pathname === "/impacts-nuts2" ? "sideBarItemSub active" : "sideBarItemSub"}>
+          <Link href="/impacts-nuts2">
+            <a>Nuts 2 Level</a>
+          </Link>
+        </div>
       </div>
-      <div className={router.pathname === "/impacts-nuts2" ? "sideBarItem active" : "sideBarItem"}>
-        <Link href="/impacts-nuts2">
-          <a>Impacts (nuts2)</a>
-        </Link>
-      </div>
+
+
       <div className={router.asPath == "/hydro/cdi" ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/hydro/cdi">
           <a>Hydro</a>
         </Link>
       </div>
+
+      <div className="alphaInfo">
+
+        <h3>⚠️</h3>
+        This page is under development. Do not expect everything to work.
+        <br />
+        More information about the project at <a href="https://www.alpine-space.org/projects/ado/en/home">https://www.alpine-space.org/projects/ado/</a>
+        <br />
+        <br />
+        Eurac Research, April 2022
+      </div>
+
+
     </div>
+
+
   );
 }
 
