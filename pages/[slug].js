@@ -11,6 +11,8 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from "../components/layout";
 
+const MAPBOX_TOKEN = 'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'
+
 
 import {
   LineChart,
@@ -306,7 +308,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             height="100vh"
             mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             onViewportChange={setViewport}
-            mapboxApiAccessToken={'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'}
+            mapboxAccessToken={MAPBOX_TOKEN}
             interactiveLayerIds={['data']}
             onHover={onHover}
             onClick={onClick}
