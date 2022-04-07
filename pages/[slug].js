@@ -57,16 +57,15 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
     bearing: 0,
     pitch: 0
   });
+
+
   const [metaData, setMetaData] = useState()
-  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : '2018-08-20');
+  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : staticMetaData?.timerange?.properties?.firstDate);
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
-
-
-
 
   const onHover = useCallback(event => {
     const {
@@ -184,9 +183,6 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   if (metadata === undefined) {
     return <>Loading...</>;
   }
-
-
-
 
   const gradientOffset = () => {
     if (!nutsData) {
@@ -420,9 +416,9 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
                 <p>file https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/timeseries/NUTS3_{clickInfo.feature.properties.NUTS_ID}.json - errors in file</p>
               )}
               <p>{clickInfo.feature.properties.NUTS_NAME} (nuts id: {clickInfo.feature.properties.NUTS_ID})</p>
-              {console.log("staticmetadata: ", staticMetaData)}
+              {/* console.log("staticmetadata: ", staticMetaData)}
               {console.log("clickinfo: ", clickInfo.feature)}
-              {console.log("nutsdata: ", nutsData)}
+              {console.log("nutsdata: ", nutsData) */}
 
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
