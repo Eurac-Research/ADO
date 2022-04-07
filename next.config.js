@@ -4,7 +4,7 @@ module.exports = {
     return [
       {
         source: "/",
-        destination: "/cdi"
+        destination: "/spei-1"
       }
     ]
   }

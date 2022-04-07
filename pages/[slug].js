@@ -38,7 +38,7 @@ export async function getStaticProps({ params }) {
 
 // This function gets called at build time
 export async function getStaticPaths() {
-  const indices = ['cdi', 'sma', 'spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'vci', 'vhi']
+  const indices = ['spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'cdi', 'sma', 'vci', 'vhi']
   // Get the paths we want to pre-render based on index
   const paths = indices.map((index) => ({
     params: { slug: index },
@@ -62,7 +62,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
 
 
   const [metaData, setMetaData] = useState()
-  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : staticMetaData?.timerange?.properties?.firstDate);
+  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.lastDate : staticMetaData?.timerange?.properties?.lastDate);
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
