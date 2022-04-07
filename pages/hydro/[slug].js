@@ -242,7 +242,7 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
 
             {hoverInfo && (
               <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
-                TODO: onclick the static html station information should open in an overlay<br />
+                Click to open station details<br />
                 station id: {hoverInfo?.feature?.properties?.id_station}
               </div>
             )}
