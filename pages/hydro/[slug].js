@@ -247,8 +247,6 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
               </div>
             )}
 
-
-
           </Map>
 
           {clickInfo && (
