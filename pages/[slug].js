@@ -53,7 +53,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const dataLayer = paint
 
   const [metaData, setMetaData] = useState()
-  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : '2018-08-20');
+  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.firstDate : staticMetaData?.timerange?.properties?.firstDate);
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
