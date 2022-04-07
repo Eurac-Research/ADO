@@ -50,7 +50,7 @@ export async function getStaticProps({ params }) {
 
 // This function gets called at build time
 export async function getStaticPaths() {
-  const indices = ['cdi', 'dsc', 'sma', 'spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'vci', 'vhi']
+  const indices = ['cdi']
   // Get the paths we want to pre-render based on posts
   const paths = indices.map((index) => ({
     params: { slug: index },
