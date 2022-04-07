@@ -41,16 +41,21 @@ function SideBar() {
       <div className="alphaInfo">
 
         <h3>⚠️</h3>
-        This page is under development. Do not expect everything to work.
+        <p>This page is under development. Do not expect everything to work.</p>
+
+        <p>
+          More information about the project at <a href="https://www.alpine-space.org/projects/ado/en/home">https://www.alpine-space.org/projects/ado/</a>
+        </p>
+        <p>
+          Raw data can be found in the public repository <a href="https://github.com/Eurac-Research/ado-data">https://github.com/Eurac-Research/ado-data</a>
+        </p>
         <br />
-        More information about the project at <a href="https://www.alpine-space.org/projects/ado/en/home">https://www.alpine-space.org/projects/ado/</a>
-        <br />
-        <br />
-        Eurac Research, April 2022
+        <p>Eurac Research, April 2022</p>
+
       </div>
 
 
-    </div>
+    </div >
 
 
   );
