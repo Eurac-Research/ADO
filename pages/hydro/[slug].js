@@ -90,6 +90,13 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
   }
 
   const [hoverInfo, setHoverInfo] = useState(null)
+  const [clickInfo, setClickInfo] = useState(null)
+  const [htmlData, setHtmlData] = useState(null)
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
+
+
 
   const onHover = useCallback(event => {
     const {
@@ -106,50 +113,26 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
   }, []);
 
 
+  const onClick = useCallback(async (event) => {
+    const {
+      features
+    } = event;
+    const hoveredFeature = features && features[0];
+    setClickInfo(
+      hoveredFeature
+        ? {
+          feature: hoveredFeature
+        }
+        : null
+    );
+    const stationId = hoveredFeature ? hoveredFeature?.properties?.id_station : null
+    getHtmlData(stationId)
+  }, []);
 
+  const onClose = useCallback(async (event) => {
+    setClickInfo()
+  }, []);
 
-  /*   
-    const [hoverInfo, setHoverInfo] = useState(null)
-    const [clickInfo, setClickInfo] = useState(null)
-    const [nutsData, setNutsData] = useState(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const [isError, setIsError] = useState(false)
-  
-  
-    const onHover = useCallback(event => {
-      const {
-        features,
-        point: { x, y }
-      } = event;
-      const hoveredFeature = features && features[0];
-  
-      setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
-    }, []);
-  
-    const onOut = useCallback(event => {
-      setHoverInfo(null)
-    }, []);
-  
-    const onClick = useCallback(async (event) => {
-      const {
-        features
-      } = event;
-      const hoveredFeature = features && features[0];
-      setClickInfo(
-        hoveredFeature
-          ? {
-            feature: hoveredFeature
-          }
-          : null
-      );
-      const nutsId = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
-      getNutsData(nutsId)
-    }, []);
-  
-    const onClose = useCallback(async (event) => {
-      setClickInfo()
-    }, []);
-   */
 
 
   /* https://www.zeromolecule.com/blog/5-utility-react-hooks-for-every-project/ */
@@ -190,6 +173,26 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
     fetchData();
   }
 
+  async function getHtmlData(id_station) {
+    const fetchData = async () => {
+      setIsError(false);
+      setIsLoading(true);
+      try {
+        // const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_${id_station ? `${id_station}` : ''}.html`
+        const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
+        const result = await axios(url);
+        setHtmlData(result.data);
+      } catch (error) {
+        setIsError(true);
+      }
+      setIsLoading(false);
+    };
+    fetchData();
+  }
+
+
+
+
   const scaleControlStyle = {
   };
   const navControlStyle = {
@@ -224,6 +227,7 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
             interactiveLayerIds={['stationPoint']}
             onMouseMove={onHover}
             onMouseLeave={onOut}
+            onClick={onClick}
           >
 
 
@@ -247,49 +251,64 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
 
           </Map>
 
+          {clickInfo && (
+            <div className="overlayContainer">
+              <div className="dataOverlay" style={{ width: "90vw", height: "90vh", position: "relative" }}>
+                <span className="closeOverlay" onClick={onClose}>close X</span>
+                {console.log("html?", htmlData)}
+                overlay
+
+                <div>
+                  <iframe srcDoc={htmlData} width="100%" height="100%" style={{ position: 'absolute', top: "80px", left: "0", height: "100%", width: "100%", paddingBottom: "150px" }}></iframe>
+                </div>
+              </div>
+            </div>
+          )}
+
+
           {/*
           <div className="controlContainer">
 
-            <div className="navigation">
-              <p>Indices</p>
-              <Link prefetch={false} href="/cdi">
-                <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
-              </Link>
-              <Link prefetch={false} href="/vci">
-                <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
-              </Link>
-              <Link prefetch={false} href="/vhi">
-                <a className={router.query.slug === 'vhi' ? 'active' : ''}>vhi</a>
-              </Link>
-              <Link prefetch={false} href="/sma">
-                <a className={router.query.slug === 'sma' ? 'active' : ''}>sma</a>
-              </Link>
-              <Link prefetch={false} href="/spei-1">
-                <a className={router.query.slug === 'spei-1' ? 'active' : ''}>spei-1</a>
-              </Link>
-              <Link prefetch={false} href="/spei-3">
-                <a className={router.query.slug === 'spei-3' ? 'active' : ''}>spei-3</a>
-              </Link>
-              <Link prefetch={false} href="/spei-6">
-                <a className={router.query.slug === 'spei-6' ? 'active' : ''}>spei-6</a>
-              </Link>
-              <Link prefetch={false} href="/spei-12">
-                <a className={router.query.slug === 'spei-12' ? 'active' : ''}>spei-12</a>
-              </Link>
-              <Link prefetch={false} href="/spi-1">
-                <a className={router.query.slug === 'spi-1' ? 'active' : ''}>spi-1</a>
-              </Link>
-              <Link prefetch={false} href="/spi-3">
-                <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
-              </Link>
-              <Link prefetch={false} href="/spi-6">
-                <a className={router.query.slug === 'spi-6' ? 'active' : ''}>spi-6</a>
-              </Link>
-              <Link prefetch={false} href="/spi-12">
-                <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
-              </Link>
-            </div>
-          </div>
+                  <div className="navigation">
+                    <p>Indices</p>
+                    <Link prefetch={false} href="/cdi">
+                      <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
+                    </Link>
+                    <Link prefetch={false} href="/vci">
+                      <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
+                    </Link>
+                    <Link prefetch={false} href="/vhi">
+                      <a className={router.query.slug === 'vhi' ? 'active' : ''}>vhi</a>
+                    </Link>
+                    <Link prefetch={false} href="/sma">
+                      <a className={router.query.slug === 'sma' ? 'active' : ''}>sma</a>
+                    </Link>
+                    <Link prefetch={false} href="/spei-1">
+                      <a className={router.query.slug === 'spei-1' ? 'active' : ''}>spei-1</a>
+                    </Link>
+                    <Link prefetch={false} href="/spei-3">
+                      <a className={router.query.slug === 'spei-3' ? 'active' : ''}>spei-3</a>
+                    </Link>
+                    <Link prefetch={false} href="/spei-6">
+                      <a className={router.query.slug === 'spei-6' ? 'active' : ''}>spei-6</a>
+                    </Link>
+                    <Link prefetch={false} href="/spei-12">
+                      <a className={router.query.slug === 'spei-12' ? 'active' : ''}>spei-12</a>
+                    </Link>
+                    <Link prefetch={false} href="/spi-1">
+                      <a className={router.query.slug === 'spi-1' ? 'active' : ''}>spi-1</a>
+                    </Link>
+                    <Link prefetch={false} href="/spi-3">
+                      <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
+                    </Link>
+                    <Link prefetch={false} href="/spi-6">
+                      <a className={router.query.slug === 'spi-6' ? 'active' : ''}>spi-6</a>
+                    </Link>
+                    <Link prefetch={false} href="/spi-12">
+                      <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
+                    </Link>
+                  </div>
+                </div>
 
             */}
 
