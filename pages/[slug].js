@@ -38,7 +38,7 @@ export async function getStaticProps({ params }) {
 
 // This function gets called at build time
 export async function getStaticPaths() {
-  const indices = ['cdi', 'sma', 'spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'vci', 'vhi']
+  const indices = ['cdi', 'sma', 'spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'sspi-10', 'vci', 'vhi']
   // Get the paths we want to pre-render based on posts
   const paths = indices.map((index) => ({
     params: { slug: index },
@@ -314,6 +314,9 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
               </Link>
               <Link prefetch={false} href="/spi-12">
                 <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
+              </Link>
+              <Link prefetch={false} href="/sspi-10">
+                <a className={router.query.slug === 'sspi-10' ? 'active' : ''}>sspi-10</a>
               </Link>
             </div>
           </div>
