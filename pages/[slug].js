@@ -27,6 +27,9 @@ import {
   ResponsiveContainer
 } from 'recharts'
 
+const indices = ['cdi', 'sma', 'vci', 'vhi', 'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10']
+
+
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`)
@@ -38,7 +41,6 @@ export async function getStaticProps({ params }) {
 
 // This function gets called at build time
 export async function getStaticPaths() {
-  const indices = ['cdi', 'sma', 'spei-1', 'spei-12', 'spei-2', 'spei-3', 'spei-6', 'spi-1', 'spi-12', 'spi-3', 'spi-6', 'sspi-10', 'vci', 'vhi']
   // Get the paths we want to pre-render based on posts
   const paths = indices.map((index) => ({
     params: { slug: index },
@@ -279,45 +281,11 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
 
             <div className="navigation">
               <p>Indices</p>
-              <Link prefetch={false} href="/cdi">
-                <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
-              </Link>
-              <Link prefetch={false} href="/vci">
-                <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
-              </Link>
-              <Link prefetch={false} href="/vhi">
-                <a className={router.query.slug === 'vhi' ? 'active' : ''}>vhi</a>
-              </Link>
-              <Link prefetch={false} href="/sma">
-                <a className={router.query.slug === 'sma' ? 'active' : ''}>sma</a>
-              </Link>
-              <Link prefetch={false} href="/spei-1">
-                <a className={router.query.slug === 'spei-1' ? 'active' : ''}>spei-1</a>
-              </Link>
-              <Link prefetch={false} href="/spei-3">
-                <a className={router.query.slug === 'spei-3' ? 'active' : ''}>spei-3</a>
-              </Link>
-              <Link prefetch={false} href="/spei-6">
-                <a className={router.query.slug === 'spei-6' ? 'active' : ''}>spei-6</a>
-              </Link>
-              <Link prefetch={false} href="/spei-12">
-                <a className={router.query.slug === 'spei-12' ? 'active' : ''}>spei-12</a>
-              </Link>
-              <Link prefetch={false} href="/spi-1">
-                <a className={router.query.slug === 'spi-1' ? 'active' : ''}>spi-1</a>
-              </Link>
-              <Link prefetch={false} href="/spi-3">
-                <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
-              </Link>
-              <Link prefetch={false} href="/spi-6">
-                <a className={router.query.slug === 'spi-6' ? 'active' : ''}>spi-6</a>
-              </Link>
-              <Link prefetch={false} href="/spi-12">
-                <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
-              </Link>
-              <Link prefetch={false} href="/sspi-10">
-                <a className={router.query.slug === 'sspi-10' ? 'active' : ''}>sspi-10</a>
-              </Link>
+              {indices?.map((index) => (
+                <Link prefetch={false} href={`/${index}`} key={index}>
+                  <a className={router.query.slug === index ? 'active' : ''}>{index}</a>
+                </Link>
+              ))}
             </div>
           </div>
 
