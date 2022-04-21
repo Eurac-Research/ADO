@@ -225,7 +225,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             initialViewState={{
               latitude: 46,
               longitude: 9,
-              minZoom: 5,
+              minZoom: 3,
               zoom: 5,
               bearing: 0,
               pitch: 0
@@ -239,7 +239,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             onClick={onClick}
           >
             <Source type="geojson" data={data}>
-              <Layer {...dataLayer} />
+              <Layer {...dataLayer} beforeId="waterway-shadow" />
             </Source>
             <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
             <NavigationControl style={navControlStyle} position={"bottom-right"} />

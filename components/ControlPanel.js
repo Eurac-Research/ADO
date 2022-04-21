@@ -22,51 +22,53 @@ function ControlPanel(props) {
   }
 
   return (
-    <div className="controlpanel">
-      <h2 onClick={setOverlay}>{metadata?.short_name} - {metadata?.long_name} <span className="getMoreInfoIcon">i</span></h2>
-      <h1>{day}</h1>
-      <div key={'day'} className="timerangeSlider">
+    <>
+      <div className="controlpanel">
+        <h2 onClick={setOverlay}>{metadata?.short_name} - {metadata?.long_name} <span className="getMoreInfoIcon">i</span></h2>
+        <h1>{day}</h1>
+        <div key={'day'} className="timerangeSlider">
 
-        {dayFromTimestamp > firstDayTimestamp
-          ? (
-            <button
-              title="prev"
-              type="submit"
-              value={dayFromTimestamp - 1}
-              onClick={evt => props.onChange(evt.target.value)}>
-              &lt;
-            </button>
-          )
-          : <button disabled={true}>&lt;</button>
-        }
+          {dayFromTimestamp > firstDayTimestamp
+            ? (
+              <button
+                title="prev"
+                type="submit"
+                value={dayFromTimestamp - 1}
+                onClick={evt => props.onChange(evt.target.value)}>
+                &lt;
+              </button>
+            )
+            : <button disabled={true}>&lt;</button>
+          }
 
-        <input
-          type="range"
-          list="tickmarks"
-          value={dayFromTimestamp}
-          min={firstDayTimestamp}
-          max={lastDayTimestamp}
-          step={1}
-          onChange={evt => props.onChange(evt.target.value)}
-        />
-        <datalist id="tickmarks">
-          {rows}
-        </datalist>
+          <input
+            type="range"
+            list="tickmarks"
+            value={dayFromTimestamp}
+            min={firstDayTimestamp}
+            max={lastDayTimestamp}
+            step={1}
+            onChange={evt => props.onChange(evt.target.value)}
+          />
+          <datalist id="tickmarks">
+            {rows}
+          </datalist>
 
-        {dayFromTimestamp < lastDayTimestamp
-          ? (
-            <button
-              title="next"
-              type="submit"
-              value={dayFromTimestamp + 1}
-              onClick={evt => props.onChange(evt.target.value)}>
-              &gt;
-            </button>
-          )
-          : <button disabled={true}>&gt;</button>
-        }
+          {dayFromTimestamp < lastDayTimestamp
+            ? (
+              <button
+                title="next"
+                type="submit"
+                value={dayFromTimestamp + 1}
+                onClick={evt => props.onChange(evt.target.value)}>
+                &gt;
+              </button>
+            )
+            : <button disabled={true}>&gt;</button>
+          }
+        </div>
+
       </div>
-
       {overlay && (
         <div className="overlayContainer" style={{ position: "fixed" }}>
           <div className="textOverlay">
@@ -76,7 +78,7 @@ function ControlPanel(props) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

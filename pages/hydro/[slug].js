@@ -261,7 +261,7 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
             </Source>
 
             <Source type="geojson" data={stationData}>
-              <Layer {...stationGeometryLayer} />
+              <Layer {...stationGeometryLayer} beforeId="waterway-shadow" />
             </Source>
 
             <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
