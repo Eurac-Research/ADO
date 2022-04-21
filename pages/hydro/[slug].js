@@ -76,7 +76,7 @@ export async function getStaticProps({ params }) {
 export async function getStaticPaths() {
   // Get the paths we want to pre-render based on posts
   const paths = indices.map((index) => ({
-    params: { slug: `/hydro/${index}` },
+    params: { slug: `${index}` },
   }))
   // { fallback: false } means other routes should 404.
   return { paths, fallback: 'blocking' }
