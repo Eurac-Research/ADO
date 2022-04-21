@@ -34,7 +34,7 @@ export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`)
   const staticData = await response.json()
-  const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/metadata/${datatype}.json`)
+  const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`)
   const staticMetaData = await responseMeta.json()
   return { props: { datatype, staticData, staticMetaData } };
 }
