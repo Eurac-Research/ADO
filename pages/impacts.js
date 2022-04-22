@@ -267,7 +267,7 @@ export default function App({ impactData }) {
             {nutsMap && (
               <>
                 <Source id="geojson" type="geojson" data={nutsMap}>
-                  <Layer {...nutsLayer} />
+                  <Layer {...nutsLayer} beforeId="waterway-shadow" />
                 </Source>
                 {/*                 <Source id="my-data" type="geojson" data={geojson}>
                   <Layer {...layerStyle} />

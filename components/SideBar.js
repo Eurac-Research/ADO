@@ -7,7 +7,7 @@ function SideBar() {
 
   return (
     <div className="sideBar">
-      <div className={(router.pathname !== "/impacts" && router.pathname !== "/impacts-nuts2" && router.asPath != "/hydro/cdi") ? "sideBarItem active" : "sideBarItem"}>
+      <div className={(router.pathname !== "/impacts" && router.pathname !== "/impacts-nuts2" && !router.asPath.includes('hydro')) ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/">
           <a>Indicies</a>
         </Link>
@@ -32,7 +32,7 @@ function SideBar() {
       </div>
 
 
-      <div className={router.asPath == "/hydro/cdi" ? "sideBarItem active" : "sideBarItem"}>
+      <div className={router.asPath.includes('hydro') ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/hydro/cdi">
           <a>Hydro</a>
         </Link>

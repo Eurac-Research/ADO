@@ -31,10 +31,10 @@ const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'sp
 
 
 export async function getStaticProps({ params }) {
-  const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
+  const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`)
   const staticData = await response.json()
-  const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/metadata/${datatype}.json`)
+  const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`)
   const staticMetaData = await responseMeta.json()
   return { props: { datatype, staticData, staticMetaData } };
 }
@@ -116,6 +116,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const data = useMemo(() => {
     return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
   }, [datatype, staticData, day]);
+
   const metadata = useMemo(() => {
     return staticMetaData;
   }, [staticMetaData]);
@@ -214,7 +215,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   return (
     <Layout theme={theme}>
       <Head>
-        <title>{staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research</title>
+        <title>{metadata?.long_name} - Alpine Drought Observatory | Eurac Research</title>
       </Head>
       <div>
 
@@ -225,7 +226,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             initialViewState={{
               latitude: 46,
               longitude: 9,
-              minZoom: 5,
+              minZoom: 3,
               zoom: 5,
               bearing: 0,
               pitch: 0
@@ -239,7 +240,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             onClick={onClick}
           >
             <Source type="geojson" data={data}>
-              <Layer {...dataLayer} />
+              <Layer {...dataLayer} beforeId="waterway-shadow" />
             </Source>
             <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
             <NavigationControl style={navControlStyle} position={"bottom-right"} />
@@ -258,7 +259,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
 
           <div className="controlContainer">
             <div className="legend">
-              {staticMetaData.colormap.legend.stops.map((item, index) => {
+              {metadata.colormap.legend.stops.map((item, index) => {
                 return (
                   <div key={`legend${index}`} className="legendItem">
                     <div
@@ -272,7 +273,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             </div>
 
             <ControlPanel
-              metadata={staticMetaData}
+              metadata={metadata}
               day={day}
               firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
               lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}

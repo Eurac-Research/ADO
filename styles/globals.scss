@@ -214,7 +214,7 @@ body {
 
     path {
       transition: 500ms all;
-      fill: #666;
+      fill: #222;
     }
 
     &:hover {
@@ -228,7 +228,7 @@ body {
     display: block;
 
     g {
-      fill: #666;
+      fill: #222;
       transition: 500ms all;
     }
 
@@ -239,10 +239,11 @@ body {
     }
 
     svg {
-      transform: scale(0.76);
+      width: 135px;
 
       @media (min-width: 768px) {
         transform: scale(1);
+        width: 200px;
       }
     }
   }
@@ -296,12 +297,15 @@ body {
   color: var(--text-strong-light);
   width: 90vw;
   height: 90vh;
+  height: auto;
+
   padding: 30px;
   padding-bottom: 80px;
   line-height: 1.5;
 
   @media (min-width: 768px) {
     height: 65vh;
+    height: auto;
   }
 
   .recharts-tooltip-label {
@@ -366,16 +370,26 @@ body {
       align-items: center;
 
       .legendColor {
-        width: 16px;
-        height: 16px;
+        width: 10px;
+        height: 10px;
         margin-right: 6px;
         border: 1px solid #999;
+
+        @media (min-width: 768px) {
+          width: 16px;
+          height: 16px;
+        }
       }
 
       .legendLabel {
         color: var(--text-strong-light);
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 400;
+
+        @media (min-width: 768px) {
+          font-size: 12px;
+        }
+
       }
     }
   }
@@ -385,12 +399,14 @@ body {
     z-index: 2;
     background-color: var(--bg-8-light);
     padding: 15px;
-    width: 90vw;
+    width: 75vw;
+    box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
+    backdrop-filter: blur(10px);
 
     @media (min-width: 768px) {
-      width: 35vw;
+      width: 40vw;
       max-width: 55vw;
-      padding: 20px;
+      padding: 30px 20px 30px 20px;
     }
 
     h1 {
@@ -400,7 +416,7 @@ body {
       margin-bottom: 14px;
 
       @media (min-width: 768px) {
-        font-size: 28px;
+        font-size: 32px;
         margin-bottom: 24px;
       }
 
@@ -430,7 +446,7 @@ body {
 
       input {
         flex-shrink: 0;
-        width: 80%;
+        width: calc(100% - 80px);
 
         &:-webkit-slider-thumb {
           -webkit-appearance: none;
@@ -523,6 +539,9 @@ body {
     align-items: center;
     color: var(--text-light);
     transition: background-color 300ms ease-in-out, color 300ms;
+    box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
+    backdrop-filter: blur(10px);
+    font-weight: 500;
 
     &:hover {
       background-color: var(--bg-light);
@@ -531,7 +550,7 @@ body {
     }
 
     &.active {
-      background-color: rgba(102, 102, 102, 0.5);
+      background-color: rgba(34, 34, 34, 0.8);
       color: #fff;
       font-weight: 500;
     }
@@ -541,7 +560,7 @@ body {
 
 .darkModeToggle {
   position: absolute;
-  bottom: 260px;
+  bottom: 180px;
   right: 10px;
   background-color: #fff;
   width: 32px;
@@ -768,14 +787,19 @@ b {
 }
 
 .alphaInfo {
+  display: none;
   width: 220px;
   font-size: 13px;
   line-height: 1.2;
   margin-top: 30px;
-  background: #fff;
   background-color: var(--bg-8-light);
   color: var(--text-strong-light);
   padding: 15px;
+  backdrop-filter: blur(10px);
+
+  @media (min-width: 768px) {
+    display: block;
+  }
 
   h3 {
     font-size: 20px;
