@@ -34,11 +34,10 @@ const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'sp
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
 
-  //const fetchStations = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`)
-  //const stationData = await fetchStations.json()
+  const fetchStations = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`)
+  const stationData = await fetchStations.json()
 
-
-
+  /*
   const stationData = {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
@@ -54,6 +53,7 @@ export async function getStaticProps({ params }) {
       }
     ]
   }
+  */
 
 
 
@@ -89,7 +89,9 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
 
-  const stationGeometryLayer = {
+  const stationGeometryLayer = paint
+
+/*   const stationGeometryLayer = {
     id: 'stationGeometry',
     source: 'stationData',
     type: 'fill',
@@ -101,7 +103,7 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
     'filter': ['==', '$type', 'Polygon']
   }
 
-  const stationPaintLayer = {
+ */  const stationPaintLayer = {
     id: 'stationPoint',
     type: 'circle',
     source: 'stationData',
@@ -114,9 +116,16 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
     'filter': ['==', '$type', 'Point']
   }
 
+
+  const [metaData, setMetaData] = useState()
+
+  const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.lastDate : staticMetaData?.timerange?.properties?.lastDate);
+
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
+
   const [htmlData, setHtmlData] = useState(null)
+  const [timeseriesData, setTimeseriesData] = useState(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
@@ -129,7 +138,6 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
       point: { x, y }
     } = event;
     const hoveredFeature = features && features[0];
-
     setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
 
   }, []);
@@ -176,13 +184,14 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
   }
   const [theme, toggleTheme] = useToggleState('light', ['dark', 'light']);
 
-  /*   const data = useMemo(() => {
-      return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
-    }, [datatype, staticData, day]);
-    const metadata = useMemo(() => {
-      return staticMetaData;
-    }, [staticMetaData]);
-   */
+  const mapStationData = useMemo(() => {
+    return stationData && updatePercentiles(stationData, f => f.properties[`${datatype}`][day]);
+  }, [datatype, stationData, day]);
+
+  const metadata = useMemo(() => {
+    return staticMetaData;
+  }, [staticMetaData]);
+
   async function getNutsData(overlayNutsId) {
     const fetchData = async () => {
       setIsError(false);
@@ -205,9 +214,15 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
       setIsLoading(true);
       try {
         // const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_${id_station ? `${id_station}` : ''}.html`
-        const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
-        const result = await axios(url);
-        setHtmlData(result.data);
+        const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
+        const timeseriesUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/timeseries/ID_STATION_${id_station ? `${id_station}` : ''}.json`
+
+        const result = await axios(htmlUrl)
+        setHtmlData(result.data)
+
+        const timeseriesResult = await axios(timeseriesUrl)
+        setTimeseriesData(timeseriesResult.data)
+
       } catch (error) {
         setIsError(true);
       }
@@ -217,16 +232,12 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
   }
 
 
-
-
   const scaleControlStyle = {
   };
   const navControlStyle = {
     right: 10,
     bottom: 120
   };
-
-
 
   return (
     <Layout theme={theme}>
@@ -250,17 +261,17 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
             style={{ width: "100vw", height: "100vh" }}
             mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}
-            interactiveLayerIds={['stationPoint']}
+            interactiveLayerIds={['data']}
             onMouseMove={onHover}
             onMouseLeave={onOut}
             onClick={onClick}
           >
 
-            <Source type="geojson" data={stationData}>
+            {/*             <Source type="geojson" data={stationData}>
               <Layer {...stationPaintLayer} />
             </Source>
-
-            <Source type="geojson" data={stationData}>
+ */}
+            <Source type="geojson" data={mapStationData}>
               <Layer {...stationGeometryLayer} beforeId="waterway-shadow" />
             </Source>
 
@@ -280,17 +291,39 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
             <div className="overlayContainer">
               <div className="dataOverlay" style={{ width: "90vw", height: "90vh", position: "relative" }}>
                 <span className="closeOverlay" onClick={onClose}>close X</span>
-                {console.log("html?", htmlData)}
-                overlay
 
+                {console.log("timeseries", timeseriesData)}
                 <div>
                   <iframe srcDoc={htmlData} width="100%" height="100%" style={{ position: 'absolute', top: "80px", left: "0", height: "100%", width: "100%", paddingBottom: "150px" }}></iframe>
                 </div>
+
               </div>
             </div>
           )}
 
           <div className="controlContainer">
+
+            <div className="legend">
+              {staticMetaData.colormap.legend.stops.map((item, index) => {
+                return (
+                  <div key={`legend${index}`} className="legendItem">
+                    <div
+                      className="legendColor"
+                      style={{ background: item['2'] }}>
+                    </div>
+                    <p className="legendLabel">{item['1']}</p>
+                  </div>
+                )
+              })}
+            </div>
+
+            <ControlPanel
+              metadata={metadata}
+              day={day}
+              firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
+              lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
+              onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))}
+            />
 
             <div className="navigation">
               <p>Indices</p>

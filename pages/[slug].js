@@ -116,6 +116,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const data = useMemo(() => {
     return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
   }, [datatype, staticData, day]);
+
   const metadata = useMemo(() => {
     return staticMetaData;
   }, [staticMetaData]);
@@ -214,7 +215,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   return (
     <Layout theme={theme}>
       <Head>
-        <title>{staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research</title>
+        <title>{metadata?.long_name} - Alpine Drought Observatory | Eurac Research</title>
       </Head>
       <div>
 
@@ -258,7 +259,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
 
           <div className="controlContainer">
             <div className="legend">
-              {staticMetaData.colormap.legend.stops.map((item, index) => {
+              {metadata.colormap.legend.stops.map((item, index) => {
                 return (
                   <div key={`legend${index}`} className="legendItem">
                     <div
@@ -272,7 +273,7 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
             </div>
 
             <ControlPanel
-              metadata={staticMetaData}
+              metadata={metadata}
               day={day}
               firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
               lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
