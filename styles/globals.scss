@@ -297,12 +297,15 @@ body {
   color: var(--text-strong-light);
   width: 90vw;
   height: 90vh;
+  height: auto;
+
   padding: 30px;
   padding-bottom: 80px;
   line-height: 1.5;
 
   @media (min-width: 768px) {
     height: 65vh;
+    height: auto;
   }
 
   .recharts-tooltip-label {

@@ -11,6 +11,8 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from "../../components/layout"
 import Header from "../../components/Header"
+import TimeSeries from "../../components/timeseries"
+
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'
 
@@ -32,7 +34,7 @@ const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'sp
 
 
 export async function getStaticProps({ params }) {
-  const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
+  const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
 
   const fetchStations = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`)
   const stationData = await fetchStations.json()
@@ -289,12 +291,15 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
 
           {clickInfo && (
             <div className="overlayContainer">
-              <div className="dataOverlay" style={{ width: "90vw", height: "90vh", position: "relative" }}>
+              <div className="dataOverlay" style={{ width: "90vw", position: "relative" }}>
                 <span className="closeOverlay" onClick={onClose}>close X</span>
 
-                {console.log("timeseries", timeseriesData)}
+                {console.log("timeseries from slug", timeseriesData)}
+
+                <TimeSeries data={timeseriesData} indices={indices} index={datatype} />
+
                 <div>
-                  <iframe srcDoc={htmlData} width="100%" height="100%" style={{ position: 'absolute', top: "80px", left: "0", height: "100%", width: "100%", paddingBottom: "150px" }}></iframe>
+                  <iframe srcDoc={htmlData} width="100%" height="100%" style={{ position: 'absolute', top: "auto", left: "0", height: "100%", width: "100%", paddingBottom: "150px" }}></iframe>
                 </div>
 
               </div>

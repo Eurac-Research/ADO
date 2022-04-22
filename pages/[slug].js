@@ -31,7 +31,7 @@ const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'sp
 
 
 export async function getStaticProps({ params }) {
-  const datatype = params.slug ? params.slug.toUpperCase() : 'CDI'
+  const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`)
   const staticData = await response.json()
   const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`)
