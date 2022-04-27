@@ -9,9 +9,8 @@ function TimeSeries(props) {
 
   const { data, indices, index } = props
   const [chartData, setChartData] = useState(null)
+  const [activeLegend, setActiveLegend] = useState(index)
 
-  /*   console.log("chartData:", data);
-   */
 
   const series = indices?.map((index) => {
     return {
@@ -19,20 +18,19 @@ function TimeSeries(props) {
     }
   })
 
+  console.log("series", series);
+
   const dimensionsArray = indices?.map((index) => {
     return index.toUpperCase()
   })
   const dimensions = ['date'].concat(dimensionsArray)
 
-  console.log("dimensionsArray", dimensionsArray)
+  console.log("dimensions", dimensions)
 
   console.log("index", index)
 
 
-  const checkActiveIndex = (element) => element === index
-  const activeDimension = dimensionsArray.findIndex(checkActiveIndex)
-
-  console.log("array key of acitve dimension aka index (ex SPI-3): ", activeDimension)
+  console.log("data", data)
 
   /* 
     create object for chart options and assign values 
@@ -40,26 +38,36 @@ function TimeSeries(props) {
   const legendObject = {}
   for (const item of indices) {
     if (index === item.toUpperCase()) {
-      legendObject[item.toUpperCase()] = true
+      legendObject[item.toUpperCase()] = true // index active
     } else {
-      legendObject[item.toUpperCase()] = false
+      legendObject[item.toUpperCase()] = false // other indices inactive
     }
   }
 
+  const [selecedDimensions, setSelecedDimensions] = useState(legendObject)
 
+  function onChartClick(param, echarts) {
+    console.log(param, echarts);
+  }
 
+  function onChartLegendselectchanged(param, echarts) {
+    console.log("legendclick: ", param, echarts);
+/*     setActiveLegend(param?.name)
+    setSelecedDimensions(param?.selected)
+ */  };
 
+  console.log("selecedDimensions", selecedDimensions);
 
   const options = {
-    title: {
-      text: 'timeseries',
-      padding: [
-        5,  // up
-        10, // right
-        25,  // down
-        10, // left
-      ]
-    },
+    /*     title: {
+          text: 'timeseries',
+          padding: [
+            5,  // up
+            10, // right
+            25,  // down
+            10, // left
+          ]
+        }, */
     toolbox: {
       show: true,
       feature: {
@@ -72,7 +80,13 @@ function TimeSeries(props) {
         saveAsImage: {}
       }
     },
-    grid: { top: 60, right: 8, bottom: 40, left: 36 },
+    grid: {
+      top: 80,
+      right: 8,
+      bottom: 40,
+      left: 36,
+      containLabel: false
+    },
     dataset: {
       dimensions: dimensions,
       source: data
@@ -87,15 +101,16 @@ function TimeSeries(props) {
       trigger: 'axis',
     },
     legend: {
+      type: "scroll",
       orient: 'horizontal',
       top: '40px',
-      icon: 'pin',
-      selected: legendObject
+      icon: 'roundRect',
+      selected: selecedDimensions
     },
-    visualMap: {
+/*     visualMap: {
       type: 'piecewise',
       show: false,
-      dimension: 7,
+      dimension: activeLegend,
       min: 0,
       max: 100,
       inRange: {
@@ -104,7 +119,7 @@ function TimeSeries(props) {
         color: ['red', 'black']
       },
     }
-  }
+ */  }
 
 
   return (
@@ -114,6 +129,9 @@ function TimeSeries(props) {
           <ReactECharts
             option={options}
             style={{ height: "400px", marginTop: "40px" }}
+            onEvents={{
+              'legendselectchanged': onChartLegendselectchanged
+            }}
           />
         </>
         : <>loading ...</>
