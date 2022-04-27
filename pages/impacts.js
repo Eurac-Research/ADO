@@ -297,6 +297,7 @@ export default function App({ impactData }) {
           />
 
           <select
+            style={{ position: "relative" }}
             value={year}
             onChange={evt => setYear(evt.target.value) + setNutsid(null)}>
             {yearAndAmount && yearAndAmount.map((yearitem) => (

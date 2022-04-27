@@ -289,25 +289,7 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
 
           </Map>
 
-          {clickInfo && (
-            <div className="overlayContainer">
-              <div className="dataOverlay" style={{ width: "90vw", position: "relative" }}>
-                <span className="closeOverlay" onClick={onClose}>close X</span>
-
-                {console.log("timeseries from slug", timeseriesData)}
-
-                <TimeSeries data={timeseriesData} indices={indices} index={datatype} />
-
-                <div>
-                  <iframe srcDoc={htmlData} width="100%" height="100%" style={{ position: 'absolute', top: "auto", left: "0", height: "100%", width: "100%", paddingBottom: "150px" }}></iframe>
-                </div>
-
-              </div>
-            </div>
-          )}
-
           <div className="controlContainer">
-
             <div className="legend">
               {staticMetaData.colormap.legend.stops.map((item, index) => {
                 return (
@@ -371,8 +353,6 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
             </div>
           </div>
 
-
-
           <div className="darkModeToggle" onClick={toggleTheme} title={theme === 'light' ? 'switch to dark mode' : "switch to light mode"}>
             {theme === 'light' ?
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" title="moon">
@@ -386,6 +366,22 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
           </div>
 
         </div>
+
+        {clickInfo && (
+          <>
+            <div className="overlayContainer" onClick={onClose}>
+            </div>
+            <div className="dataOverlay">
+              <span className="closeOverlay" onClick={onClose}>close X</span>
+
+              <TimeSeries data={timeseriesData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
+              {htmlData ?
+                <iframe srcDoc={htmlData} width="100%" height="5500px" style={{ position: 'absolute', top: "auto", left: "0", height: "5500opx", width: "100%", paddingBottom: "150px" }}></iframe>
+                : <>loading ...</>}
+
+            </div>
+          </>
+        )}
 
       </div >
     </Layout >

@@ -70,13 +70,14 @@ function ControlPanel(props) {
 
       </div>
       {overlay && (
-        <div className="overlayContainer" style={{ position: "fixed" }}>
+        <>
+          <div className="overlayContainer" onClick={onClose}></div>
           <div className="textOverlay">
             <span className="closeOverlay" onClick={onClose}>close X</span>
             <h3 className="overlayTitle">{metadata?.short_name} - {metadata?.long_name}</h3>
             <p>{metadata?.abstract}</p>
           </div>
-        </div>
+        </>
       )}
     </>
   );
