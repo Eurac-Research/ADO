@@ -246,144 +246,144 @@ export default function App({ datatype, staticData, staticMetaData, cachmentsLay
       <Head>
         <title>{staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research</title>
       </Head>
-      <div>
 
-        <Header />
+      <Header />
 
-        <div className="reactMap">
-          <Map reuseMaps
-            initialViewState={{
-              latitude: 46,
-              longitude: 9,
-              minZoom: 5,
-              zoom: 5,
-              bearing: 0,
-              pitch: 0
-            }}
-            style={{ width: "100vw", height: "100vh" }}
-            mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
-            mapboxAccessToken={MAPBOX_TOKEN}
-            interactiveLayerIds={['data']}
-            onMouseMove={onHover}
-            onMouseLeave={onOut}
-            onClick={onClick}
-          >
+      <div className="reactMap">
+        <Map reuseMaps
+          initialViewState={{
+            latitude: 46,
+            longitude: 9,
+            minZoom: 5,
+            zoom: 5,
+            bearing: 0,
+            pitch: 0
+          }}
+          style={{ width: "100vw", height: "100vh" }}
+          mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
+          mapboxAccessToken={MAPBOX_TOKEN}
+          interactiveLayerIds={['data']}
+          onMouseMove={onHover}
+          onMouseLeave={onOut}
+          onClick={onClick}
+        >
 
-            {/*             <Source type="geojson" data={stationData}>
+          {/*             <Source type="geojson" data={stationData}>
               <Layer {...stationPaintLayer} />
             </Source>
  */}
-            <Source type="geojson" data={mapStationData}>
-              <Layer {...stationGeometryLayer} beforeId="waterway-shadow" />
-            </Source>
+          <Source type="geojson" data={mapStationData}>
+            <Layer {...stationGeometryLayer} beforeId="waterway-shadow" />
+          </Source>
 
-            <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
-            <NavigationControl style={navControlStyle} position={"bottom-right"} />
+          <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
+          <NavigationControl style={navControlStyle} position={"bottom-right"} />
 
-            {hoverInfo && (
-              <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
-                Click to open station details<br />
-                station id: {hoverInfo?.feature?.properties?.id_station}
-              </div>
-            )}
-
-          </Map>
-
-          <div className="controlContainer">
-            <div className="legend">
-              {staticMetaData.colormap.legend.stops.map((item, index) => {
-                return (
-                  <div key={`legend${index}`} className="legendItem">
-                    <div
-                      className="legendColor"
-                      style={{ background: item['2'] }}>
-                    </div>
-                    <p className="legendLabel">{item['1']}</p>
-                  </div>
-                )
-              })}
+          {hoverInfo && (
+            <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
+              Click to open station details<br />
+              station id: {hoverInfo?.feature?.properties?.id_station}
             </div>
+          )}
 
-            <ControlPanel
-              metadata={metadata}
-              day={day}
-              firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
-              lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
-              onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))}
-            />
+        </Map>
 
-            <div className="navigation">
-              <p>Indices</p>
-              <Link prefetch={false} href="/hydro/cdi">
-                <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/vci">
-                <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/vhi">
-                <a className={router.query.slug === 'vhi' ? 'active' : ''}>vhi</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/sma">
-                <a className={router.query.slug === 'sma' ? 'active' : ''}>sma</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spei-1">
-                <a className={router.query.slug === 'spei-1' ? 'active' : ''}>spei-1</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spei-3">
-                <a className={router.query.slug === 'spei-3' ? 'active' : ''}>spei-3</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spei-6">
-                <a className={router.query.slug === 'spei-6' ? 'active' : ''}>spei-6</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spei-12">
-                <a className={router.query.slug === 'spei-12' ? 'active' : ''}>spei-12</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spi-1">
-                <a className={router.query.slug === 'spi-1' ? 'active' : ''}>spi-1</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spi-3">
-                <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spi-6">
-                <a className={router.query.slug === 'spi-6' ? 'active' : ''}>spi-6</a>
-              </Link>
-              <Link prefetch={false} href="/hydro/spi-12">
-                <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
-              </Link>
-            </div>
-          </div>
 
-          <div className="darkModeToggle" onClick={toggleTheme} title={theme === 'light' ? 'switch to dark mode' : "switch to light mode"}>
-            {theme === 'light' ?
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" title="moon">
-                <path d="M283.21 512c78.96 0 151.08-35.92 198.86-94.8 7.07-8.7-.64-21.42-11.56-19.34-124.2 23.65-238.27-71.58-238.27-196.96a200.43 200.43 0 0 1 101.5-174.39C343.43 21 341 6.31 330 4.28A258.16 258.16 0 0 0 283.2 0c-141.3 0-256 114.51-256 256 0 141.3 114.51 256 256 256z" />
-              </svg>
-              : <svg xmlns="http://www.w3.org/2000/svg" title="sun" fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="5" />
-                <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-              </svg>
-            }
-          </div>
-
+        <div className="darkModeToggle" onClick={toggleTheme} title={theme === 'light' ? 'switch to dark mode' : "switch to light mode"}>
+          {theme === 'light' ?
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" title="moon">
+              <path d="M283.21 512c78.96 0 151.08-35.92 198.86-94.8 7.07-8.7-.64-21.42-11.56-19.34-124.2 23.65-238.27-71.58-238.27-196.96a200.43 200.43 0 0 1 101.5-174.39C343.43 21 341 6.31 330 4.28A258.16 258.16 0 0 0 283.2 0c-141.3 0-256 114.51-256 256 0 141.3 114.51 256 256 256z" />
+            </svg>
+            : <svg xmlns="http://www.w3.org/2000/svg" title="sun" fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          }
         </div>
 
-        {clickInfo && (
-          <>
-            <div className="overlayContainer" onClick={onClose}>
-            </div>
-            <div className="dataOverlay">
-              <span className="closeOverlay" onClick={onClose}>close X</span>
+      </div>
 
-              <TimeSeries data={timeseriesData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
-              {htmlData ?
-                <iframe srcDoc={htmlData} width="100%" height="5500px" style={{ position: 'absolute', top: "auto", left: "0", height: "5500opx", width: "100%", paddingBottom: "150px" }}></iframe>
-                : <>loading ...</>}
+      {clickInfo && (
+        <>
+          <div className="overlayContainer" onClick={onClose}>
+          </div>
+          <div className="dataOverlay">
+            <span className="closeOverlay" onClick={onClose}>close X</span>
 
-            </div>
-          </>
-        )}
+            <TimeSeries data={timeseriesData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
+            {htmlData ?
+              <iframe srcDoc={htmlData} width="100%" height="5500px" style={{ position: 'absolute', top: "auto", left: "0", height: "5500opx", width: "100%", paddingBottom: "150px" }}></iframe>
+              : <>loading ...</>}
 
-      </div >
+          </div>
+        </>
+      )}
+
+      <div className="controlContainer">
+        <div className="legend">
+          {staticMetaData.colormap.legend.stops.map((item, index) => {
+            return (
+              <div key={`legend${index}`} className="legendItem">
+                <div
+                  className="legendColor"
+                  style={{ background: item['2'] }}>
+                </div>
+                <p className="legendLabel">{item['1']}</p>
+              </div>
+            )
+          })}
+        </div>
+
+        <ControlPanel
+          metadata={metadata}
+          day={day}
+          firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
+          lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
+          onChange={value => setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))}
+        />
+
+        <div className="navigation">
+          <p>Indices</p>
+          <Link prefetch={false} href="/hydro/cdi">
+            <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/vci">
+            <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/vhi">
+            <a className={router.query.slug === 'vhi' ? 'active' : ''}>vhi</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/sma">
+            <a className={router.query.slug === 'sma' ? 'active' : ''}>sma</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spei-1">
+            <a className={router.query.slug === 'spei-1' ? 'active' : ''}>spei-1</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spei-3">
+            <a className={router.query.slug === 'spei-3' ? 'active' : ''}>spei-3</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spei-6">
+            <a className={router.query.slug === 'spei-6' ? 'active' : ''}>spei-6</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spei-12">
+            <a className={router.query.slug === 'spei-12' ? 'active' : ''}>spei-12</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spi-1">
+            <a className={router.query.slug === 'spi-1' ? 'active' : ''}>spi-1</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spi-3">
+            <a className={router.query.slug === 'spi-3' ? 'active' : ''}>spi-3</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spi-6">
+            <a className={router.query.slug === 'spi-6' ? 'active' : ''}>spi-6</a>
+          </Link>
+          <Link prefetch={false} href="/hydro/spi-12">
+            <a className={router.query.slug === 'spi-12' ? 'active' : ''}>spi-12</a>
+          </Link>
+        </div>
+      </div>
+
+
     </Layout >
   );
 }
