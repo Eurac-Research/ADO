@@ -175,6 +175,11 @@
   font-weight: 600;
 }
 
+.markdownBody i,
+.markdownBody em {
+  font-style: italic;
+}
+
 .markdownBody dfn {
   font-style: italic;
 }
