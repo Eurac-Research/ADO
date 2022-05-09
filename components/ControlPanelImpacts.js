@@ -11,7 +11,7 @@ function ControlPanelImpacts(props) {
   } = props;
 
 
-  console.log("year", year);
+  //console.log("year", year);
 
   const selectedYear = year ? year : yearRange[0]
 

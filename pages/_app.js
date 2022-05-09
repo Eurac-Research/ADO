@@ -1,7 +1,8 @@
 import '../styles/globals.scss'
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Router from 'next/router'
 import * as gtag from '../lib/gtag'
+import { ThemeProvider } from "../context/theme";
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -14,7 +15,11 @@ function MyApp({ Component, pageProps }) {
     }
   }, [])
 
-  return <Component {...pageProps} />
+  return (
+    <ThemeProvider>
+      <Component {...pageProps} />
+    </ThemeProvider >
+  )
 }
 
 export default MyApp

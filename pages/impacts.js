@@ -10,10 +10,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from "../components/layout"
-import Header from "../components/Header"
 import uniqolor from 'uniqolor'
 const { Color, ColorImmutable } = require('frostcolor')
 
+import { getAllPosts } from '../lib/api'
+import { useThemeContext } from "../context/theme";
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'
 
@@ -34,11 +35,15 @@ import { match } from 'assert'
 export async function getStaticProps({ params }) {
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/EDIIALPS_V1.0-minified.json`)
   const impactData = await response.json()
-  return { props: { impactData } };
+  const allPosts = getAllPosts([
+    'title',
+    'slug',
+  ])
+  return { props: { impactData, allPosts } };
 }
 
 
-export default function App({ impactData }) {
+export default function App({ impactData, allPosts }) {
   const router = useRouter()
 
   function impactAmountByNutsId(NUTS_ID) {
@@ -61,12 +66,13 @@ export default function App({ impactData }) {
   const [nutsName, setNutsName] = useState(null)
   const [year, setYear] = useState("")
 
+  const [theme, setTheme] = useThemeContext();
 
 
   const impactDataByYear = impactData.filter(item => item.Year_start == year);
 
-  console.log("impactDataByYear", impactDataByYear);
-
+  /*   console.log("impactDataByYear", impactDataByYear);
+   */
 
   const uniqueYears = [...new Set(impactData.map(item => item.Year_start))]
 
@@ -99,7 +105,7 @@ export default function App({ impactData }) {
 
   // create array
   const impactEntries = Object.entries(uniqueImpactsByNutsID);
-  console.log("impactEntries", impactEntries);
+  //console.log("impactEntries", impactEntries);
 
 
   // Calculate color values for each nuts3id
@@ -237,13 +243,11 @@ export default function App({ impactData }) {
 
 
   return (
-    <Layout>
+    <Layout posts={allPosts}>
       <Head>
         <title>Impacts - Alpine Drought Observatory | Eurac Research</title>
       </Head>
       <div>
-
-        <Header />
 
         <div className="reactMap">
           <Map
@@ -256,7 +260,7 @@ export default function App({ impactData }) {
               zoom: 5,
             }}
             style={{ width: "100vw", height: "100vh" }}
-            mapStyle={'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
+            mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
             mapboxAccessToken={MAPBOX_TOKEN}
             interactiveLayerIds={['nuts']}
             onMouseMove={onHover}

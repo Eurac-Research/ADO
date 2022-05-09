@@ -10,10 +10,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from "../components/layout"
-import Header from "../components/Header"
 import TimeSeries from "../components/timeseries"
 
 import { getAllPosts } from '../lib/api'
+import { useThemeContext } from "../context/theme";
 
 
 
@@ -28,9 +28,11 @@ export async function getStaticProps({ params }) {
   const staticData = await response.json()
   const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`)
   const staticMetaData = await responseMeta.json()
-  const fileNames = getAllPosts()
-
-  return { props: { datatype, staticData, staticMetaData, fileNames } };
+  const allPosts = getAllPosts([
+    'title',
+    'slug',
+  ])
+  return { props: { datatype, staticData, staticMetaData, allPosts } };
 }
 
 // This function gets called at build time
@@ -43,7 +45,7 @@ export async function getStaticPaths() {
   return { paths, fallback: false }
 }
 
-export default function App({ datatype, staticData, staticMetaData, fileNames }) {
+export default function App({ datatype, staticData, staticMetaData, allPosts }) {
   const router = useRouter()
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
@@ -56,6 +58,7 @@ export default function App({ datatype, staticData, staticMetaData, fileNames })
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
+  const [theme, setTheme] = useThemeContext();
 
 
 
@@ -94,20 +97,6 @@ export default function App({ datatype, staticData, staticMetaData, fileNames })
     setClickInfo()
   }, []);
 
-  /* https://www.zeromolecule.com/blog/5-utility-react-hooks-for-every-project/ */
-  function useToggleState(
-    initialState = false,
-    [on, off] = ['dark', 'light']
-  ) {
-    const [state, setState] = useState(initialState);
-
-    const toggleState = useCallback(() => {
-      setState(s => (s === on ? off : on));
-    }, [on, off]);
-
-    return [state, toggleState, setState];
-  }
-  const [theme, toggleTheme] = useToggleState('light', ['dark', 'light']);
 
   const data = useMemo(() => {
     return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
@@ -161,15 +150,11 @@ export default function App({ datatype, staticData, staticMetaData, fileNames })
     return null;
   }
 
-  console.log("files slug: ", fileNames)
-
   return (
-    <Layout theme={theme} files={fileNames}>
+    <Layout theme={theme} posts={allPosts}>
       <Head>
         <title>{metadata?.long_name} - Alpine Drought Observatory | Eurac Research</title>
       </Head>
-
-      <Header />
 
       <div className="reactMap">
         <Map
@@ -208,17 +193,6 @@ export default function App({ datatype, staticData, staticMetaData, fileNames })
         </Map>
 
 
-        <div className="darkModeToggle" onClick={toggleTheme} title={theme === 'light' ? 'switch to dark mode' : "switch to light mode"}>
-          {theme === 'light' ?
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" title="moon">
-              <path d="M283.21 512c78.96 0 151.08-35.92 198.86-94.8 7.07-8.7-.64-21.42-11.56-19.34-124.2 23.65-238.27-71.58-238.27-196.96a200.43 200.43 0 0 1 101.5-174.39C343.43 21 341 6.31 330 4.28A258.16 258.16 0 0 0 283.2 0c-141.3 0-256 114.51-256 256 0 141.3 114.51 256 256 256z" />
-            </svg>
-            : <svg xmlns="http://www.w3.org/2000/svg" title="sun" fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="5" />
-              <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-            </svg>
-          }
-        </div>
 
       </div>
 

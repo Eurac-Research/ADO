@@ -24,9 +24,16 @@
     "react-dom": "17.0.2",
     "react-map-gl": "^7.0.6",
     "recharts": "^2.1.6",
+    "rehype-accessible-emojis": "^0.3.2",
+    "rehype-sanitize": "^5.0.1",
+    "rehype-stringify": "^9.0.3",
+    "rehype-twemojify": "^3.1.0",
     "remark": "^14.0.2",
+    "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
+    "remark-rehype": "^10.1.0",
     "sass": "^1.43.4",
+    "twemoji": "^14.0.2",
     "uniqolor": "^1.0.2"
   },
   "devDependencies": {

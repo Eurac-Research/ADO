@@ -3,13 +3,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 
-function SideBar({ files }) {
+function SideBar({ posts, sideBarPositionRelative }) {
   const router = useRouter();
 
-  console.log("fileNames sidebar", files);
-
   return (
-    <div className="sideBar">
+    <div className={(sideBarPositionRelative === 0) ? `sideBar` : `sideBar relative`}>
       <div className={(router.pathname !== "/impacts" && router.pathname !== "/impacts-nuts2" && !router.asPath.includes('hydro')) ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/">
           <a>Indicies</a>
@@ -39,11 +37,14 @@ function SideBar({ files }) {
         </Link>
       </div>
 
-      {files.map((item) => (
-        <div key={item} className={"sideBarItem"}>
-          <a>{item}</a>
+      {posts && posts.map((item, index) => (
+        <div key={`${item}-${index}`} className={router.asPath.includes(item.slug) ? "sideBarItem active" : "sideBarItem"}>
+          <Link href={`/md/${item?.slug}`}>
+            <a>{item.title}</a>
+          </Link>
         </div>
-      ))}
+      ))
+      }
 
       <div className="alphaInfo">
 
