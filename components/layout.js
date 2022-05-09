@@ -9,7 +9,6 @@ export default function Layout({ children, posts, headerMode = 0 } = {}) {
 
   return (
     <div className={theme}>
-      {headerMode}
       <Header headerModeWithBackground={headerMode} />
       <SideBar posts={posts} sideBarPositionRelative={headerMode} />
       <main>{children}</main>
