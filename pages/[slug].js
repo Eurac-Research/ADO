@@ -13,6 +13,10 @@ import Layout from "../components/layout"
 import Header from "../components/Header"
 import TimeSeries from "../components/timeseries"
 
+import { getAllPosts } from '../lib/api'
+
+
+
 const MAPBOX_TOKEN = 'pk.eyJ1IjoidGlhY29wIiwiYSI6ImNrdWY2amV3YzEydGYycXJ2ZW94dHVqZjMifQ.kQv7jZ5lernZkyYI_3gd5A'
 
 const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10', 'cdi', 'sma', 'vci', 'vhi']
@@ -24,7 +28,9 @@ export async function getStaticProps({ params }) {
   const staticData = await response.json()
   const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`)
   const staticMetaData = await responseMeta.json()
-  return { props: { datatype, staticData, staticMetaData } };
+  const fileNames = getAllPosts()
+
+  return { props: { datatype, staticData, staticMetaData, fileNames } };
 }
 
 // This function gets called at build time
@@ -37,7 +43,7 @@ export async function getStaticPaths() {
   return { paths, fallback: false }
 }
 
-export default function App({ datatype, staticData, staticMetaData, href }) {
+export default function App({ datatype, staticData, staticMetaData, fileNames }) {
   const router = useRouter()
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
@@ -49,6 +55,8 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
   const [nutsData, setNutsData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
+
+
 
 
   const onHover = useCallback(event => {
@@ -153,9 +161,10 @@ export default function App({ datatype, staticData, staticMetaData, href }) {
     return null;
   }
 
+  console.log("files slug: ", fileNames)
 
   return (
-    <Layout theme={theme}>
+    <Layout theme={theme} files={fileNames}>
       <Head>
         <title>{metadata?.long_name} - Alpine Drought Observatory | Eurac Research</title>
       </Head>

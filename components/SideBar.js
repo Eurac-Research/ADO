@@ -2,8 +2,11 @@ import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-function SideBar() {
+
+function SideBar({ files }) {
   const router = useRouter();
+
+  console.log("fileNames sidebar", files);
 
   return (
     <div className="sideBar">
@@ -12,7 +15,6 @@ function SideBar() {
           <a>Indicies</a>
         </Link>
       </div>
-
 
       <div className={(router.pathname === "/impacts" || router.pathname === "/impacts-nuts2") ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/impacts">
@@ -31,12 +33,17 @@ function SideBar() {
         </div>
       </div>
 
-
       <div className={router.asPath.includes('hydro') ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/hydro/cdi">
           <a>Hydro</a>
         </Link>
       </div>
+
+      {files.map((item) => (
+        <div key={item} className={"sideBarItem"}>
+          <a>{item}</a>
+        </div>
+      ))}
 
       <div className="alphaInfo">
 
@@ -56,7 +63,6 @@ function SideBar() {
 
 
     </div >
-
 
   );
 }

@@ -1,12 +1,14 @@
 import CookieConsent from 'react-cookie-consent'
 import SideBar from "./SideBar"
 
-export default function Layout({ theme, children }) {
+export default function Layout({ theme, children, files }) {
+
+  console.log("files layout", files);
 
 
   return (
     <div className={theme}>
-      <SideBar />
+      <SideBar files={files} />
       <main>{children}</main>
       <CookieConsent
         location="none"
