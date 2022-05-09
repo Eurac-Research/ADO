@@ -11,15 +11,6 @@ title: About the Project
 ###### h6 Heading
 
 
-## Horizontal Rules
-
-___
-
----
-
-***
-
-
 ## Typographic replacements
 
 Enable typographer option to see result.
