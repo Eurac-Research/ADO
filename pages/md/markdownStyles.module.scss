@@ -1,9 +1,9 @@
 .contentBox {
-  max-width: 840px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 150px 20px 20px 20px;
 
   @media (min-width: 768px) {
+    max-width: 840px;
     padding: 150px 0 0 0;
   }
 }

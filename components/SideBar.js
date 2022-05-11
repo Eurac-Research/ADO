@@ -8,7 +8,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
 
   return (
     <div className={(sideBarPositionRelative === 0) ? `sideBar` : `sideBar relative`}>
-      <div className={(router.pathname !== "/impacts" && router.pathname !== "/impacts-nuts2" && !router.asPath.includes('hydro')) ? "sideBarItem active" : "sideBarItem"}>
+      <div className={(router.pathname !== "/impacts" && router.pathname !== "/impacts-nuts2" && !router.asPath.includes('hydro') && !router.asPath.includes('/md')) ? "sideBarItem active" : "sideBarItem"}>
         <Link href="/">
           <a>Indicies</a>
         </Link>

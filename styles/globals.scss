@@ -208,9 +208,13 @@ body {
 
   &.bg {
     backdrop-filter: blur(10px);
+    height: 120px;
+
+    @media (min-width: 768px) {
+      height: 100px;
+    }
   }
 
-  .logos {}
 
   .ado-logo {
     display: block;
@@ -261,7 +265,6 @@ body {
     }
   }
 
-
   .alpinespace {
     width: 160px;
     height: auto;
@@ -269,7 +272,6 @@ body {
     @media (min-width: 768px) {
       width: 220px;
     }
-
   }
 }
 
@@ -711,10 +713,9 @@ body {
 
 
   &.relative {
-    @media (max-width:1270px) {
-      position: static;
-      margin-top: 100px;
-      top: 0;
+    @media (max-width:768px) {
+      position: fixed;
+      bottom: 10px;
       transform: translateY(0);
     }
   }
