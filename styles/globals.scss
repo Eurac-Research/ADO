@@ -200,7 +200,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 
   @media (min-width: 768px) {
     padding: 20px;
@@ -208,8 +208,9 @@ body {
 
   &.bg {
     backdrop-filter: blur(10px);
-
   }
+
+  .logos {}
 
   .ado-logo {
     display: block;
@@ -233,6 +234,11 @@ body {
 
   .eurac-logo {
     display: block;
+    margin-bottom: 20px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 30px;
+    }
 
     g {
       fill: #222;
@@ -253,6 +259,17 @@ body {
         width: 200px;
       }
     }
+  }
+
+
+  .alpinespace {
+    width: 160px;
+    height: auto;
+
+    @media (min-width: 768px) {
+      width: 220px;
+    }
+
   }
 }
 
@@ -360,10 +377,10 @@ body {
   max-height: 100%;
   z-index: 3;
   user-select: none;
-  padding-bottom: 80px;
+  padding-bottom: 110px;
 
   @media (min-width: 768px) {
-    padding-bottom: 100px;
+    padding-bottom: 80px;
   }
 
   .legend {
@@ -516,7 +533,7 @@ body {
 
 .navigation {
   position: fixed;
-  bottom: 10px;
+  bottom: 60px;
   flex-shrink: 0;
   height: 40px;
   width: 100%;
@@ -529,6 +546,7 @@ body {
   @media (min-width: 768px) {
     height: 50px;
     width: 100%;
+    bottom: 10px;
   }
 
   p {
@@ -665,10 +683,32 @@ body {
 
 .sideBar {
   position: fixed;
-  top: 30%;
-  right: 0;
+  bottom: 10px;
   z-index: 3;
-  transform: translateY(-30%);
+  flex-shrink: 0;
+  height: 40px;
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-wrap: normal;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-start;
+
+  @media (min-width: 768px) {
+    top: 200px;
+    position: fixed;
+    right: 0;
+    z-index: 3;
+    flex-wrap: wrap;
+    height: auto;
+    bottom: auto;
+    flex-direction: column;
+    align-items: flex-end;
+    width: auto;
+  }
+
 
   &.relative {
     @media (max-width:1270px) {
@@ -681,7 +721,7 @@ body {
 
   .alphaInfo {
     display: none;
-    width: 220px;
+    width: 300px;
     font-size: 13px;
     line-height: 1.2;
     margin-top: 30px;
@@ -709,19 +749,40 @@ body {
 
   .sideBarItem {
     width: auto;
-    height: auto;
-    text-align: right;
-    margin-bottom: 10px;
+    height: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    @media (min-width: 768px) {
+      text-align: right;
+      display: block;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
 
     a {
-      display: inline-block;
+      display: block;
       height: 100%;
       width: auto;
-      padding: 10px 15px 10px 10px;
+      padding: 10px;
       background-color: var(--bg-8-light);
       color: var(--text-strong-light);
       text-decoration: none;
       transition: all 100ms ease-in-out;
+      white-space: nowrap;
+      margin-right: 10px;
+
+
+      @media (min-width: 768px) {
+        display: inline-block;
+        padding: 10px 15px 10px 10px;
+        white-space: initial;
+        margin-right: 0px;
+        box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
+      }
 
       &:hover {
         font-weight: bold;
@@ -738,6 +799,15 @@ body {
     font-size: 13px;
     margin-top: 5px;
     font-weight: normal;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
+
 
     a {
       padding: 5px 15px 5px 5px;
