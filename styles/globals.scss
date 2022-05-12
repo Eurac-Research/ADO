@@ -257,10 +257,11 @@ body {
 
     svg {
       width: 135px;
+      height: auto;
 
       @media (min-width: 768px) {
         transform: scale(1);
-        width: 200px;
+        width: 215px;
       }
     }
   }
@@ -629,6 +630,20 @@ body {
       g {
         fill: #fff;
       }
+    }
+  }
+
+  .alpinespace {
+    .fillzero {
+      fill: #ccc;
+    }
+
+    .fillsix {
+      fill: #aaa;
+    }
+
+    .strokezero {
+      stroke: #ccc;
     }
   }
 }
