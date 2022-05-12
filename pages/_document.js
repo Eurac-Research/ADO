@@ -27,6 +27,7 @@ class MyDocument extends Document {
               page_path: window.location.pathname,
               'anonymize_ip': true
             });
+            gtag('config', 'G-E4WRL8Q51T');
           `,
             }}
           />
