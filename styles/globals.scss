@@ -850,11 +850,15 @@ body {
   z-index: 3;
 
   .impactsItem {
-    margin-bottom: 30px;
+    margin-bottom: 28px;
+
+    border-top: 1px solid #ccc;
+    padding-top: 28px;
 
     p {
       font-size: 14px;
       line-height: 1.2;
+      margin-bottom: 10px;
     }
   }
 }
