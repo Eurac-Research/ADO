@@ -90,9 +90,6 @@ export default function App({ impactData, allPosts }) {
   /*   console.log("yearAndAmount", yearAndAmount);
    */
 
-  // Build a GL match expression that defines the color for every vector tile feature
-  // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
-  const matchExpression = ['match', ['get', 'NUTS_ID']];
 
 
   // count number of distict values AKA number of impacts for a given nutsid
@@ -113,30 +110,36 @@ export default function App({ impactData, allPosts }) {
   //console.log("impactEntries", impactEntries);
 
 
+  // https://docs.mapbox.com/mapbox-gl-js/example/data-join/
+  // Build a GL match expression that defines the color for every vector tile feature
+  // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
+  const matchExpression = ['match', ['get', 'NUTS_ID']];
+
+
   // Calculate color values for each nuts3id
-  for (const row of impactEntries) {
-    const amount = row['1']
-    const color = uniqolor(amount, {
-      saturation: [50, 75],
-      lightness: [50, 70],
-      differencePoint: 90,
-    })
+  if (impactEntries.length > 1) {
+    for (const row of impactEntries) {
+      const amount = row['1']
+      const color = uniqolor(amount, {
+        saturation: [50, 75],
+        lightness: [50, 70],
+        differencePoint: 90,
+      })
 
-    // get color by basecolor - darken color by amount of impacts per nutsregion
-    const mycolor = Color.fromString("#FFCEC3").darken((amount / 100)).toHexString()
-    // console.log(`mycolor amount ${mycolor}, ${amount / 100}`);
+      // get color by basecolor - darken color by amount of impacts per nutsregion
+      const mycolor = Color.fromString("#FFCEC3").darken((amount / 100)).toHexString()
+      // console.log(`mycolor amount ${mycolor}, ${amount / 100}`);
 
-    matchExpression.push(row['0'], mycolor)
+      matchExpression.push(row['0'], mycolor)
+    }
+
   }
 
   // Last value is the default, used where there is no data
-  matchExpression.push('rgba(0, 0, 0, 0)')
+  matchExpression.push('rgba(0, 0, 0, 0.1)')
 
   // Add layer from the vector tile source to create the choropleth
   // Insert it below the 'admin-1-boundary-bg' layer in the style
-
-
-  // console.log("matchExpression", matchExpression);
 
 
   const nutsLayer = {
@@ -360,9 +363,9 @@ export default function App({ impactData, allPosts }) {
     const hoveredFeature = features && features[0];
     const clickedNutsid = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
     const clickedNutsName = hoveredFeature ? hoveredFeature?.properties?.NUTS_NAME : null
-    setYear("")
     setNutsName(clickedNutsName)
     setNutsid(clickedNutsid)
+    setYear("")
 
 
     if (featuredId === null) {
@@ -427,6 +430,17 @@ export default function App({ impactData, allPosts }) {
 
   }, []);
 
+  const removeNutsInformation = useCallback(event => {
+    const map = mapRef.current.getMap()
+
+    map.setFeatureState(
+      { source: 'geojson', id: featuredId },
+      { hover: false }
+    );
+    setFeaturedId(null)
+
+  }, [featuredId]);
+
 
   return (
     <Layout posts={allPosts}>
@@ -479,7 +493,8 @@ export default function App({ impactData, allPosts }) {
           </Map>
         </div>
 
-        <div className="controlContainer">
+        <div className="controlContainer" onClick={removeNutsInformation}>
+
           <ControlPanelImpacts
             year={year}
             yearRange={uniqueYears}
