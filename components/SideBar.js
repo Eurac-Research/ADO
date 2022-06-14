@@ -58,7 +58,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
           Raw data can be found in the public repository <a href="https://github.com/Eurac-Research/ado-data">https://github.com/Eurac-Research/ado-data</a>
         </p>
         <br />
-        <p>Eurac Research, May 2022</p>
+        <p>Eurac Research, June 2022</p>
 
       </div>
 
