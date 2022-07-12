@@ -1,4 +1,3 @@
-import CookieConsent from 'react-cookie-consent'
 import SideBar from "./SideBar"
 import Header from "../components/Header"
 import { useThemeContext } from "../context/theme";
@@ -29,21 +28,6 @@ export default function Layout({ children, posts, headerMode = 0 } = {}) {
           </svg>
         }
       </div>
-
-      <CookieConsent
-        location="none"
-        buttonText="It's OK for me"
-        cookieName="ADOCookieConsent"
-        overlay={true}
-        overlayClasses="cookieConsentContainer"
-        containerClasses="cookieConsent"
-        contentClasses="cookieConsentContent"
-        expires={150}
-        sameSite="strict"
-      >
-        This website uses cookies (Google Analytics).{" "}<br />
-        Read our <span style={{ textDecoration: "underline" }}><a href="https://www.eurac.edu/en/static/privacy-policy">Privacy Statement</a></span>
-      </CookieConsent>
     </div>
   )
 }
