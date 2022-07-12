@@ -3,7 +3,7 @@ export function updatePercentiles(featureCollection, accessor) {
   return {
     type: 'FeatureCollection',
     features: features.map(f => {
-      const value = accessor(f);      
+      const value = accessor(f);
       const properties = {
         ...f.properties,
         value
