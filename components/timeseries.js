@@ -18,20 +18,19 @@ function TimeSeries(props) {
     }
   })
 
-  console.log("series", series);
 
   const dimensionsArray = indices?.map((index) => {
     return index.toUpperCase()
   })
   const dimensions = ['date'].concat(dimensionsArray)
 
-  console.log("dimensions", dimensions)
-
-  console.log("index", index)
-
-
-  console.log("data", data)
-
+  /*   console.log("dimensions", dimensions)
+  
+    console.log("index", index)
+  
+  
+    console.log("data", data)
+   */
   /* 
     create object for chart options and assign values 
   */
@@ -46,17 +45,14 @@ function TimeSeries(props) {
 
   const [selecedDimensions, setSelecedDimensions] = useState(legendObject)
 
-  function onChartClick(param, echarts) {
-    console.log(param, echarts);
-  }
 
   function onChartLegendselectchanged(param, echarts) {
-    console.log("legendclick: ", param, echarts);
+    // console.log("legendclick: ", param, echarts);
 /*     setActiveLegend(param?.name)
     setSelecedDimensions(param?.selected)
  */  };
 
-  console.log("selecedDimensions", selecedDimensions);
+  // console.log("selecedDimensions", selecedDimensions);
 
   const options = {
     /*     title: {
