@@ -71,7 +71,7 @@ export default function App({ impactData, allPosts }) {
 
   const impactDataByYear = impactData.filter(item => item.Year_start == year);
 
-  console.log("impactDataByYear", impactDataByYear);
+  // console.log("impactDataByYear", impactDataByYear);
 
 
   const uniqueYears = [...new Set(impactData.map(item => item.Year_start))]
@@ -105,7 +105,7 @@ export default function App({ impactData, allPosts }) {
 
   // create array
   const impactEntries = Object.entries(uniqueImpactsByNutsID);
-  console.log("impactEntries", impactEntries);
+  // console.log("impactEntries", impactEntries);
 
 
   // Calculate color values for each NUTS2id

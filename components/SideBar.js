@@ -55,10 +55,10 @@ function SideBar({ posts, sideBarPositionRelative }) {
           More information about the project at <a href="https://www.alpine-space.org/projects/ado/en/home">https://www.alpine-space.org/projects/ado/</a>
         </p>
         <p>
-          Raw data can be found in the public repository <a href="https://github.com/Eurac-Research/ado-data">https://github.com/Eurac-Research/ado-data</a>
+          Data can be found in the public repository <a href="https://github.com/Eurac-Research/ado-data">https://github.com/Eurac-Research/ado-data</a>
         </p>
         <br />
-        <p>Eurac Research, June 2022</p>
+        <p>Eurac Research, July 2022</p>
 
       </div>
 
