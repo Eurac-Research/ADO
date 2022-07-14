@@ -89,7 +89,7 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
         }
         : null
     );
-    const nutsId = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
+    const nutsId = hoveredFeature ? hoveredFeature?.properties?.nuts_id : null
     getNutsData(nutsId)
   }, []);
 
@@ -185,8 +185,8 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
               <br />
               <br />
               {day}
-              <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
-              <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
+              <div>NUTS_NAME: {hoverInfo.feature.properties.nuts_name}</div>
+              <div>NUTS_ID: {hoverInfo.feature.properties.nuts_id}</div>
               <div>{datatype}: {hoverInfo.feature.properties.value}</div>
             </div>
           )}
@@ -240,9 +240,9 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
             <span className="closeOverlay" onClick={onClose}>close X</span>
             <h3>{datatype} - {staticMetaData?.long_name}</h3>
             {isError && (
-              <p>file https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_{clickInfo.feature.properties.NUTS_ID}.json - errors in file</p>
+              <p>file https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_{clickInfo.feature.properties.nuts_id}.json - errors in file</p>
             )}
-            <p>{clickInfo.feature.properties.NUTS_NAME} (nuts id: {clickInfo.feature.properties.NUTS_ID})</p>
+            <p>{clickInfo.feature.properties.nuts_name} (nuts id: {clickInfo.feature.properties.nuts_id})</p>
 
             <TimeSeries data={nutsData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
 
