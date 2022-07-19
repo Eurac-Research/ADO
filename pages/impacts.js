@@ -47,8 +47,8 @@ export default function App({ impactData, allPosts }) {
   const router = useRouter()
   const mapRef = React.useRef();
 
-  function impactAmountByNutsId(NUTS_ID) {
-    const result = impactEntries.find(item => item[0] === NUTS_ID)
+  function impactAmountByNutsId(nuts_id) {
+    const result = impactEntries.find(item => item[0] === nuts_id)
     if (result) {
       return result[1] // amount of impact items
     }
@@ -113,7 +113,7 @@ export default function App({ impactData, allPosts }) {
   // https://docs.mapbox.com/mapbox-gl-js/example/data-join/
   // Build a GL match expression that defines the color for every vector tile feature
   // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
-  const matchExpression = ['match', ['get', 'NUTS_ID']];
+  const matchExpression = ['match', ['get', 'nuts_id']];
 
 
   // Calculate color values for each nuts3id
@@ -291,11 +291,11 @@ export default function App({ impactData, allPosts }) {
                 </p>
 
                 {item?.NUTS3_ID && nutsMap.features
-                  .filter(nut => nut.properties.NUTS_ID === item?.NUTS3_ID)
+                  .filter(nut => nut.properties.nuts_id === item?.NUTS3_ID)
                   .map((nut, index) => (
                     <p key={index}>
                       <b>Region</b> <span style={{ fontSize: "12px" }}>(<a href="https://ec.europa.eu/eurostat/web/nuts/background" target="_blank" rel="noreferrer">NUTS-3</a>)</span><br />
-                      {nut.properties.NUTS_NAME}
+                      {nut.properties.nuts_name}
                     </p>
                   ))
                 }
@@ -361,8 +361,8 @@ export default function App({ impactData, allPosts }) {
       features
     } = event;
     const hoveredFeature = features && features[0];
-    const clickedNutsid = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
-    const clickedNutsName = hoveredFeature ? hoveredFeature?.properties?.NUTS_NAME : null
+    const clickedNutsid = hoveredFeature ? hoveredFeature?.properties?.nuts_id : null
+    const clickedNutsName = hoveredFeature ? hoveredFeature?.properties?.nuts_name : null
     setNutsName(clickedNutsName)
     setNutsid(clickedNutsid)
     setYear("")
@@ -485,9 +485,9 @@ export default function App({ impactData, allPosts }) {
               <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
                 click to open impact
                 <br />
-                <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
-                <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-                amount: {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}
+                <div>nuts_name: {hoverInfo.feature.properties.nuts_name}</div>
+                <div>nuts_id: {hoverInfo.feature.properties.nuts_id}</div>
+                amount: {impactAmountByNutsId(hoverInfo.feature.properties.nuts_id)}
               </div>
             )}
           </Map>

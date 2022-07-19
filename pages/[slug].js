@@ -185,8 +185,8 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
               <br />
               <br />
               {day}
-              <div>NUTS_NAME: {hoverInfo.feature.properties.nuts_name}</div>
-              <div>NUTS_ID: {hoverInfo.feature.properties.nuts_id}</div>
+              <div>nuts_name: {hoverInfo.feature.properties.nuts_name}</div>
+              <div>nuts_id: {hoverInfo.feature.properties.nuts_id}</div>
               <div>{datatype}: {hoverInfo.feature.properties.value}</div>
             </div>
           )}
