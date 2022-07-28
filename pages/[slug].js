@@ -75,7 +75,7 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
     setHoverInfo(hoveredFeature && { rgbaColor: featureColor, feature: hoveredFeature, x, y });
   }, []);
 
-//console.log("hoverinfo", hoverInfo);
+console.log("hoverinfo", hoverInfo);
 
   const onOut = useCallback(event => {
     setHoverInfo(null)
@@ -178,7 +178,7 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
           onMouseLeave={onOut}
           onClick={onClick}
         >
-          <Source type="geojson" data={data}>
+          <Source type="geojson" data={data} generateId={true}>
             <Layer {...dataLayer} beforeId="waterway-shadow" />
           </Source>
           <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />

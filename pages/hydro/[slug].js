@@ -243,6 +243,11 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
             <h1>{clickInfo?.feature?.properties?.country}, {clickInfo?.feature?.properties?.region}, {clickInfo?.feature?.properties?.location_s} - {clickInfo?.feature?.properties?.id_station}</h1>
 
             <TimeSeries data={timeseriesData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
+            
+            <div className='mapLink'>
+              View all hydrological stations in the alpine region <a href="https://maps.eurac.edu/maps/85/view" target="_blank">https://maps.eurac.edu/maps/85/view</a>
+            </div>
+            
             {htmlData ?
               <iframe srcDoc={htmlData} width="100%" height="5500px" style={{ position: 'absolute', top: "auto", left: "0", height: "5500opx", width: "100%", paddingBottom: "150px" }}></iframe>
               : <>loading ...</>}
