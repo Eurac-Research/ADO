@@ -105,7 +105,7 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
       point: { x, y }
     } = event;
     const hoveredFeature = features && features[0];
-    console.log("hoverfeat", hoveredFeature)
+    //console.log("hoverfeat", hoveredFeature)
     setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
   }, []);
 
