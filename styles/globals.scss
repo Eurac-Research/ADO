@@ -125,7 +125,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: '';
+  content: "";
   content: none;
 }
 
@@ -135,7 +135,6 @@ table {
 }
 
 /* end reset css */
-
 
 :root {
   --bg-9-dark: rgba(0, 0, 0, 0.9);
@@ -148,7 +147,6 @@ table {
   --text-dark: #fff;
   --tooltipBg: #fff;
 }
-
 
 :root {
   .dark {
@@ -202,6 +200,8 @@ body {
   justify-content: space-between;
   align-items: flex-start;
 
+  height: 0;
+
   @media (min-width: 768px) {
     padding: 20px;
   }
@@ -214,7 +214,6 @@ body {
       height: 100px;
     }
   }
-
 
   .ado-logo {
     display: block;
@@ -287,13 +286,38 @@ body {
 .tooltip {
   position: absolute;
   margin: 8px;
-  padding: 4px;
+  padding: 2px 8px;
   background: var(--bg-9-dark);
   color: var(--text-dark);
   max-width: 300px;
-  font-size: 11px;
+  font-size: 12px;
   z-index: 9;
   pointer-events: none;
+
+  span {
+    display: block;
+  }
+  .indexName {
+    font-size: 10px;
+  }
+  .indexValue {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .indexValueDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    background-color: #fff;
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .tooltipLocation {
+  }
+  .tooltipCTA {
+    font-size: 10px;
+  }
 }
 
 .overlayContainer {
@@ -304,7 +328,6 @@ body {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 100;
-
 }
 
 .dataOverlay {
@@ -324,7 +347,8 @@ body {
   padding-bottom: 80px;
   line-height: 1.5;
 
-  @media (min-width: 768px) {}
+  @media (min-width: 768px) {
+  }
 
   .recharts-tooltip-label {
     color: #222;
@@ -359,9 +383,7 @@ body {
     font-weight: 600;
     margin-bottom: 20px;
   }
-
 }
-
 
 .closeOverlay {
   text-align: right;
@@ -422,7 +444,6 @@ body {
         @media (min-width: 768px) {
           font-size: 12px;
         }
-
       }
     }
   }
@@ -452,7 +473,6 @@ body {
         font-size: 32px;
         margin-bottom: 24px;
       }
-
     }
 
     h2 {
@@ -487,10 +507,9 @@ body {
           width: 25px;
           height: 25px;
           border-radius: 50%;
-          background: #04AA6D;
+          background: #04aa6d;
           cursor: pointer;
         }
-
       }
 
       button {
@@ -530,7 +549,6 @@ body {
         color: #fff;
       }
     }
-
   }
 }
 
@@ -588,7 +606,6 @@ body {
       color: #fff;
       font-weight: 500;
     }
-
   }
 }
 
@@ -603,8 +620,6 @@ body {
   padding: 6px;
   cursor: pointer;
 }
-
-
 
 /* darkmode */
 
@@ -697,7 +712,6 @@ body {
   padding: 6px;
 }
 
-
 .sideBar {
   position: fixed;
   bottom: 10px;
@@ -725,9 +739,8 @@ body {
     align-items: flex-end;
   }
 
-
   &.relative {
-    @media (max-width:768px) {
+    @media (max-width: 768px) {
       position: fixed;
       bottom: 10px;
       transform: translateY(0);
@@ -757,10 +770,7 @@ body {
     p {
       margin-bottom: 8px;
     }
-
   }
-
-
 
   .sideBarItem {
     width: auto;
@@ -779,7 +789,6 @@ body {
       margin-bottom: 10px;
     }
 
-
     a {
       display: block;
       height: 100%;
@@ -791,7 +800,6 @@ body {
       transition: all 100ms ease-in-out;
       white-space: nowrap;
       margin-right: 10px;
-
 
       @media (min-width: 768px) {
         display: inline-block;
@@ -824,7 +832,6 @@ body {
       display: block;
     }
 
-
     a {
       padding: 5px 15px 5px 5px;
       background-color: var(--bg-8-light);
@@ -836,7 +843,6 @@ body {
     }
   }
 }
-
 
 .impactsWrapper {
   position: fixed;
@@ -926,8 +932,6 @@ b {
   font-weight: bold;
 }
 
-
-
 .dark,
 .light {
   height: 100%;
@@ -1013,7 +1017,7 @@ b {
   --color-prettylights-syntax-markup-italic: #24292f;
   --color-prettylights-syntax-markup-bold: #24292f;
   --color-prettylights-syntax-markup-deleted-text: #82071e;
-  --color-prettylights-syntax-markup-deleted-bg: #FFEBE9;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
   --color-prettylights-syntax-markup-inserted-text: #116329;
   --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
   --color-prettylights-syntax-markup-changed-text: #953800;

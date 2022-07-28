@@ -11,26 +11,18 @@ function TimeSeries(props) {
   const [chartData, setChartData] = useState(null)
   const [activeLegend, setActiveLegend] = useState(index)
 
-
   const series = indices?.map((index) => {
     return {
-      type: 'line'
+      type: 'line',
+      showSymbol: false
     }
   })
-
 
   const dimensionsArray = indices?.map((index) => {
     return index.toUpperCase()
   })
   const dimensions = ['date'].concat(dimensionsArray)
 
-  /*   console.log("dimensions", dimensions)
-  
-    console.log("index", index)
-  
-  
-    console.log("data", data)
-   */
   /* 
     create object for chart options and assign values 
   */

@@ -77,10 +77,12 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
     type: 'circle',
     source: 'stationData',
     paint: {
-      'circle-color': 'red',
-      'circle-radius': 8,
-      'circle-stroke-width': 1,
+      'circle-color': '#426cb5',
+      'circle-radius': 12,
+      'circle-blur': 0,
+      'circle-stroke-width': 3,
       'circle-stroke-color': '#fff',
+      'circle-stroke-opacity': 0.9,
     }
   }
 
@@ -88,7 +90,6 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
   const [metaData, setMetaData] = useState()
   const [day, setDay] = useState(metaData ? metaData?.timerange?.properties?.lastDate : staticMetaData?.timerange?.properties?.lastDate);
   const [hoverInfo, setHoverInfo] = useState(null)
-  const [stationHoverInfo, setStationHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [htmlData, setHtmlData] = useState(null)
   const [timeseriesData, setTimeseriesData] = useState(null)
@@ -98,27 +99,13 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
   const [theme, setTheme] = useThemeContext();
 
 
-  const onHover2 = useCallback(event => {
-    const {
-      features,
-      point: { x, y }
-    } = event;
-    const hoveredFeature = features && features[0];
-    setStationHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
-  }, []);
-
-  const onOut2 = useCallback(event => {
-    setStationHoverInfo(null)
-  }, []);
-
-
-
   const onHover = useCallback(event => {
     const {
       features,
       point: { x, y }
     } = event;
     const hoveredFeature = features && features[0];
+    console.log("hoverfeat", hoveredFeature)
     setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
   }, []);
 
@@ -163,24 +150,24 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
       setIsError(false);
       setIsLoading(true);
       try {
-        // const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_${id_station ? `${id_station}` : ''}.html`
-        const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
+        const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_${id_station}.html`
+        //const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
         const timeseriesUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/timeseries/ID_STATION_${id_station ? `${id_station}` : ''}.json`
-
         const result = await axios(htmlUrl)
+
         setHtmlData(result.data)
 
         const timeseriesResult = await axios(timeseriesUrl)
         setTimeseriesData(timeseriesResult.data)
 
       } catch (error) {
+        console.log("error",error);
         setIsError(true);
       }
       setIsLoading(false);
     };
     fetchData();
   }
-
 
   const scaleControlStyle = {
   };
@@ -189,6 +176,9 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
     bottom: 120
   };
 
+
+
+  console.log("clickInfo",clickInfo);
   return (
     <Layout theme={theme} posts={allPosts}>
       <Head>
@@ -208,7 +198,7 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
           style={{ width: "100vw", height: "100vh" }}
           mapStyle={theme === 'dark' ? 'mapbox://styles/tiacop/ckxsylx3u0qoj14muybrpmlpy' : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'}
           mapboxAccessToken={MAPBOX_TOKEN}
-          interactiveLayerIds={['data', 'stationPoint']}
+          interactiveLayerIds={['data']}
           onMouseMove={onHover}
           onMouseLeave={onOut}
           onClick={onClick}
@@ -227,19 +217,17 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
 
           {hoverInfo && (
             <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
-              Click to open station details<br />
-              station id: {hoverInfo?.feature?.properties?.id_station}
+              <span className='indexName'>{datatype} - {day}</span>
+              <span className='indexValue'>{hoverInfo.feature.properties.value}</span>
+              <span className='tooltipLocation'>{hoverInfo?.feature?.properties?.location_s}, {hoverInfo?.feature?.properties?.region}, {hoverInfo?.feature?.properties?.country}</span>
+              {hoverInfo?.feature?.properties?.watercours && (
+                <span>Water Course: {hoverInfo?.feature?.properties?.watercours}<br /></span>
+              )}
+              <span className='tooltipCTA'>Click to view details</span>
+
+
             </div>
           )}
-
-
-          {stationHoverInfo && (
-            <div className="tooltip" style={{ left: stationHoverInfo.x, top: stationHoverInfo.y }}>
-              Click to open station details<br />
-              station id: {stationHoverInfo?.feature?.properties?.id_station}
-            </div>
-          )}
-
 
         </Map>
 
@@ -251,6 +239,8 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
           </div>
           <div className="dataOverlay">
             <span className="closeOverlay" onClick={onClose}>close X</span>
+
+            <h1>{clickInfo?.feature?.properties?.country}, {clickInfo?.feature?.properties?.region}, {clickInfo?.feature?.properties?.location_s} - {clickInfo?.feature?.properties?.id_station}</h1>
 
             <TimeSeries data={timeseriesData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
             {htmlData ?

@@ -61,7 +61,6 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
   const [theme, setTheme] = useThemeContext();
 
 
-
   const onHover = useCallback(event => {
     const {
       features,
@@ -69,9 +68,14 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
     } = event;
     const hoveredFeature = features && features[0];
 
+    // const hoverInfo?.feature?.layer?.paint?.["fill-color"].r
+    const featureColor = `hsla(${hoveredFeature?.layer?.paint?.["fill-color"].r},${hoveredFeature?.layer?.paint?.["fill-color"].g},${hoveredFeature?.layer?.paint?.["fill-color"].b},${hoveredFeature?.layer?.paint?.["fill-color"].a})`
+    
     // prettier-ignore
-    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+    setHoverInfo(hoveredFeature && { rgbaColor: featureColor, feature: hoveredFeature, x, y });
   }, []);
+
+//console.log("hoverinfo", hoverInfo);
 
   const onOut = useCallback(event => {
     setHoverInfo(null)
@@ -181,13 +185,19 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
           <NavigationControl style={navControlStyle} position={"bottom-right"} />
           {hoverInfo && (
             <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
-              click to open timeline
-              <br />
-              <br />
-              {day}
-              <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
-              <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-              <div>{datatype}: {hoverInfo.feature.properties.value}</div>
+              <span className='indexName'>{datatype} - {day}</span>
+              <span className='indexValue'>
+                {/* 
+                does not return a valid color code ... 
+                https://docs.mapbox.com/mapbox-gl-js/api/map/#instance-members-querying-features
+                https://docs.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures/
+                --> example, added a question to the mapbox team there.
+                
+                <span className="indexValueDot" style={{backgroundColor: hoverInfo?.rgbaColor}}></span> */}
+                {hoverInfo.feature.properties.value}</span>
+              <span className='tooltipLocation'>{hoverInfo.feature.properties.NUTS_NAME}</span>
+              {/* <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div> */}
+              <span className='tooltipCTA'>Click to view details</span>
             </div>
           )}
         </Map>
