@@ -245,7 +245,7 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
             <TimeSeries data={timeseriesData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
             
             <div className='mapLink'>
-              View all hydrological stations in the alpine region <a href="https://maps.eurac.edu/maps/85/view" target="_blank">https://maps.eurac.edu/maps/85/view</a>
+              View all hydrological stations in the alpine region <a href="https://maps.eurac.edu/maps/85/view" rel="noreferrer" target="_blank">https://maps.eurac.edu/maps/85/view</a>
             </div>
             
             {htmlData ?
