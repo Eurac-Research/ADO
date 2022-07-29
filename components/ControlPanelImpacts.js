@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { format } from 'date-format-parse'
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 
 function ControlPanelImpacts(props) {
@@ -15,11 +17,22 @@ function ControlPanelImpacts(props) {
 
   const selectedYear = year ? year : yearRange[0]
 
+  const router = useRouter();
 
 
   return (
     <div className="controlpanel">
       <h1>{selectedYear}</h1>
+
+      <div className='impactsNutsSwitch'>
+        <Link href="/impacts">
+          <a className={router.pathname === "/impacts" ? "active" : ""}>Nuts 3</a>
+        </Link>
+        <Link href="/impacts-nuts2">
+          <a className={router.pathname === "/impacts-nuts2" ? "active" : ""}>Nuts 2</a>
+        </Link>
+      </div>
+        
       <div className="timerangeSlider">
 
         {/*selectedYear > yearRange[0]

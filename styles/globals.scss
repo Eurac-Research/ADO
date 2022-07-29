@@ -125,7 +125,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: "";
+  content: '';
   content: none;
 }
 
@@ -879,16 +879,13 @@ body {
   left: 20px;
   width: 360px;
   background-color: #fff;
-  height: calc(100% - 460px);
-  overflow: auto;
-  padding: 10px 20px 10px 20px;
   z-index: 3;
 
   .impactsItem {
     margin-bottom: 28px;
 
-    border-top: 1px solid #ccc;
-    padding-top: 28px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 28px;
 
     p {
       font-size: 14px;
@@ -898,6 +895,47 @@ body {
   }
 }
 
+.closeImpactWrapper {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  z-index: 5;
+  font-size: 12px;
+  background-color: #fff;
+  width: 50px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0%;
+  box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
+  cursor: pointer;
+}
+
+.impactsTitle {
+  padding: 10px 20px 10px 20px;
+}
+.impactsContent {
+  position: relative;
+  height: 44vh;
+  overflow: auto;
+  padding: 10px 20px 10px 20px;
+}
+
+.impactsNutsSwitch {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: inline-block;
+  a {
+    text-decoration: underline;
+    color: var(--text-strong-light);
+    padding: 5px;
+    &.active {
+      opacity: 0.5;
+    }
+  }
+}
 .impactsYearRange {
   position: absolute;
   bottom: 20px;
@@ -925,7 +963,7 @@ body {
   transition: all 100ms ease-in-out;
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     top: 4px;
     left: 0;
@@ -940,7 +978,7 @@ body {
     font-weight: bold;
 
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       top: 4px;
       left: -4px;

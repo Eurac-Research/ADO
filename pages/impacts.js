@@ -67,6 +67,10 @@ export default function App({ impactData, allPosts }) {
   const [nutsName, setNutsName] = useState(null)
   const [year, setYear] = useState("")
 
+
+  const [mapClicked, setMapClicked] = useState(false)
+
+
   const [theme, setTheme] = useThemeContext();
 
 
@@ -259,98 +263,109 @@ export default function App({ impactData, allPosts }) {
 
   const NewComponent = () => (
     <div className='impactsWrapper'>
+      <div className="closeImpactWrapper" onClick={closeImpactsWrapper}>close x</div>
 
-      {/* year selected */}
       {year && (
-        <>
+        <div className='impactsTitle'>
           <h1 style={{ fontSize: "30px", marginBottom: "10px", marginTop: "10px" }}> {year}</h1>
           {yearAndAmount
             .filter(item => parseInt(year) === item?.impactYear)
             .map((item, index) => (
-              <h2 key={item?.impactYear + index} style={{ fontSize: "18px", marginBottom: "30px", marginTop: "10px" }}>
+              <h2 key={item?.impactYear + index} style={{ fontSize: "18px", marginBottom: "20px", marginTop: "10px" }}>
                 {item?.impactAmount} impact{item?.impactAmount > 1 && (<>s</>)}
               </h2>
             ))
           }
-          {impactData && impactData
-            .filter(item => item.Year_start === parseInt(year))
-            .map((item, index) => (
-              <div key={item.ID} div className="impactsItem">
-
-                <p><b>Description</b><br />{item?.Impact_description}</p>
-
-                <p>
-                  {impactCategories
-                    .filter(cat => cat?.id === item?.Impact_category)
-                    .map((cat, index) => (
-                      <div key={cat.id}>
-                        <b>Category</b><br />
-                        {cat.categoryname}
-                      </div>
-                    ))}
-                </p>
-
-                {item?.NUTS3_ID && nutsMap.features
-                  .filter(nut => nut.properties.NUTS_ID === item?.NUTS3_ID)
-                  .map((nut, index) => (
-                    <p key={index}>
-                      <b>Region</b> <span style={{ fontSize: "12px" }}>(<a href="https://ec.europa.eu/eurostat/web/nuts/background" target="_blank" rel="noreferrer">NUTS-3</a>)</span><br />
-                      {nut.properties.NUTS_NAME}
-                    </p>
-                  ))
-                }
-                {(!item?.NUTS3_ID && item?.NUTS2_ID) && nuts2static
-                  .filter(nut => nut.nuts2id === item?.NUTS2_ID)
-                  .map((nut, index) => (
-                    <p key={nut.id + index}>
-                      <b>Region</b> <span style={{ fontSize: "12px" }}>(<a href="https://ec.europa.eu/eurostat/web/nuts/background" target="_blank" rel="noreferrer">NUTS-2</a>)</span><br />
-                      {nut.name}
-                    </p>
-                  ))
-                }
-
-              </div>
-            ))
-          }
-        </>
+        </div>
       )}
 
-      {/* click on a region on the map */}
-      {nutsid && (
-        <>
-          <h1 style={{ fontSize: "30px", marginBottom: "10px", marginTop: "10px" }}>{nutsName}</h1>
-          <h2 style={{ fontSize: "18px", marginBottom: "30px", marginTop: "10px" }}>
 
+      {nutsid && (
+        <div className='impactsTitle'>
+        <h1 style={{ fontSize: "30px", marginBottom: "10px", marginTop: "10px" }}>{nutsName}</h1>
+          <h2 style={{ fontSize: "18px", marginBottom: "20px", marginTop: "10px" }}>
             {impactAmountByNutsId(nutsid) ?
               impactAmountByNutsId(nutsid) > 1 ? `${impactAmountByNutsId(nutsid)} impacts` : `${impactAmountByNutsId(nutsid)} impact`
               : "no impacts"
             }
-
-
           </h2>
-
-          {impactData && impactData
-            .filter(item => item.NUTS3_ID === nutsid)
-            .reverse()
-            .map((item, index) => (
-              <div key={item.ID} className="impactsItem">
-
-                <p><b>Description:</b><br /> {item?.Impact_description}</p>
-                <p><b>Category:</b><br />
-                  {impactCategories
-                    .filter(cat => cat?.id === item?.Impact_category)
-                    .map((cat, index) => (
-                      <div key={cat.id}>
-                        {cat.categoryname}
-                      </div>
-                    ))}
-                </p>
-                <p><b>Year:</b><br /> {item?.Year_start}</p>
-              </div>
-            ))
-          }
-        </>
+        </div>
       )}
+
+      <div className='impactsContent'>
+        {/* year selected */}
+        {year && (
+          <>
+            {impactData && impactData
+              .filter(item => item.Year_start === parseInt(year))
+              .map((item, index) => (
+                <div key={item.ID} div className="impactsItem">
+
+                  <p><b>Description</b><br />{item?.Impact_description}</p>
+
+                  <div>
+                    {impactCategories
+                      .filter(cat => cat?.id === item?.Impact_category)
+                      .map((cat, index) => (
+                        <div key={cat.id}>
+                          <b>Category</b><br />
+                          {cat.categoryname}
+                        </div>
+                      ))}
+                  </div>
+
+                  {item?.NUTS3_ID && nutsMap.features
+                    .filter(nut => nut.properties.NUTS_ID === item?.NUTS3_ID)
+                    .map((nut, index) => (
+                      <p key={index}>
+                        <b>Region</b> <span style={{ fontSize: "12px" }}>(<a href="https://ec.europa.eu/eurostat/web/nuts/background" target="_blank" rel="noreferrer">NUTS-3</a>)</span><br />
+                        {nut.properties.NUTS_NAME}
+                      </p>
+                    ))
+                  }
+                  {(!item?.NUTS3_ID && item?.NUTS2_ID) && nuts2static
+                    .filter(nut => nut.nuts2id === item?.NUTS2_ID)
+                    .map((nut, index) => (
+                      <p key={nut.id + index}>
+                        <b>Region</b> <span style={{ fontSize: "12px" }}>(<a href="https://ec.europa.eu/eurostat/web/nuts/background" target="_blank" rel="noreferrer">NUTS-2</a>)</span><br />
+                        {nut.name}
+                      </p>
+                    ))
+                  }
+
+                </div>
+              ))
+            }
+          </>
+        )}
+
+        {/* click on a region on the map */}
+        {nutsid && (
+          <>
+            {impactData && impactData
+              .filter(item => item.NUTS3_ID === nutsid)
+              .reverse()
+              .map((item, index) => (
+                <div key={item.ID} className="impactsItem">
+
+                  <p><b>Description:</b><br /> {item?.Impact_description}</p>
+                  <p><b>Category:</b><br />
+                    {impactCategories
+                      .filter(cat => cat?.id === item?.Impact_category)
+                      .map((cat, index) => (
+                        <div key={cat.id}>
+                          {cat.categoryname}
+                        </div>
+                      ))}
+                  </p>
+                  <p><b>Year:</b><br /> {item?.Year_start}</p>
+                </div>
+              ))
+            }
+          </>
+        )}
+      
+      </div>
     </div>
   )
 
@@ -381,13 +396,13 @@ export default function App({ impactData, allPosts }) {
         { hover: false }
       );
     }
-
-    setFeaturedId(hoveredFeature.id)
-
-    map.setFeatureState(
-      { source: 'geojson', id: hoveredFeature.id },
-      { hover: true }
-    )
+    if (clickedNutsid !== null) {
+      setFeaturedId(hoveredFeature.id)
+      map.setFeatureState(
+        { source: 'geojson', id: hoveredFeature.id },
+        { hover: true }
+      )
+      }
 
   }, [featuredId]);
 
@@ -432,15 +447,25 @@ export default function App({ impactData, allPosts }) {
 
   const removeNutsInformation = useCallback(event => {
     const map = mapRef.current.getMap()
-
     map.setFeatureState(
       { source: 'geojson', id: featuredId },
       { hover: false }
     );
+    setNutsid(null)
     setFeaturedId(null)
-
   }, [featuredId]);
 
+
+
+const closeImpactsWrapper = useCallback(event => {
+  removeNutsInformation()
+  setYear("")
+  const map = mapRef.current.getMap()
+  map.setFeatureState(
+    { source: 'geojson', id: featuredId },
+    { hover: false }
+  );
+}, [featuredId]);
 
   return (
     <Layout posts={allPosts}>
@@ -477,7 +502,8 @@ export default function App({ impactData, allPosts }) {
                 {/*                 <Source id="my-data" type="geojson" data={geojson}>
                   <Layer {...layerStyle} />
                 </Source>
- */}              </>
+                */}              
+              </>
             )}
             <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} position={"bottom-right"} />
             <NavigationControl style={navControlStyle} position={"bottom-right"} />
@@ -493,30 +519,34 @@ export default function App({ impactData, allPosts }) {
           </Map>
         </div>
 
-        <div className="controlContainer" onClick={removeNutsInformation}>
 
-          <ControlPanelImpacts
-            year={year}
-            yearRange={uniqueYears}
-            yearAndAmount={yearAndAmount}
-            onChange={value => setYear(value) + setNutsid(null)}
-          />
 
-          <select
-            style={{ position: "relative" }}
-            value={year}
-            onChange={evt => setYear(evt.target.value) + setNutsid(null)}>
-            {yearAndAmount && yearAndAmount.map((yearitem) => (
-              <option
-                key={`year-${yearitem.impactYear}`}
-                value={yearitem.impactYear}>
-                {yearitem.impactYear} ({yearitem.impactAmount} impacts)
-              </option>
-            ))
-            }
-          </select>
+        {!nutsid && (
+          <div className="controlContainer" onClick={removeNutsInformation}>
 
-        </div>
+            <ControlPanelImpacts
+              year={year}
+              yearRange={uniqueYears}
+              yearAndAmount={yearAndAmount}
+              onChange={value => setYear(value) + setNutsid(null)}
+            />
+
+            <select
+              style={{ position: "relative" }}
+              value={year}
+              onChange={evt => setYear(evt.target.value) + setNutsid(null)}>
+              {yearAndAmount && yearAndAmount.map((yearitem) => (
+                <option
+                  key={`year-${yearitem.impactYear}`}
+                  value={yearitem.impactYear}>
+                  {yearitem.impactYear} ({yearitem.impactAmount} impacts)
+                </option>
+              ))
+              }
+            </select>
+
+          </div>
+        )}
 
 
 
