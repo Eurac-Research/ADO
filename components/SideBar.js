@@ -18,17 +18,6 @@ function SideBar({ posts, sideBarPositionRelative }) {
         <Link href="/impacts">
           <a>Impacts</a>
         </Link>
-
-        <div className={router.pathname === "/impacts" ? "sideBarItemSub active" : "sideBarItemSub"}>
-          <Link href="/impacts">
-            <a>Nuts 3 Level</a>
-          </Link>
-        </div>
-        <div className={router.pathname === "/impacts-nuts2" ? "sideBarItemSub active" : "sideBarItemSub"}>
-          <Link href="/impacts-nuts2">
-            <a>Nuts 2 Level</a>
-          </Link>
-        </div>
       </div>
 
       <div className={router.asPath.includes('hydro') ? "sideBarItem active" : "sideBarItem"}>
@@ -49,15 +38,13 @@ function SideBar({ posts, sideBarPositionRelative }) {
       <div className="alphaInfo">
 
         <h3>⚠️</h3>
-        <p>This page is under development. Do not expect everything to work.</p>
-
+        <p>This page is in public BETA and still under development.</p>
         <p>
           More information about the project at <a href="https://www.alpine-space.org/projects/ado/en/home">https://www.alpine-space.org/projects/ado/</a>
         </p>
         <p>
           Data can be found in the public repository <a href="https://github.com/Eurac-Research/ado-data">https://github.com/Eurac-Research/ado-data</a>
         </p>
-        <br />
         <p>Eurac Research, July 2022</p>
 
       </div>

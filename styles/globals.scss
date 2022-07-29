@@ -778,13 +778,13 @@ body {
 
   .alphaInfo {
     display: none;
-    width: 300px;
+    width: 370px;
     font-size: 12px;
     line-height: 1.2;
-    margin-top: 30px;
+    margin-top: 20px;
     background-color: var(--bg-8-light);
     color: var(--text-strong-light);
-    padding: 15px;
+    padding: 10px;
     backdrop-filter: blur(10px);
 
     @media (min-width: 768px) {
@@ -793,11 +793,11 @@ body {
 
     h3 {
       font-size: 20px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     p {
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
   }
 
