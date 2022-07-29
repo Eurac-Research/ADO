@@ -105,8 +105,10 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
       point: { x, y }
     } = event;
     const hoveredFeature = features && features[0];
-    //console.log("hoverfeat", hoveredFeature)
-    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+    const featureColor = `rgba(${Math.round(hoveredFeature?.layer?.paint?.["fill-color"].r * 255)},${Math.round(hoveredFeature?.layer?.paint?.["fill-color"].g * 255)},${Math.round(hoveredFeature?.layer?.paint?.["fill-color"].b * 255)},1)`
+    // prettier-ignore
+    setHoverInfo(hoveredFeature && { rgbaColor: featureColor, feature: hoveredFeature, x, y });
+
   }, []);
 
   const onOut = useCallback(event => {
@@ -218,7 +220,9 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
           {hoverInfo && (
             <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
               <span className='indexName'>{datatype} - {day}</span>
-              <span className='indexValue'>{hoverInfo.feature.properties.value}</span>
+              <span className='indexValue'>
+                <span className="indexValueColorDot" style={{backgroundColor: hoverInfo?.rgbaColor}}></span>
+                {hoverInfo.feature.properties.value}</span>
               <span className='tooltipLocation'>{hoverInfo?.feature?.properties?.location_s}, {hoverInfo?.feature?.properties?.region}, {hoverInfo?.feature?.properties?.country}</span>
               {hoverInfo?.feature?.properties?.watercours && (
                 <span>Water Course: {hoverInfo?.feature?.properties?.watercours}<br /></span>

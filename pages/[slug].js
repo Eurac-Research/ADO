@@ -67,10 +67,7 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
       point: { x, y }
     } = event;
     const hoveredFeature = features && features[0];
-
-    // const hoverInfo?.feature?.layer?.paint?.["fill-color"].r
-    const featureColor = `hsla(${hoveredFeature?.layer?.paint?.["fill-color"].r},${hoveredFeature?.layer?.paint?.["fill-color"].g},${hoveredFeature?.layer?.paint?.["fill-color"].b},${hoveredFeature?.layer?.paint?.["fill-color"].a})`
-    
+    const featureColor = `rgba(${Math.round(hoveredFeature?.layer?.paint?.["fill-color"].r * 255)},${Math.round(hoveredFeature?.layer?.paint?.["fill-color"].g * 255)},${Math.round(hoveredFeature?.layer?.paint?.["fill-color"].b * 255)},1)`
     // prettier-ignore
     setHoverInfo(hoveredFeature && { rgbaColor: featureColor, feature: hoveredFeature, x, y });
   }, []);
@@ -187,13 +184,16 @@ console.log("hoverinfo", hoverInfo);
             <div className="tooltip" style={{ left: hoverInfo.x, top: hoverInfo.y }}>
               <span className='indexName'>{datatype} - {day}</span>
               <span className='indexValue'>
-                {/* 
-                does not return a valid color code ... 
+                
+                {/* does not return a valid color code ... multiply by 255 
+
+                https://stackoverflow.com/questions/73156238/mapbox-what-color-code-does-queryrenderedfeatures-return-how-to-convert-the-va/73156740#73156740
+
                 https://docs.mapbox.com/mapbox-gl-js/api/map/#instance-members-querying-features
                 https://docs.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures/
-                --> example, added a question to the mapbox team there.
+                --> example, added a question to the mapbox team there. */}
                 
-                <span className="indexValueDot" style={{backgroundColor: hoverInfo?.rgbaColor}}></span> */}
+                <span className="indexValueColorDot" style={{backgroundColor: hoverInfo?.rgbaColor}}></span>
                 {hoverInfo.feature.properties.value}</span>
               <span className='tooltipLocation'>{hoverInfo.feature.properties.NUTS_NAME}</span>
               {/* <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div> */}
