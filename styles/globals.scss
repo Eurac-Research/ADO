@@ -350,9 +350,7 @@ body {
 .dataOverlay {
   position: absolute;
   z-index: 101;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 20px;
 
   background: var(--bg-10-light);
   color: var(--text-strong-light);
@@ -365,6 +363,9 @@ body {
   line-height: 1.5;
 
   @media (min-width: 768px) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .recharts-tooltip-label {
@@ -431,6 +432,13 @@ body {
 
   @media (min-width: 768px) {
     padding-bottom: 80px;
+  }
+
+  &.impacts {
+    padding-bottom: 50px;
+    @media (min-width: 768px) {
+      padding-bottom: 80px;
+    }
   }
 
   .legend {
@@ -754,10 +762,14 @@ body {
   flex-direction: row;
   justify-content: flex-start;
 
-  width: 1px;
-  overflow: visible;
+  background-color: var(--bg-light);
+
+  width: 100%;
+  overflow-x: auto;
 
   @media (min-width: 768px) {
+    width: 1px;
+    overflow: visible;
     top: 200px;
     position: fixed;
     right: 0;
@@ -766,6 +778,7 @@ body {
     bottom: auto;
     flex-direction: column;
     align-items: flex-end;
+    background-color: transparent;
   }
 
   &.relative {
@@ -875,11 +888,17 @@ body {
 
 .impactsWrapper {
   position: fixed;
-  top: 120px;
+  top: 80px;
   left: 20px;
-  width: 360px;
   background-color: #fff;
   z-index: 3;
+
+  width: calc(100% - 40px);
+
+  @media (min-width: 768px) {
+    top: 120px;
+    width: 360px;
+  }
 
   .impactsItem {
     margin-bottom: 28px;

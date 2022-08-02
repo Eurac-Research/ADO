@@ -522,7 +522,7 @@ const closeImpactsWrapper = useCallback(event => {
 
 
         {!nutsid && (
-          <div className="controlContainer" onClick={removeNutsInformation}>
+          <div className="controlContainer impacts" onClick={removeNutsInformation}>
 
             <ControlPanelImpacts
               year={year}

@@ -131,6 +131,7 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
     );
     const stationId = hoveredFeature ? hoveredFeature?.properties?.id_station : null
     getHtmlData(stationId)
+    getTimeseries(stationId)
   }, []);
 
   const onClose = useCallback(async (event) => {
@@ -154,10 +155,26 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
       try {
         const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_${id_station}.html`
         //const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
-        const timeseriesUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/timeseries/ID_STATION_${id_station ? `${id_station}` : ''}.json`
         const result = await axios(htmlUrl)
 
         setHtmlData(result.data)
+
+      } catch (error) {
+        console.log("error",error);
+        setIsError(true);
+      }
+      setIsLoading(false);
+    };
+    fetchData();
+  }
+
+  async function getTimeseries(id_station) {
+    const fetchData = async () => {
+      setIsError(false);
+      setIsLoading(true);
+      try {
+        //const htmlUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/html/report_ADO_DSC_ITC1_0037.html`
+        const timeseriesUrl = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/timeseries/ID_STATION_${id_station ? `${id_station}` : ''}.json`
 
         const timeseriesResult = await axios(timeseriesUrl)
         setTimeseriesData(timeseriesResult.data)
@@ -253,7 +270,7 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
             </div>
             
             {htmlData ?
-              <iframe srcDoc={htmlData} width="100%" height="5500px" style={{ position: 'absolute', top: "auto", left: "0", height: "5500opx", width: "100%", paddingBottom: "150px" }}></iframe>
+              <iframe srcDoc={htmlData} width="100%" height="15000px" style={{ position: 'absolute', top: "auto", left: "0", height: "5500opx", width: "100%", paddingBottom: "150px" }}></iframe>
               : <>loading ...</>}
 
           </div>
