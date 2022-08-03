@@ -388,19 +388,20 @@ body {
 .textOverlay {
   position: absolute;
   z-index: 101;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 
+  top: 20px;
   background: var(--bg-10-light);
   color: var(--text-strong-light);
-  width: 80vw;
+  width: 100%;
   height: auto;
   padding: 30px;
   padding-bottom: 80px;
   line-height: 1.5;
 
   @media (min-width: 768px) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 50vw;
   }
 
@@ -424,19 +425,20 @@ body {
   align-items: flex-start;
   justify-content: flex-end;
   width: 100%;
-  height: 100vh;
+  height: 80vh;
   max-height: 100%;
   z-index: 3;
   user-select: none;
-  padding-bottom: 110px;
 
   @media (min-width: 768px) {
+    height: 100vh;
     padding-bottom: 80px;
   }
 
   &.impacts {
-    padding-bottom: 50px;
+    height: 90vh;
     @media (min-width: 768px) {
+      height: 100vh;
       padding-bottom: 80px;
     }
   }
@@ -601,10 +603,13 @@ body {
   overflow-wrap: normal;
   align-items: center;
 
+  background-color: var(--bg-light);
+
   @media (min-width: 768px) {
     height: 50px;
     width: 100%;
     bottom: 10px;
+    background-color: transparent;
   }
 
   p {
@@ -648,7 +653,7 @@ body {
 
 .darkModeToggle {
   position: fixed;
-  bottom: 180px;
+  bottom: 250px;
   right: 10px;
   background-color: #fff;
   width: 32px;
@@ -656,6 +661,10 @@ body {
   border-radius: 100%;
   padding: 6px;
   cursor: pointer;
+
+  @media (min-width: 768px) {
+    bottom: 230px;
+  }
 }
 
 /* darkmode */
@@ -1126,4 +1135,11 @@ b {
   --color-accent-emphasis: #0969da;
   --color-attention-subtle: #fff8c5;
   --color-danger-fg: #cf222e;
+}
+
+.mapboxgl-ctrl-bottom-right {
+  bottom: 60px !important;
+  @media (min-width: 768px) {
+    bottom: 30px;
+  }
 }

@@ -13,9 +13,9 @@ function ControlPanelImpacts(props) {
   } = props;
 
 
-  //console.log("year", year);
+  console.log("yearRange", [...yearRange].pop());
 
-  const selectedYear = year ? year : yearRange[0]
+  const selectedYear = year ? year : [...yearRange].pop()
 
   const router = useRouter();
 

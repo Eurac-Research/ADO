@@ -126,8 +126,6 @@ console.log("hoverinfo", hoverInfo);
   const scaleControlStyle = {
   };
   const navControlStyle = {
-    right: 10,
-    bottom: 120
   };
 
   if (metadata === undefined) {

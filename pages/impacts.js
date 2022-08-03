@@ -48,7 +48,9 @@ export default function App({ impactData, allPosts }) {
   const mapRef = React.useRef();
 
   function impactAmountByNutsId(NUTS_ID) {
+
     const result = impactEntries.find(item => item[0] === NUTS_ID)
+
     if (result) {
       return result[1] // amount of impact items
     }
@@ -282,7 +284,7 @@ export default function App({ impactData, allPosts }) {
 
       {nutsid && (
         <div className='impactsTitle'>
-        <h1 style={{ fontSize: "30px", marginBottom: "10px", marginTop: "10px" }}>{nutsName}</h1>
+          <h1 style={{ fontSize: "30px", marginBottom: "10px", marginTop: "10px" }}>{nutsName}</h1>
           <h2 style={{ fontSize: "18px", marginBottom: "20px", marginTop: "10px" }}>
             {impactAmountByNutsId(nutsid) ?
               impactAmountByNutsId(nutsid) > 1 ? `${impactAmountByNutsId(nutsid)} impacts` : `${impactAmountByNutsId(nutsid)} impact`
@@ -303,16 +305,16 @@ export default function App({ impactData, allPosts }) {
 
                   <p><b>Description</b><br />{item?.Impact_description}</p>
 
-                  <div>
+                  <>
                     {impactCategories
                       .filter(cat => cat?.id === item?.Impact_category)
                       .map((cat, index) => (
-                        <div key={cat.id}>
+                        <p key={cat.id}>
                           <b>Category</b><br />
                           {cat.categoryname}
-                        </div>
+                        </p>
                       ))}
-                  </div>
+                  </>
 
                   {item?.NUTS3_ID && nutsMap.features
                     .filter(nut => nut.properties.NUTS_ID === item?.NUTS3_ID)
@@ -353,9 +355,9 @@ export default function App({ impactData, allPosts }) {
                     {impactCategories
                       .filter(cat => cat?.id === item?.Impact_category)
                       .map((cat, index) => (
-                        <div key={cat.id}>
-                          {cat.categoryname}
-                        </div>
+                        <span key={cat.id}>
+                         {cat.categoryname}
+                        </span>
                       ))}
                   </p>
                   <p><b>Year:</b><br /> {item?.Year_start}</p>
@@ -383,7 +385,8 @@ export default function App({ impactData, allPosts }) {
     setYear("")
 
 
-    if (featuredId === null) {
+    if (featuredId === null && hoveredFeature) {
+      console.log("hadfasdfasfasdf");
       map.setFeatureState(
         { source: 'geojson', id: hoveredFeature.id },
         { hover: true }
@@ -513,7 +516,9 @@ const closeImpactsWrapper = useCallback(event => {
                 <br />
                 <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
                 <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-                amount: {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}
+                {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
+                  <>amount: {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}</>
+                )}
               </div>
             )}
           </Map>
