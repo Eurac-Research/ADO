@@ -21,7 +21,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
       </div>
 
       <div className={router.asPath.includes('hydro') ? "sideBarItem active" : "sideBarItem"}>
-        <Link href="/hydro/cdi">
+        <Link href="/hydro/spei-1">
           <a>Hydro</a>
         </Link>
       </div>
