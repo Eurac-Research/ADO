@@ -31,7 +31,8 @@ import {
 } from 'recharts'
 
 
-const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10', 'cdi', 'sma', 'vci', 'vhi']
+//const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10', 'cdi', 'sma', 'vci', 'vhi']
+const indices = ['spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12', 'spi-1', 'spi-3', 'spi-6', 'spi-12', 'sspi-10', 'sma', 'vci', 'vhi']
 
 
 export async function getStaticProps({ params }) {
@@ -302,9 +303,9 @@ export default function App({ datatype, staticMetaData, catchmentData, stationDa
 
         <div className="navigation">
           <p>Indices</p>
-          <Link prefetch={false} href="/hydro/cdi">
+          {/* <Link prefetch={false} href="/hydro/cdi">
             <a className={router.query.slug === 'cdi' ? 'active' : ''}>cdi</a>
-          </Link>
+          </Link> */}
           <Link prefetch={false} href="/hydro/vci">
             <a className={router.query.slug === 'vci' ? 'active' : ''}>vci</a>
           </Link>
