@@ -1,16 +1,17 @@
-name: Notify MS Teams about build failure
+#Triggered for deployment status changes
+name: Deployment Failure notification
+on: [deployment_status]
 
-on:
-  push: {}
-  
 jobs:
-  if_failure:
-    name: Only if failure
-    runs-on: ubuntu-18.04
+  add-failure-comment:
+    name: Add a comment to the commit that caused the failure
+    if: github.event.deployment_status.state == 'failure'
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@master
-      - name: Microsoft Teams Notification
-        uses: skitionek/notify-microsoft-teams@master
-        if: failure()
-        with:
-          webhook_url: ${{ secrets.TEAMS_WEBHOOK }}
+      - name: Add commit comment - failure
+        run: |
+          cat << EOF > message.json
+          {"@type":"MessageCard","@context":"https://schema.org/extensions","summary":"Pipeline failed!","themeColor":"ff0000","title":"$GITHUB_REPOSITORY pipeline failed 💢!","sections":[{"facts":[{"name":"Repository:","value":"$GITHUB_REPOSITORY"},{"name":"Branch:","value":"$GITHUB_REF_NAME"},{"name":"Commit:","value":"$GITHUB_SHA"}]}],"potentialAction":[{"@type":"OpenUri","name":"View on GitHub","targets":[{"os":"default","uri":"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"}]}]}
+          EOF
+          curl -X POST ${{ secrets.TEAMS_WEBHOOK }} --header 'Content-Type: application/json' -d @message.json
