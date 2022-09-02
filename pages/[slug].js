@@ -27,7 +27,160 @@ export async function getStaticProps({ params }) {
   const response = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`)
   const staticData = await response.json()
   const responseMeta = await fetch(`https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`)
-  const staticMetaData = await responseMeta.json()
+  // const staticMetaData = await responseMeta.json()
+
+  const staticMetaData = datatype === "SSPI-10" ? {
+    "short_name": "SSPI-10",
+    "long_name": "Standardized Snowpack Index",
+    "abstract": "The SSPI provides information of the relative volume of the snowpack in the catchment on a ten-daily basis compared to the period of reference.",
+    "timerange": {
+        "type": "date",
+        "properties": {
+            "firstDate": "2022-07-21",
+            "lastDate": "2022-08-19"
+        }
+    },
+    "colormap": {
+        "id": "data",
+        "type": "fill",
+        "paint": {
+          "fill-color": [
+            'step',
+            ['get', 'value'],
+            "rgba(236,11,0,0.9)",
+            -2,
+            "rgba(237,69,61,0.9)",
+            -1.5,
+            "rgba(238,127,122,0.9)",
+            -1,
+            "rgba(239,239,239,0.9)",
+            0,
+            "rgba(213,233,237,0.9)",
+            1,
+            "rgba(200,229,236,0.9)",
+            1.5,
+            "rgba(187,226,234,0.9)",
+            2.01,
+            "black"
+          ],
+        },
+        "legend": {
+            "stops": [
+                [
+                    -2,
+                    "Highly less than normal",
+                    "rgba(236,11,0,0.7)"
+                ],
+                [
+                    -1.5,
+                    "Much less than normal",
+                    "rgba(237,69,61,0.7)"
+                ],
+                [
+                    -1,
+                    "Less than normal",
+                    "rgba(238,127,122,0.7)"
+                ],
+                [
+                    0,
+                    "Near normal conditions",
+                    "rgba(239,239,239,0.7)"
+                ],
+                [
+                    1,
+                    "More than normal",
+                    "rgba(213,233,237,0.7)"
+                ],
+                [
+                    1.5,
+                    "Much more than normal",
+                    "rgba(200,229,236,0.7)"
+                ],
+                [
+                    2,
+                    "Highly more than normal",
+                    "rgba(187,226,234,0.7)"
+                ]
+            ]
+        }
+    }
+} : {
+  "short_name": "SPEI-1",
+  "long_name": "Standardized Precipitation and Evapotranspiration Index - 1",
+  "abstract": "The Standardized Precipitation Index (SPI) is the most commonly used indicator worldwide for detecting and characterizing meteorological droughts. The SPI indicator, which was developed by McKee et al. (1993), and described in detail by Edwards and McKee (1997), measures precipitation anomalies at a given location, based on a comparison of observed total precipitation amounts for an accumulation period of interest (e.g. 1, 3, 12, 48 months), with the long-term historic rainfall record for that period. For any given region, increasingly severe rainfall deficits (i.e., meteorological droughts) are indicated as SPI decreases below ‒1.0.  A new variation of SPI - the Standardized Precipitation and Evapotranspiration Index (SPEI) - has been developed (Vicente-Serrano et al., 2010), which includes precipitation and temperature, in order to identify increases in drought severity linked with higher water demand by evapotranspiration.",
+  "timerange": {
+      "type": "date",
+      "properties": {
+          "firstDate": "2022-07-21",
+          "lastDate": "2022-08-19"
+      }
+  },
+  "colormap": {
+      "id": "data",
+      "type": "fill",
+      "paint": {
+        "fill-color": [
+          'step',
+          ['get', 'value'],
+          "rgba(215,25,28,0.7)",
+          -2,
+          "rgba(253,174,97,0.7)",
+          -1.5,
+          "rgba(255,255,191,0.7)",
+          -1,
+          "rgba(255,255,255,0.7)",
+          0,
+          "rgba(245,153,246,0.7)",
+          1,
+          "rgba(180,103,221,0.7)",
+          1.5,
+          "rgba(69,0,153,0.7)"
+        ],
+      },
+      "legend": {
+          "stops": [
+              [
+                  -2,
+                  "Extremely dry",
+                  "rgba(215,25,28,0.7)"
+              ],
+              [
+                  -1.5,
+                  "Very dry",
+                  "rgba(253,174,97,0.7)"
+              ],
+              [
+                  -1,
+                  "Moderately dry",
+                  "rgba(255,255,191,0.7)"
+              ],
+              [
+                  0,
+                  "Normal",
+                  "rgba(255,255,255,0.7)"
+              ],
+              [
+                  1,
+                  "Moderately wet",
+                  "rgba(245,153,246,0.7)"
+              ],
+              [
+                  1.5,
+                  "Very wet",
+                  "rgba(180,103,221,0.7)"
+              ],
+              [
+                  2,
+                  "Extremely wet",
+                  "rgba(69,0,153,0.7)"
+              ]
+          ]
+      }
+  }
+}
+
+console.log("metadata", staticMetaData)
+
   const allPosts = getAllPosts([
     'title',
     'slug',
@@ -72,7 +225,6 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
     setHoverInfo(hoveredFeature && { rgbaColor: featureColor, feature: hoveredFeature, x, y });
   }, []);
 
-console.log("hoverinfo", hoverInfo);
 
   const onOut = useCallback(event => {
     setHoverInfo(null)
