@@ -120,7 +120,7 @@ console.log("meta: ", metadata);
         <>
           <ReactECharts
             option={options}
-            style={{ height: "400px", marginTop: "40px" }}
+            style={{ height: "400px", marginTop: "10px" }}
             onEvents={{
               'legendselectchanged': onChartLegendselectchanged
             }}
