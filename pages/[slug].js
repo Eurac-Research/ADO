@@ -59,9 +59,7 @@ export async function getStaticProps({ params }) {
             1,
             "rgba(200,229,236,0.9)",
             1.5,
-            "rgba(187,226,234,0.9)",
-            2.01,
-            "black"
+            "rgba(187,226,234,0.9)"
           ],
         },
         "legend": {
