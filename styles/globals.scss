@@ -1143,3 +1143,39 @@ b {
     bottom: 30px;
   }
 }
+
+.timeSeriesLegend {
+  margin-top: 2rem;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  width: fit-content;
+  h3 {
+    font-size: 12px;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+  }
+}
+.timeSeriesLegendBox {
+  display: grid;
+  width: fit-content;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  font-size: 12px;
+
+  span {
+    padding: 2px 10px;
+    border-bottom: 1px solid #ccc;
+    &.value {
+      font-family: monospace;
+      padding-right: 10px;
+    }
+    &.zero {
+      background-color: #c9efd4;
+      border-color: #c9efd4;
+      font-weight: bold;
+    }
+  }
+}

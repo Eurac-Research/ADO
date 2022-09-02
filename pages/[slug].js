@@ -270,8 +270,26 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
               <p>file https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_{clickInfo.feature.properties.NUTS_ID}.json - errors in file</p>
             )}
             <p>{clickInfo.feature.properties.NUTS_NAME} (nuts id: {clickInfo.feature.properties.NUTS_ID})</p>
+            <div className="timeSeriesLegend">
+              <h3>SPEI / SPI Legend </h3>
+              <div className="timeSeriesLegendBox">
+              <span className="value">&nbsp;2</span><span>Extremely wet</span>
+              <span className="value">&nbsp;1.5</span><span>Very wet</span>
+              <span className="value">&nbsp;1</span><span>Moderately wet</span>
+              <span className="zero value">&nbsp;0</span><span className="zero">Normal</span>
+              <span className="value">-1</span><span>Moderately dry</span>
+              <span className="value">-1.5</span><span>Very dry</span>
+              <span className="value">-2</span><span>Extremely dry</span>
+              </div>
 
-            <TimeSeries data={nutsData} indices={indices} index={datatype} style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} />
+            </div>
+            <TimeSeries 
+              data={nutsData} 
+              indices={indices} 
+              index={datatype}
+              metadata={staticMetaData}
+              style={{ width: "100%", height: "100%", position: "relative", zIndex: "102", top: "0", left: "0" }} 
+            />
 
           </div>
         </>

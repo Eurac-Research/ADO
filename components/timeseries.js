@@ -7,7 +7,7 @@ import { check } from 'prettier'
 
 function TimeSeries(props) {
 
-  const { data, indices, index } = props
+  const { data, indices, index, metadata } = props
   const [chartData, setChartData] = useState(null)
   const [activeLegend, setActiveLegend] = useState(index)
 
@@ -37,12 +37,16 @@ function TimeSeries(props) {
 
   const [selecedDimensions, setSelecedDimensions] = useState(legendObject)
 
+console.log(selecedDimensions);
+
+console.log("meta: ", metadata);
+
+
 
   function onChartLegendselectchanged(param, echarts) {
-    // console.log("legendclick: ", param, echarts);
-/*     setActiveLegend(param?.name)
-    setSelecedDimensions(param?.selected)
- */  };
+    console.log("legendclick: ", param, echarts);
+
+  };
 
   // console.log("selecedDimensions", selecedDimensions);
 
