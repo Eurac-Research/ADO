@@ -211,8 +211,9 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
-  const [theme, setTheme] = useThemeContext();
 
+
+  const [theme, setTheme] = useThemeContext();
 
   const onHover = useCallback(event => {
     const {
@@ -224,7 +225,6 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
     // prettier-ignore
     setHoverInfo(hoveredFeature && { rgbaColor: featureColor, feature: hoveredFeature, x, y });
   }, []);
-
 
   const onOut = useCallback(event => {
     setHoverInfo(null)
@@ -251,14 +251,35 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
   }, []);
 
 
-  const data = useMemo(() => {
-    return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
-  }, [datatype, staticData, day]);
 
   const metadata = useMemo(() => {
     return staticMetaData;
   }, [staticMetaData]);
 
+  const timestamp = format(day, 'X');
+  const dayFromTimestamp = timestamp / 60 / 60 / 24
+  const firstDayTimestamp = format(metadata?.timerange?.properties?.firstDate, 'X') / 60 / 60 / 24
+  const lastDayTimestamp = format(metadata?.timerange?.properties?.lastDate, 'X') / 60 / 60 / 24
+
+  // indices does not have common timeranges ... 
+  // compare timestamps and set to last possible date if selected date is not available in an index
+  const fixedDay = (dayFromTimestamp > lastDayTimestamp) ? 
+      setDay(format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
+    : (dayFromTimestamp < firstDayTimestamp) ? 
+      setDay(format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
+    : day
+
+  // console.log("day", day)
+  // console.log("fixedDay", fixedDay)
+  
+
+
+  const data = useMemo(() => {
+    return staticData && updatePercentiles(staticData, f => f.properties[`${datatype}`][day]);
+  }, [datatype, staticData, day]);
+
+  //console.log("data", data)
+  
   async function getNutsData(overlayNutsId) {
     const fetchData = async () => {
       setIsError(false);
@@ -283,7 +304,6 @@ export default function App({ datatype, staticData, staticMetaData, allPosts }) 
   if (metadata === undefined) {
     return <>Loading...</>;
   }
-
 
   function CustomTooltip({ payload, label, active }) {
     if (active && payload && payload.length) {

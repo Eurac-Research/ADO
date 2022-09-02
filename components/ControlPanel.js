@@ -21,6 +21,7 @@ function ControlPanel(props) {
     rows.push(<option key={i} value={i}></option>);
   }
 
+
   return (
     <>
       <div className="controlpanel">
@@ -44,7 +45,7 @@ function ControlPanel(props) {
           <input
             type="range"
             list="tickmarks"
-            value={dayFromTimestamp}
+            value={(dayFromTimestamp > lastDayTimestamp) ? lastDayTimestamp : (dayFromTimestamp < firstDayTimestamp) ? lastDayTimestamp : dayFromTimestamp}
             min={firstDayTimestamp}
             max={lastDayTimestamp}
             step={1}
