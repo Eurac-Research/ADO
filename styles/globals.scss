@@ -961,6 +961,8 @@ body {
     padding: 5px;
     &.active {
       opacity: 0.5;
+      text-decoration: none;
+      pointer-events: none;
     }
   }
 }
