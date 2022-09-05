@@ -327,8 +327,6 @@ body {
     display: inline-block;
     margin-right: 6px;
   }
-  .tooltipLocation {
-  }
   .tooltipCTA {
     font-size: 10px;
     @media (min-width: 768px) {
@@ -961,6 +959,8 @@ body {
     padding: 5px;
     &.active {
       opacity: 0.5;
+      text-decoration: none;
+      pointer-events: none;
     }
   }
 }

@@ -86,7 +86,7 @@ export default function App({ impactData, allPosts }) {
   const impactsByYearForMap = year ? impactDataByYear : impactData
 
   const uniqueImpactsByNutsID = impactsByYearForMap.reduce(
-    (acc, o) => ((acc[o.NUTS2_ID] = (acc[o.NUTS2_ID] || 0) + 1), acc),
+    (acc, o) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
     {}
   )
   // console.log("unique arr", uniqueImpactsByNutsID);
@@ -687,7 +687,7 @@ export default function App({ impactData, allPosts }) {
                     {item?.NUTS3_ID &&
                       nutsMap.features
                         .filter(
-                          (nut) => nut.properties.NUTS_ID === item?.NUTS2_ID
+                          (nut) => nut.properties.NUTS_ID === item?.NUTS3_ID
                         )
                         .map((nut, index) => (
                           <p key={index}>
@@ -739,7 +739,7 @@ export default function App({ impactData, allPosts }) {
           <>
             {impactData &&
               impactData
-                .filter((item) => item.NUTS2_ID === nutsid)
+                .filter((item) => item.NUTS3_ID === nutsid)
                 .reverse()
                 .map((item, index) => (
                   <div key={item.ID} className="impactsItem">
@@ -812,7 +812,7 @@ export default function App({ impactData, allPosts }) {
   useEffect(() => {
     /* global fetch */
     fetch(
-      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts2_simple_4326.geojson'
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts3_simple_4326.geojson'
     )
       .then((resp) => resp.json())
       .then((json) => {
