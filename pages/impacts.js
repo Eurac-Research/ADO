@@ -665,7 +665,7 @@ export default function App({ impactData, allPosts }) {
               impactData
                 .filter((item) => item.Year_start === parseInt(year))
                 .map((item, index) => (
-                  <div key={item.ID} div className="impactsItem">
+                  <div key={item.ID} className="impactsItem">
                     <p>
                       <b>Description</b>
                       <br />
