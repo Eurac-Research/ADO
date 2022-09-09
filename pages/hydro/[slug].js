@@ -168,16 +168,36 @@ export default function App({
     setClickInfo()
   }, [])
 
+  const metadata = useMemo(() => {
+    return staticMetaData
+  }, [staticMetaData])
+
+  const timestamp = format(day, 'X')
+  const dayFromTimestamp = timestamp / 60 / 60 / 24
+  const firstDayTimestamp =
+    format(metadata?.timerange?.properties?.firstDate, 'X') / 60 / 60 / 24
+  const lastDayTimestamp =
+    format(metadata?.timerange?.properties?.lastDate, 'X') / 60 / 60 / 24
+
+  // indices does not have common timeranges ...
+  // compare timestamps and set to last possible date if selected date is not available in an index
+  const fixedDay =
+    dayFromTimestamp > lastDayTimestamp
+      ? setDay(
+          format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+        )
+      : dayFromTimestamp < firstDayTimestamp
+      ? setDay(
+          format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+        )
+      : day
+
   const mapCatchmentData = useMemo(() => {
     return (
       catchmentData &&
       updatePercentiles(catchmentData, (f) => f.properties[`${datatype}`][day])
     )
   }, [datatype, catchmentData, day])
-
-  const metadata = useMemo(() => {
-    return staticMetaData
-  }, [staticMetaData])
 
   async function getHtmlData(id_station) {
     const fetchData = async () => {
@@ -227,8 +247,7 @@ export default function App({
     <Layout theme={theme} posts={allPosts}>
       <Head>
         <title>
-          {staticMetaData?.long_name} - Alpine Drought Observatory | Eurac
-          Research
+          {`${staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research`}
         </title>
       </Head>
 
