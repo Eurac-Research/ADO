@@ -207,7 +207,7 @@ export default function App({
     <Layout theme={theme} posts={allPosts}>
       <Head>
         <title>
-          {metadata?.long_name} - Alpine Drought Observatory | Eurac Research
+          {`${staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research`}
         </title>
       </Head>
 
