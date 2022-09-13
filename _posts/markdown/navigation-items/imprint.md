@@ -1,3 +1,8 @@
+---
+title: Imprint / Privacy
+slug: imprint-privacy
+---
+
 **Eurac Research**
 
 Institute for Earth Observation<br />
