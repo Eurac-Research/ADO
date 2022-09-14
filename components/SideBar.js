@@ -62,7 +62,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
           </div>
         ))}
 
-      <div className="alphaInfo">
+      {/* <div className="alphaInfo">
         <h3>⚠️</h3>
         <p>This page is in public BETA and still under development.</p>
         <p>
@@ -78,7 +78,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
           </a>
         </p>
         <p>Eurac Research, September 2022</p>
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import Head from 'next/head'
 import markdownToHtml from '@/lib/markdownToHtml'
 import markdownStyles from './markdownStyles.module.scss'
 import { useThemeContext } from '../../context/theme'
+import Image from 'next/image'
 
 export default function Post({ post, morePosts, preview, allPosts }) {
   const router = useRouter()
@@ -28,6 +29,134 @@ export default function Post({ post, morePosts, preview, allPosts }) {
             </Head>
             <h1>{post?.title}</h1>
             <div dangerouslySetInnerHTML={{ __html: post?.content }} />
+
+            {post?.slug === 'about-the-project' && (
+              <>
+                <h2 style={{ marginTop: '70px' }}>Partner</h2>
+                <div className={markdownStyles.partnerLogos}>
+                  <a
+                    href="https://www.regione.piemonte.it/web/"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624965085-regionepiemontelogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="200"
+                      height="79"
+                    />
+                  </a>
+                  <a
+                    href="https://www.arso.gov.si/en/"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624964035-arsologo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="200"
+                      height="62"
+                    />
+                  </a>
+                  <a
+                    href="https://www.wsl.ch/en/index.html"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624969001-wsllogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="157"
+                      height="150"
+                    />
+                  </a>
+                  <a
+                    href="https://www.land-oberoesterreich.gv.at/default.htm"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624968920-landoberosterreichlogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="199"
+                      height="140"
+                    />
+                  </a>
+                  <a
+                    href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624964716-kgzmblogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="193"
+                      height="150"
+                    />
+                  </a>
+                  <a
+                    href="https://www.unr.uni-freiburg.de/en"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624964892-unifreiburglogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="161"
+                      height="150"
+                    />
+                  </a>
+                  <a
+                    href="https://www.anbi.it/?lang=en"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624963431-anbilogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="200"
+                      height="98"
+                    />
+                  </a>
+                  <a
+                    href="https://www.inrae.fr/en"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1624963435-inrae.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="200"
+                      height="107"
+                    />
+                  </a>
+                  <a
+                    href="https://www.zamg.ac.at/"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1625049129-zamg-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="200"
+                      height="125"
+                    />
+                  </a>
+                  <a
+                    href="https://www.iskriva.net/"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      q="80"
+                      src="https://webassets.eurac.edu/31538/1630484236-iskriva-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                      width="200"
+                      height="122"
+                    />
+                  </a>
+                </div>
+              </>
+            )}
           </article>
         </div>
       )}
