@@ -52,7 +52,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                     rel="noreferrer"
                   >
                     <Image
-                      q="80"
+                      q="99"
                       src="https://webassets.eurac.edu/31538/1624964035-arsologo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                       width="200"
                       height="62"
@@ -76,7 +76,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                     rel="noreferrer"
                   >
                     <Image
-                      q="80"
+                      q="99"
                       src="https://webassets.eurac.edu/31538/1624968920-landoberosterreichlogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                       width="199"
                       height="140"
