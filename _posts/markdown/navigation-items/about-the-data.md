@@ -9,6 +9,13 @@ The ADO project is generating a wide array of datasets for monitoring of drought
 
 ## Drought Indices
 
+* [Standardised Precipitation Index (SPI)](https://doi.org/10.48784/15abe686-534a-11ec-b9ef-02000a08f41d "SPI")
+* [Standardised Precipitation-Evapotranspiration Index (SPEI)](https://doi.org/10.48784/166E51EE-534A-11EC-9143-02000A08F41D "SPEI")
+* [Standardised Snow Pack Index (SSPI)](https://doi.org/10.48784/0ca021a6-7942-11ec-a314-02000a08f41d "SSPI")
+* [Soil Moisture Anomalies (SMA)](https://doi.org/10.48784/ea665ca2-0ceb-11ed-86c5-02000a08f4e5 "SMA")
+* [Vegetation Health Index (VHI)](https://doi.org/10.48784/161b3496-534a-11ec-b78a-02000a08f41d "VHI")
+* [Vegetation Condition Index (VCI)](https://doi.org/10.48784/16367c6a-534a-11ec-b0a3-02000a08f41d "VCI")
+
 ## Hydrogical Data
 
 ## Drought Impacts
