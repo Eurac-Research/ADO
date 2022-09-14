@@ -3,8 +3,14 @@ title: About the Data
 slug: about-the-data
 ---
 
-## Report on existing monitoring platforms and potential data for the integration into ADO  
+The ADO project is generating a wide array of datasets for monitoring of drought which are all made available under an open data license. All datasets are shared through our [Environmentdal Data Platform](https://edp-portal.eurac.edu/home "EDP-Portal"), which offers a variety of interfaces for accessing the data, including hosted [jupyter environments](https://edp-portal.eurac.edu/jupyter/ "jupyter"), openEO API through the [web editor](https://editor.openeo.org/?server=https://openeo.eurac.edu "openEO web editor") or directly using the python and R client libraries and OGC standards like the WFS and [Web Coverage Service (WCS)](http://saocompute.eurac.edu/rasdaman/ows#/services "rasdaman").
 
-The Regional report on existing drought monitoring platforms and potential data for the integration into ADO is based on the analysis of channelled reviews of drought monitoring approaches from Austria, France, Germany, Italy, Switzerland and Slovenia.  
+## Meteorological Data
 
-The report includes an overview of existing indices by country, by drought type addressed, by type of calculation and type of projection. It collects drought monitoring approaches for early detection of drought conditions across the Alpine region. For the preparation of the future ADO platform it collects information about already existing drought monitoring platforms available to users at country and international level. The report reviews existing platforms and by doing this collects the requirements and examples of good practices for tools of early warning systems. Lastly it collects indices already in use in the Alpine area and recommends additional indices that could be used in the ADO platform.  
+## Drought Indices
+
+## Hydrogical Data
+
+## Drought Impacts
+
+## Vulnerability
