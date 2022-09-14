@@ -37,7 +37,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.regione.piemonte.it/web/"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -49,7 +49,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.arso.gov.si/en/"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -61,7 +61,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.wsl.ch/en/index.html"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -73,7 +73,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.land-oberoesterreich.gv.at/default.htm"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -85,7 +85,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -97,7 +97,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.unr.uni-freiburg.de/en"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -109,7 +109,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.anbi.it/?lang=en"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -121,7 +121,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.inrae.fr/en"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -133,7 +133,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.zamg.ac.at/"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
@@ -145,7 +145,7 @@ export default function Post({ post, morePosts, preview, allPosts }) {
                   <a
                     href="https://www.iskriva.net/"
                     target="_blank"
-                    rel="noopener"
+                    rel="noreferrer"
                   >
                     <Image
                       q="80"
