@@ -4,138 +4,30 @@ slug: about-the-project
 ---
 
 
-# h1 Heading 
-## h2 Heading
-### h3 Heading
-#### h4 Heading
-##### h5 Heading
-###### h6 Heading
+# About the project
 
+Droughts are becoming an increasing concern in the Alps and in the lowland areas that receive Alpine water. 
+**The Alpine Drought Observatory (ADO)** provides a tool for a quick and easy overview of the current drought situation in the Alpine region and past drought situations in the last 12-48 month. 
+ADO is integrating data from climate models, satellite data observations and ground station data from all Alpine countries as well as historical entries. The data is harmonized with all Alpine countries and continuously updated daily or every two weeks depending on the observation index. All data is offered on open access under the CC-BY 4.0 license.
 
+ADO provides the following data for the entire alpine space on political and hydrological relevant boundaries:
+* Meteorological indicators such as SPI (precipitation), SPEI (evaporation), and SSPI (snow conditions). 
+* Satellite based vegetation indicators VHI , VCI 
+* Hydrological data from monitoring stations Along most rivers in the Alps 
+* Historical database on drought impacts from scientific articles and media reports 
+* Vulnerability analysis and relevant data for its assessment
 
+The user can select between different drought indices (see data section) and can move back in time by shifting the time slider. By clicking on the map, the user can retrieve detailed information including a graph with a time series for the specific location. 
 
-## Emphasis
-
-**This is bold text**
-
-__This is bold text__
-
-*This is italic text*
-
-_This is italic text_
-
-~~Strikethrough~~
-
-
-## Blockquotes
-
-
-> Blockquotes can also be nested...
->> ...by using additional greater-than signs right next to each other...
-> > > ...or with spaces between arrows.
-
-
-## Lists
-
-Unordered
-
-+ Create a list by starting a line with `+`, `-`, or `*`
-+ Sub-lists are made by indenting 2 spaces:
-  - Marker character change forces new list start:
-    * Ac tristique libero volutpat at
-    + Facilisis in pretium nisl aliquet
-    - Nulla volutpat aliquam velit
-+ Very easy!
-
-Ordered
-
-1. Lorem ipsum dolor sit amet
-2. Consectetur adipiscing elit
-3. Integer molestie lorem at massa
-
-
-1. You can use sequential numbers...
-1. ...or keep all the numbers as `1.`
-
-Start numbering with offset:
-
-57. foo
-1. bar
-
-
-## Code
-
-Inline `code`
-
-Indented code
-
-    // Some comments
-    line 1 of code
-    line 2 of code
-    line 3 of code
-
-
-Block code "fences"
-
-```
-Sample text here...
-```
-
-
-## Tables
-
-| Option | Description |
-| ------ | ----------- |
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |
-
-Right aligned columns
-
-| Option | Description |
-| ------:| -----------:|
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |
-
-
-## Links
-
-[link text](http://dev.nodeca.com)
-
-[link with title](http://nodeca.github.io/pica/demo/ "title text!")
-
-Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
-
-
-## Images
-
-![Minion](https://octodex.github.com/images/minion.png)
-![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat")
-
-Like links, Images also have a footnote style syntax
-
-![Alt text][id]
-
-With a reference later in the document defining the URL location:
-
-[id]: https://octodex.github.com/images/dojocat.jpg  "The Dojocat"
-
-
-
-
-### [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
-
-Footnote 1 link[^first].
-
-Footnote 2 link[^second].
-
-Inline footnote^[Text of inline footnote] definition.
-
-Duplicated footnote reference[^second].
-
-[^first]: Footnote **can have markup**
-
-    and multiple paragraphs.
-
-[^second]: Footnote text.
+ADO is the result of a fruitful partnership of
+* Eurac Research as project coordinator and the technical development, implementation and operator of the web portal and data services in a comprehensive collaboration, the Institute for Earth Observation, Institute for Alpine Environment, Center for Sensing Solutions, ICT and Communications.  
+* The Central Institute for Meteorology and Geodynamics - ZAMG for the processing of climate data 
+* The Slovenian Ministry of Environment and Spatial Planning - ARSO for the drought indicators 
+* The University of Freiburg for the data collection of drought impacts and vulnerability 
+* The Piemonte Region for the coordination of the case studies
+* ISkriva Institute for the project communication 
+* The Swiss Institute for Forests, Snow and Landscape with case studies in the Canton of Ticino and Canton of Thurgau 
+* The French National Research Institute for Science and Technology in Environment and Agriculture - INRAE for case studies in the French Alps. 
+* The province of Upper Austria for a case study
+* 
+The project: Alpine drought observatory (ADO) was funded by Interreg alpine space program 2019 – 2022 [ADO - Alpine Space Programme](https://www.alpine-space.eu/project/ado/ "alpine-space.eu")
