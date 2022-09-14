@@ -7,6 +7,7 @@ import markdownToHtml from '@/lib/markdownToHtml'
 import markdownStyles from './markdownStyles.module.scss'
 import { useThemeContext } from '../../context/theme'
 import Image from 'next/image'
+import 'external-svg-loader'
 
 export default function Post({ post, morePosts, preview, allPosts }) {
   const router = useRouter()
@@ -34,6 +35,18 @@ export default function Post({ post, morePosts, preview, allPosts }) {
               <>
                 <h2 style={{ marginTop: '70px' }}>Partner</h2>
                 <div className={markdownStyles.partnerLogos}>
+                  <a
+                    href="https://www.eurac.edu/en"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <svg
+                      style={{ paddingLeft: '20px' }}
+                      data-src={`https://webassets.eurac.edu/31538/1632322898-eurac-logo-vertical.svg`}
+                      width={170}
+                      height={130}
+                    />
+                  </a>
                   <a
                     href="https://www.regione.piemonte.it/web/"
                     target="_blank"
