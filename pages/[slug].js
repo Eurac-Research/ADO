@@ -22,6 +22,8 @@ import { useThemeContext } from '../context/theme'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
+const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
+
 const indices = [
   'spei-1',
   'spei-2',
@@ -41,11 +43,11 @@ const indices = [
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
   const response = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`
+    `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
   )
   const staticData = await response.json()
   const responseMeta = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`
+    `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
   )
   const staticMetaData = await responseMeta.json()
   const allPosts = getAllPosts(['title', 'slug'])
@@ -71,6 +73,8 @@ export default function App({
   const router = useRouter()
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
+
+  console.log('find firstDate', staticData)
 
   const [metaData, setMetaData] = useState()
   const [day, setDay] = useState(
@@ -164,7 +168,7 @@ export default function App({
       setIsError(false)
       setIsLoading(true)
       try {
-        const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/timeseries/NUTS3_${
+        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${
           overlayNutsId ? `${overlayNutsId}` : ''
         }.json`
         const result = await axios(url)
@@ -329,7 +333,7 @@ export default function App({
             {isError && (
               <p>
                 file
-                https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_
+                {ADO_DATA_URL}/json/timeseries/NUTS3_
                 {clickInfo.feature.properties.NUTS_ID}.json - errors in file
               </p>
             )}
