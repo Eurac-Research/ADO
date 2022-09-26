@@ -74,14 +74,8 @@ export default function App({
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
 
-  console.log('find firstDate', staticData)
-
   const [metaData, setMetaData] = useState()
-  const [day, setDay] = useState(
-    metaData
-      ? metaData?.timerange?.properties?.lastDate
-      : staticMetaData?.timerange?.properties?.lastDate
-  )
+  const [day, setDay] = useState(staticData?.metadata?.properties?.lastDate)
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
@@ -134,9 +128,9 @@ export default function App({
   const timestamp = format(day, 'X')
   const dayFromTimestamp = timestamp / 60 / 60 / 24
   const firstDayTimestamp =
-    format(metadata?.timerange?.properties?.firstDate, 'X') / 60 / 60 / 24
+    format(staticData?.metadata?.properties?.firstDate, 'X') / 60 / 60 / 24
   const lastDayTimestamp =
-    format(metadata?.timerange?.properties?.lastDate, 'X') / 60 / 60 / 24
+    format(staticData?.metadata?.properties?.lastDate, 'X') / 60 / 60 / 24
 
   // indices does not have common timeranges ...
   // compare timestamps and set to last possible date if selected date is not available in an index
@@ -301,8 +295,8 @@ export default function App({
         <ControlPanel
           metadata={metadata}
           day={day}
-          firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
-          lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
+          firstDay={staticData?.metadata?.properties?.firstDate}
+          lastDay={staticData?.metadata?.properties?.lastDate}
           onChange={(value) =>
             setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
           }
