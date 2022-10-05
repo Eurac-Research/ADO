@@ -22,6 +22,8 @@ import { useThemeContext } from '../context/theme'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
+const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
+
 const indices = [
   'spei-1',
   'spei-2',
@@ -41,11 +43,11 @@ const indices = [
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
   const response = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/${datatype}-latest.geojson`
+    `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
   )
   const staticData = await response.json()
   const responseMeta = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/metadata/${datatype}.json`
+    `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
   )
   const staticMetaData = await responseMeta.json()
   const allPosts = getAllPosts(['title', 'slug'])
@@ -73,11 +75,7 @@ export default function App({
   const dataLayer = paint
 
   const [metaData, setMetaData] = useState()
-  const [day, setDay] = useState(
-    metaData
-      ? metaData?.timerange?.properties?.lastDate
-      : staticMetaData?.timerange?.properties?.lastDate
-  )
+  const [day, setDay] = useState(staticData?.metadata?.properties?.lastDate)
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
   const [nutsData, setNutsData] = useState(null)
@@ -130,9 +128,9 @@ export default function App({
   const timestamp = format(day, 'X')
   const dayFromTimestamp = timestamp / 60 / 60 / 24
   const firstDayTimestamp =
-    format(metadata?.timerange?.properties?.firstDate, 'X') / 60 / 60 / 24
+    format(staticData?.metadata?.properties?.firstDate, 'X') / 60 / 60 / 24
   const lastDayTimestamp =
-    format(metadata?.timerange?.properties?.lastDate, 'X') / 60 / 60 / 24
+    format(staticData?.metadata?.properties?.lastDate, 'X') / 60 / 60 / 24
 
   // indices does not have common timeranges ...
   // compare timestamps and set to last possible date if selected date is not available in an index
@@ -164,7 +162,7 @@ export default function App({
       setIsError(false)
       setIsLoading(true)
       try {
-        const url = `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/nuts/timeseries/NUTS3_${
+        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${
           overlayNutsId ? `${overlayNutsId}` : ''
         }.json`
         const result = await axios(url)
@@ -297,8 +295,8 @@ export default function App({
         <ControlPanel
           metadata={metadata}
           day={day}
-          firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
-          lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
+          firstDay={staticData?.metadata?.properties?.firstDate}
+          lastDay={staticData?.metadata?.properties?.lastDate}
           onChange={(value) =>
             setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
           }
@@ -329,7 +327,7 @@ export default function App({
             {isError && (
               <p>
                 file
-                https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/timeseries/NUTS3_
+                {ADO_DATA_URL}/json/timeseries/NUTS3_
                 {clickInfo.feature.properties.NUTS_ID}.json - errors in file
               </p>
             )}
