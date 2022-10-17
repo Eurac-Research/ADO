@@ -349,6 +349,15 @@ export default function App({
                 left: '0',
               }}
             />
+            {staticMetaData?.doi && (
+              <p style={{ marginTop: '1rem', fontSize: '10px' }}>
+                More information about the data:
+                <br />
+                <a href={staticMetaData?.doi} target="_blank" rel="noreferrer">
+                  {staticMetaData?.doi}
+                </a>
+              </p>
+            )}
           </div>
         </>
       )}
