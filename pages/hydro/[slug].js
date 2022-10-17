@@ -325,6 +325,46 @@ export default function App({
         </Map>
       </div>
 
+      <div
+        className="controlContainer"
+        style={{ opacity: clickInfo ? '0' : '1' }}
+      >
+        <div className="legend">
+          {staticMetaData.colormap.legend.stops.map((item, index) => {
+            return (
+              <div key={`legend${index}`} className="legendItem">
+                <div
+                  className="legendColor"
+                  style={{ background: item['2'] }}
+                ></div>
+                <p className="legendLabel">{item['1']}</p>
+              </div>
+            )
+          })}
+        </div>
+
+        <ControlPanel
+          metadata={metadata}
+          day={day}
+          firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
+          lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
+          onChange={(value) =>
+            setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
+          }
+        />
+
+        <div className="navigation">
+          <p>Indices</p>
+          {indices?.map((index) => (
+            <Link prefetch={false} href={`/hydro/${index}`} key={index}>
+              <a className={router.query.slug === index ? 'active' : ''}>
+                {index}
+              </a>
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {clickInfo && (
         <>
           <div className="overlayContainer" onClick={onClose}></div>
@@ -386,43 +426,6 @@ export default function App({
           </div>
         </>
       )}
-
-      <div className="controlContainer">
-        <div className="legend">
-          {staticMetaData.colormap.legend.stops.map((item, index) => {
-            return (
-              <div key={`legend${index}`} className="legendItem">
-                <div
-                  className="legendColor"
-                  style={{ background: item['2'] }}
-                ></div>
-                <p className="legendLabel">{item['1']}</p>
-              </div>
-            )
-          })}
-        </div>
-
-        <ControlPanel
-          metadata={metadata}
-          day={day}
-          firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
-          lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
-          onChange={(value) =>
-            setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
-          }
-        />
-
-        <div className="navigation">
-          <p>Indices</p>
-          {indices?.map((index) => (
-            <Link prefetch={false} href={`/hydro/${index}`} key={index}>
-              <a className={router.query.slug === index ? 'active' : ''}>
-                {index}
-              </a>
-            </Link>
-          ))}
-        </div>
-      </div>
     </Layout>
   )
 }

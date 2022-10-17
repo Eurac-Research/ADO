@@ -1,7 +1,7 @@
 function TimeSeriesLegend() {
   return (
     <div className="timeSeriesLegend">
-      <div style={{ marginTop: '18px', width: '140px' }}>
+      <div style={{ marginTop: '18px', width: '140px', flexShrink: '0' }}>
         <h4>How to read the values </h4>
         <p>Did you know? You can select and compare several indices.</p>
       </div>
