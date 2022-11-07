@@ -7,6 +7,7 @@ import Map, {
   NavigationControl,
 } from 'react-map-gl'
 import ControlPanelImpacts from '../components/ControlPanelImpacts'
+import ReportedImpactsIntro from '../components/ReportedImpactsIntro'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
@@ -988,6 +989,7 @@ export default function App({ impactData, allPosts }) {
 
         {year && <NewComponent />}
         {nutsid && <NewComponent />}
+        {!nutsid && !year && <ReportedImpactsIntro />}
       </div>
     </Layout>
   )

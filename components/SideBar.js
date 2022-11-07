@@ -32,7 +32,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         }
       >
         <Link href="/impacts">
-          <a>Impacts</a>
+          <a>Reported Impacts</a>
         </Link>
       </div>
 
