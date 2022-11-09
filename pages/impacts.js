@@ -53,12 +53,13 @@ export default function App({ impactData, allPosts }) {
       presented as this has never been done across the European Alpine region.
       The Alpine Space covers the Alps and their foothills, as well as different
       climatic zones and therefore allows the consideration of water and natural
-      resource flow and exchange typical of mountain regions. With the region's
-      extent, we therefore include drought impacts not only at high altitudes,
-      but also in downstream areas of the water-rich source regions (e.g. the
-      river basins Po, Rhine, Danube etc.). Besides the most prominent impact
-      category ‘agriculture and livestock farming’, many impact reports also
-      relate to ‘public water supply’, ‘forestry’, ‘aquatic ecosystems’.
+      resource flow and exchange typical of mountain regions. With the
+      region&apos;s extent, we therefore include drought impacts not only at
+      high altitudes, but also in downstream areas of the water-rich source
+      regions (e.g. the river basins Po, Rhine, Danube etc.). Besides the most
+      prominent impact category &apos;agriculture and livestock farming&apos;,
+      many impact reports also relate to &apos;public water supply&apos;,
+      &apos;forestry&apos;, &apos;aquatic ecosystems&apos;.
       <br />
       For further information on the database please read: Stephan, R., Erfurt,
       M., Terzi, S., Žun, M., Kristan, B., Haslinger, K., and Stahl, K.: An
