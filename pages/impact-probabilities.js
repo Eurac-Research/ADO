@@ -33,15 +33,6 @@ export default function App({ impactData, allPosts }) {
   const router = useRouter()
   const mapRef = React.useRef()
 
-  // function impactAmountByNutsId(NUTS_ID) {
-  //   const result = impactEntries.find((item) => item[0] === NUTS_ID)
-
-  //   if (result) {
-  //     return result[1] // amount of impact items
-  //   }
-  //   return null
-  // }
-
   const introHeadline = `Impact probabilities`
   const introText = (
     <>
@@ -89,7 +80,7 @@ export default function App({ impactData, allPosts }) {
   const [nutsName, setNutsName] = useState(null)
   const [spei, setSpei] = useState('')
 
-  const selectedSpei = spei ? spei : '-4'
+  const selectedIndicatorValue = spei ? spei : '-4'
 
   const [mapClicked, setMapClicked] = useState(false)
 
@@ -97,26 +88,26 @@ export default function App({ impactData, allPosts }) {
 
   const [featuredId, setFeaturedId] = useState(null)
 
-  const impactDataBySPEI = impactData.filter(
-    (item) => item.SPEI3 == selectedSpei
+  const impactDataByIndicatorValue = impactData.filter(
+    (item) => item.SPEI3 == selectedIndicatorValue
   )
-  console.log('impactDataBySPEI', impactDataBySPEI)
+  //console.log('impactDataByIndicatorValue', impactDataByIndicatorValue)
 
   const uniqueSPEI = [...new Set(impactData.map((item) => item.SPEI3))]
 
   //console.log('uniqueSPEI', uniqueSPEI)
   //console.log('spei', spei)
 
-  const SPEIandPredictedProb = uniqueSPEI.map((spei) => {
-    return {
-      selectedSPEI: spei,
-      PredictedProb: impactData.filter((item) => item.SPEI3 === spei).length,
-    }
-  })
+  // const SPEIandPredictedProb = uniqueSPEI.map((spei) => {
+  //   return {
+  //     selectedIndicatorValue: spei,
+  //     PredictedProb: impactData.filter((item) => item.SPEI3 === spei).length,
+  //   }
+  // })
 
   //console.log('SPEIandPredictedProb', SPEIandPredictedProb)
 
-  const impactsBySPEIForMap = spei ? impactDataBySPEI : impactData
+  // const impactsBySPEIForMap = spei ? impactDataByIndicatorValue : impactData
 
   // const uniqueImpactsByNutsID = impactsBySPEIForMap.reduce(
   //   (acc, o) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
@@ -128,15 +119,18 @@ export default function App({ impactData, allPosts }) {
   // const impactEntries = Object.entries(uniqueImpactsByNutsID)
   // console.log('impactEntries', impactEntries)
 
+  const type =
+    router.query.type === 'sma' ? 'PredictedProbSMA' : 'PredictedProbSPEI'
+
   // https://docs.mapbox.com/mapbox-gl-js/example/data-join/
   // Build a GL match expression that defines the color for every vector tile feature
   // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
   // Calculate color values for each country based on 'hdi' value
-  for (const row of impactDataBySPEI) {
+  for (const row of impactDataByIndicatorValue) {
     // Convert the range of data values to a suitable color
-    const amount = row['PredictedProb']
+    const amount = row[`${type}`]
     const color = `rgba(${amount * 250}, 80, 100, ${amount * 1.5})`
 
     matchExpression.push(row['NUTS3_ID'], color)
@@ -146,8 +140,8 @@ export default function App({ impactData, allPosts }) {
   matchExpression.push('rgba(255, 255, 255, 0.2)')
 
   // // Calculate color values for each nuts3id
-  // if (impactDataBySPEI.length > 1) {
-  //   for (const row of impactDataBySPEI) {
+  // if (impactDataByIndicatorValue.length > 1) {
+  //   for (const row of impactDataByIndicatorValue) {
   //     const amount = row['PredictedProb']
   //     console.log('amount', amount)
   //     const color = uniqolor(amount, {
