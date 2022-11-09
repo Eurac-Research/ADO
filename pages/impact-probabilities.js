@@ -38,9 +38,12 @@ export default function App({ impactData, allPosts }) {
     <>
       Scenarios of impact probabilities of hydrological drought (SPEI-3) or
       soil-moisture drought (SMA-1) impacts for selected drought index levels.
-      The darker the red, the more likely DSM impacts occur. NUTS 3 regions
-      without any impacts are coloured in gray. National borders across the
-      Alpine Space are shown in black.
+      <br />
+      <br />
+      <b style={{ color: '#f83e66' }}>
+        The darker the red, the more likely impacts occur.{' '}
+      </b>
+      Regions without any impacts are coloured in white.
       <br />
       <br />
       These risk maps have been developed with impact data from the EDIIALPS
@@ -93,6 +96,16 @@ export default function App({ impactData, allPosts }) {
   )
   //console.log('impactDataByIndicatorValue', impactDataByIndicatorValue)
 
+  function impactByNutsId(NUTS_ID) {
+    const result = impactDataByIndicatorValue.find(
+      (item) => item['NUTS3_ID'] === NUTS_ID
+    )
+    if (result) {
+      return result // amount of impact items
+    }
+    return null
+  }
+
   const uniqueSPEI = [...new Set(impactData.map((item) => item.SPEI3))]
 
   //console.log('uniqueSPEI', uniqueSPEI)
@@ -131,13 +144,14 @@ export default function App({ impactData, allPosts }) {
   for (const row of impactDataByIndicatorValue) {
     // Convert the range of data values to a suitable color
     const amount = row[`${type}`]
-    const color = `rgba(${amount * 250}, 80, 100, ${amount * 1.5})`
+    //const color = `rgba(${amount * 150}, 40, 100, ${amount})`
+    const color = `rgba(${amount * 250}, 60, 100, ${amount})`
 
     matchExpression.push(row['NUTS3_ID'], color)
   }
 
   // Last value is the default, used where there is no data
-  matchExpression.push('rgba(255, 255, 255, 0.2)')
+  matchExpression.push('rgba(255, 255, 255, 1)')
 
   // // Calculate color values for each nuts3id
   // if (impactDataByIndicatorValue.length > 1) {
@@ -379,6 +393,7 @@ export default function App({ impactData, allPosts }) {
     } = event
     const hoveredFeature = features && features[0]
 
+    //console.log('hoveredFeature', hoveredFeature)
     // prettier-ignore
     setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
   }, [])
@@ -474,13 +489,40 @@ export default function App({ impactData, allPosts }) {
                 className="tooltip"
                 style={{ left: hoverInfo.x, top: hoverInfo.y }}
               >
-                click to open impact
-                <br />
-                <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
-                <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
                 <div>
-                  probability: {hoverInfo.feature.properties.PredictedProb}
+                  {hoverInfo.feature.properties.NUTS_NAME} (
+                  {hoverInfo.feature.properties.NUTS_ID})
                 </div>
+                {impactByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
+                  <>
+                    <div
+                      style={{
+                        color:
+                          router.query.type !== 'sma' ? '#f85065' : 'white',
+                      }}
+                    >
+                      probability SPEI-3:{' '}
+                      {(
+                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
+                          .PredictedProbSPEI * 100
+                      ).toFixed(1)}
+                      %
+                    </div>
+                    <div
+                      style={{
+                        color:
+                          router.query.type === 'sma' ? '#f85065' : 'white',
+                      }}
+                    >
+                      probability SMA-1:{' '}
+                      {(
+                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
+                          .PredictedProbSMA * 100
+                      ).toFixed(1)}
+                      %
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </Map>

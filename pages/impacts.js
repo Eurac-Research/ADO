@@ -94,7 +94,7 @@ export default function App({ impactData, allPosts }) {
 
   const impactDataByYear = impactData.filter((item) => item.Year_start == year)
 
-  console.log('impactData', impactData)
+  //console.log('impactData', impactData)
 
   // console.log('impactDataByYear', impactDataByYear)
 
@@ -820,7 +820,6 @@ export default function App({ impactData, allPosts }) {
       setYear('')
 
       if (featuredId === null && hoveredFeature) {
-        console.log('hadfasdfasfasdf')
         map.setFeatureState(
           { source: 'geojson', id: hoveredFeature.id },
           { hover: true }
