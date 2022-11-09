@@ -22,7 +22,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
 export async function getStaticProps({ params }) {
   const response = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/hd-impacts.json`
+    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/impacts-predictedProb.json`
   )
   const impactData = await response.json()
   const allPosts = getAllPosts(['title', 'slug'])
@@ -33,14 +33,14 @@ export default function App({ impactData, allPosts }) {
   const router = useRouter()
   const mapRef = React.useRef()
 
-  function impactAmountByNutsId(NUTS_ID) {
-    const result = impactEntries.find((item) => item[0] === NUTS_ID)
+  // function impactAmountByNutsId(NUTS_ID) {
+  //   const result = impactEntries.find((item) => item[0] === NUTS_ID)
 
-    if (result) {
-      return result[1] // amount of impact items
-    }
-    return null
-  }
+  //   if (result) {
+  //     return result[1] // amount of impact items
+  //   }
+  //   return null
+  // }
 
   const introHeadline = `Impact probabilities`
   const introText = (
@@ -81,6 +81,7 @@ export default function App({ impactData, allPosts }) {
   const [isError, setIsError] = useState(false)
   const [nutsMap, setNutsMap] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
+
   const [nutsData, setNutsData] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
 
@@ -103,8 +104,8 @@ export default function App({ impactData, allPosts }) {
 
   const uniqueSPEI = [...new Set(impactData.map((item) => item.SPEI3))]
 
-  console.log('uniqueSPEI', uniqueSPEI)
-  console.log('spei', spei)
+  //console.log('uniqueSPEI', uniqueSPEI)
+  //console.log('spei', spei)
 
   const SPEIandPredictedProb = uniqueSPEI.map((spei) => {
     return {
@@ -113,19 +114,19 @@ export default function App({ impactData, allPosts }) {
     }
   })
 
-  console.log('SPEIandPredictedProb', SPEIandPredictedProb)
+  //console.log('SPEIandPredictedProb', SPEIandPredictedProb)
 
   const impactsBySPEIForMap = spei ? impactDataBySPEI : impactData
 
-  const uniqueImpactsByNutsID = impactsBySPEIForMap.reduce(
-    (acc, o) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
-    {}
-  )
+  // const uniqueImpactsByNutsID = impactsBySPEIForMap.reduce(
+  //   (acc, o) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
+  //   {}
+  // )
   //console.log('unique arr', uniqueImpactsByNutsID)
 
   // create array
-  const impactEntries = Object.entries(uniqueImpactsByNutsID)
-  console.log('impactEntries', impactEntries)
+  // const impactEntries = Object.entries(uniqueImpactsByNutsID)
+  // console.log('impactEntries', impactEntries)
 
   // https://docs.mapbox.com/mapbox-gl-js/example/data-join/
   // Build a GL match expression that defines the color for every vector tile feature
@@ -191,170 +192,170 @@ export default function App({ impactData, allPosts }) {
     bottom: 120,
   }
 
-  const NewComponent = () => (
-    <div className="impactsWrapper">
-      <div className="closeImpactWrapper" onClick={closeImpactsWrapper}>
-        close x
-      </div>
+  // const NewComponent = () => (
+  //   <div className="impactsWrapper">
+  //     <div className="closeImpactWrapper" onClick={closeImpactsWrapper}>
+  //       close x
+  //     </div>
 
-      {spei && (
-        <div className="impactsTitle">
-          <h1
-            style={{
-              fontSize: '30px',
-              marginBottom: '10px',
-              marginTop: '10px',
-            }}
-          >
-            {' '}
-            {spei}
-          </h1>
-        </div>
-      )}
+  //     {spei && (
+  //       <div className="impactsTitle">
+  //         <h1
+  //           style={{
+  //             fontSize: '30px',
+  //             marginBottom: '10px',
+  //             marginTop: '10px',
+  //           }}
+  //         >
+  //           {' '}
+  //           {spei}
+  //         </h1>
+  //       </div>
+  //     )}
 
-      {nutsid && (
-        <div className="impactsTitle">
-          <h1
-            style={{
-              fontSize: '30px',
-              marginBottom: '10px',
-              marginTop: '10px',
-            }}
-          >
-            {nutsName}
-          </h1>
-          <h2
-            style={{
-              fontSize: '18px',
-              marginBottom: '20px',
-              marginTop: '10px',
-            }}
-          >
-            {impactAmountByNutsId(nutsid)
-              ? impactAmountByNutsId(nutsid) > 1
-                ? `${impactAmountByNutsId(nutsid)} impacts`
-                : `${impactAmountByNutsId(nutsid)} impact`
-              : 'no impacts'}
-          </h2>
-        </div>
-      )}
+  //     {nutsid && (
+  //       <div className="impactsTitle">
+  //         <h1
+  //           style={{
+  //             fontSize: '30px',
+  //             marginBottom: '10px',
+  //             marginTop: '10px',
+  //           }}
+  //         >
+  //           {nutsName}
+  //         </h1>
+  //         <h2
+  //           style={{
+  //             fontSize: '18px',
+  //             marginBottom: '20px',
+  //             marginTop: '10px',
+  //           }}
+  //         >
+  //           {impactAmountByNutsId(nutsid)
+  //             ? impactAmountByNutsId(nutsid) > 1
+  //               ? `${impactAmountByNutsId(nutsid)} impacts`
+  //               : `${impactAmountByNutsId(nutsid)} impact`
+  //             : 'no impacts'}
+  //         </h2>
+  //       </div>
+  //     )}
 
-      <div className="impactsContent">
-        {/* year selected */}
-        {spei && (
-          <>
-            {impactData &&
-              impactData
-                .filter((item) => item.SPEI3 === parseInt(spei))
-                .map((item, index) => (
-                  <div key={item.ID} className="impactsItem">
-                    <p>
-                      <b>Description</b>
-                      <br />
-                      {item?.Impact_description}
-                    </p>
+  //     <div className="impactsContent">
+  //       {/* year selected */}
+  //       {spei && (
+  //         <>
+  //           {impactData &&
+  //             impactData
+  //               .filter((item) => item.SPEI3 === parseInt(spei))
+  //               .map((item, index) => (
+  //                 <div key={item.ID} className="impactsItem">
+  //                   <p>
+  //                     <b>Description</b>
+  //                     <br />
+  //                     {item?.Impact_description}
+  //                   </p>
 
-                    {item?.NUTS3_ID &&
-                      nutsMap.features
-                        .filter(
-                          (nut) => nut.properties.NUTS_ID === item?.NUTS3_ID
-                        )
-                        .map((nut, index) => (
-                          <p key={index}>
-                            <b>Region</b>{' '}
-                            <span style={{ fontSize: '12px' }}>
-                              (
-                              <a
-                                href="https://ec.europa.eu/eurostat/web/nuts/background"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                NUTS-3
-                              </a>
-                              )
-                            </span>
-                            <br />
-                            {nut.properties.NUTS_NAME}
-                          </p>
-                        ))}
-                  </div>
-                ))}
-          </>
-        )}
+  //                   {item?.NUTS3_ID &&
+  //                     nutsMap.features
+  //                       .filter(
+  //                         (nut) => nut.properties.NUTS_ID === item?.NUTS3_ID
+  //                       )
+  //                       .map((nut, index) => (
+  //                         <p key={index}>
+  //                           <b>Region</b>{' '}
+  //                           <span style={{ fontSize: '12px' }}>
+  //                             (
+  //                             <a
+  //                               href="https://ec.europa.eu/eurostat/web/nuts/background"
+  //                               target="_blank"
+  //                               rel="noreferrer"
+  //                             >
+  //                               NUTS-3
+  //                             </a>
+  //                             )
+  //                           </span>
+  //                           <br />
+  //                           {nut.properties.NUTS_NAME}
+  //                         </p>
+  //                       ))}
+  //                 </div>
+  //               ))}
+  //         </>
+  //       )}
 
-        {/* click on a region on the map */}
-        {nutsid && (
-          <>
-            {impactData &&
-              impactData
-                .filter((item) => item.NUTS2_ID === nutsid)
-                .reverse()
-                .map((item, index) => (
-                  <div key={item.ID} className="impactsItem">
-                    <p>
-                      <b>Description:</b>
-                      <br /> {item?.Impact_description}
-                    </p>
-                    <p>
-                      <b>Category:</b>
-                      <br />
-                      {impactCategories
-                        .filter((cat) => cat?.id === item?.Impact_category)
-                        .map((cat, index) => (
-                          <span key={cat.id}>{cat.categoryname}</span>
-                        ))}
-                    </p>
-                    <p>
-                      <b>Year:</b>
-                      <br /> {item?.Year_start}
-                    </p>
-                  </div>
-                ))}
-          </>
-        )}
-      </div>
-    </div>
-  )
+  //       {/* click on a region on the map */}
+  //       {nutsid && (
+  //         <>
+  //           {impactData &&
+  //             impactData
+  //               .filter((item) => item.NUTS2_ID === nutsid)
+  //               .reverse()
+  //               .map((item, index) => (
+  //                 <div key={item.ID} className="impactsItem">
+  //                   <p>
+  //                     <b>Description:</b>
+  //                     <br /> {item?.Impact_description}
+  //                   </p>
+  //                   <p>
+  //                     <b>Category:</b>
+  //                     <br />
+  //                     {impactCategories
+  //                       .filter((cat) => cat?.id === item?.Impact_category)
+  //                       .map((cat, index) => (
+  //                         <span key={cat.id}>{cat.categoryname}</span>
+  //                       ))}
+  //                   </p>
+  //                   <p>
+  //                     <b>Year:</b>
+  //                     <br /> {item?.Year_start}
+  //                   </p>
+  //                 </div>
+  //               ))}
+  //         </>
+  //       )}
+  //     </div>
+  //   </div>
+  // )
 
-  const onClick = useCallback(
-    async (event) => {
-      const map = mapRef.current.getMap()
+  // const onClick = useCallback(
+  //   async (event) => {
+  //     const map = mapRef.current.getMap()
 
-      const { features } = event
-      const hoveredFeature = features && features[0]
-      const clickedNutsid = hoveredFeature
-        ? hoveredFeature?.properties?.NUTS_ID
-        : null
-      const clickedNutsName = hoveredFeature
-        ? hoveredFeature?.properties?.NUTS_NAME
-        : null
-      setNutsName(clickedNutsName)
-      setNutsid(clickedNutsid)
-      setSpei('')
+  //     const { features } = event
+  //     const hoveredFeature = features && features[0]
+  //     const clickedNutsid = hoveredFeature
+  //       ? hoveredFeature?.properties?.NUTS_ID
+  //       : null
+  //     const clickedNutsName = hoveredFeature
+  //       ? hoveredFeature?.properties?.NUTS_NAME
+  //       : null
+  //     setNutsName(clickedNutsName)
+  //     setNutsid(clickedNutsid)
+  //     setSpei('')
 
-      if (featuredId === null && hoveredFeature) {
-        map.setFeatureState(
-          { source: 'geojson', id: hoveredFeature.id },
-          { hover: true }
-        )
-      }
+  //     if (featuredId === null && hoveredFeature) {
+  //       map.setFeatureState(
+  //         { source: 'geojson', id: hoveredFeature.id },
+  //         { hover: true }
+  //       )
+  //     }
 
-      if (featuredId !== null) {
-        map.setFeatureState(
-          { source: 'geojson', id: featuredId },
-          { hover: false }
-        )
-      }
-      if (clickedNutsid !== null) {
-        setFeaturedId(hoveredFeature.id)
-        map.setFeatureState(
-          { source: 'geojson', id: hoveredFeature.id },
-          { hover: true }
-        )
-      }
-    },
-    [featuredId]
-  )
+  //     if (featuredId !== null) {
+  //       map.setFeatureState(
+  //         { source: 'geojson', id: featuredId },
+  //         { hover: false }
+  //       )
+  //     }
+  //     if (clickedNutsid !== null) {
+  //       setFeaturedId(hoveredFeature.id)
+  //       map.setFeatureState(
+  //         { source: 'geojson', id: hoveredFeature.id },
+  //         { hover: true }
+  //       )
+  //     }
+  //   },
+  //   [featuredId]
+  // )
 
   useEffect(() => {
     /* global fetch */
@@ -444,9 +445,9 @@ export default function App({ impactData, allPosts }) {
                 : 'mapbox://styles/tiacop/ckxub0vjxd61x14myndikq1dl'
             }
             mapboxAccessToken={MAPBOX_TOKEN}
+            interactiveLayerIds={['geojson']}
             onMouseMove={onHover}
             onMouseLeave={onOut}
-            onClick={onClick}
           >
             {nutsMap && (
               <>
@@ -483,12 +484,9 @@ export default function App({ impactData, allPosts }) {
                 <br />
                 <div>NUTS_NAME: {hoverInfo.feature.properties.NUTS_NAME}</div>
                 <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
-                {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
-                  <>
-                    amount:{' '}
-                    {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}
-                  </>
-                )}
+                <div>
+                  probability: {hoverInfo.feature.properties.PredictedProb}
+                </div>
               </div>
             )}
           </Map>
@@ -516,12 +514,10 @@ export default function App({ impactData, allPosts }) {
           }
         </div> */}
 
-        {spei && <NewComponent />}
-        {nutsid && <NewComponent />}
+        {/* {spei && <NewComponent />}
+        {nutsid && <NewComponent />} */}
 
-        {!nutsid && !spei && (
-          <ReportedImpactsIntro headline={introHeadline} text={introText} />
-        )}
+        <ReportedImpactsIntro headline={introHeadline} text={introText} />
       </div>
     </Layout>
   )

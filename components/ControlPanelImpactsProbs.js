@@ -7,9 +7,9 @@ function ControlPanelImpactsProbs(props) {
   const selectedSpei = spei ? spei : '-4'
 
   const router = useRouter()
-
   return (
     <div className="controlpanel">
+      <h2>{router.query.type === 'sma' ? 'SMA-1' : 'SPEI-3'}</h2>
       <h1>
         {selectedSpei === '-4'
           ? 'Extremely dry'
@@ -44,6 +44,12 @@ function ControlPanelImpactsProbs(props) {
           max="0"
           onChange={(evt) => props.onChange(evt.target.value)}
         />
+
+        {router.query.type === 'sma' ? (
+          <Link href="?type=spei">show SPEI-3 map</Link>
+        ) : (
+          <Link href="?type=sma">show SMA-1 map</Link>
+        )}
 
         {/* <datalist id="tickmarks">
           {yearRange?.map((tick) => {
