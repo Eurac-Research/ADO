@@ -9,7 +9,11 @@ function ControlPanelImpactsProbs(props) {
   const router = useRouter()
   return (
     <div className="controlpanel">
-      <h2>{router.query.type === 'sma' ? 'SMA-1' : 'SPEI-3'}</h2>
+      <h2>
+        {router.query.type === 'sma'
+          ? 'SMA-1 - Soil Moisture Anomalies'
+          : 'SPEI-3 - Standardized Precipitation and Evapotranspiration Index'}
+      </h2>
       <h1>
         {selectedSpei === '-4'
           ? 'Extremely dry'
@@ -45,12 +49,6 @@ function ControlPanelImpactsProbs(props) {
           onChange={(evt) => props.onChange(evt.target.value)}
         />
 
-        {router.query.type === 'sma' ? (
-          <Link href="?type=spei">show SPEI-3 map</Link>
-        ) : (
-          <Link href="?type=sma">show SMA-1 map</Link>
-        )}
-
         {/* <datalist id="tickmarks">
           {yearRange?.map((tick) => {
             return <option key={tick} value={tick}></option>
@@ -69,6 +67,13 @@ function ControlPanelImpactsProbs(props) {
           )
           : <button disabled={true}>&gt;</button>
           */}
+      </div>
+      <div className="switchImpactMap">
+        {router.query.type === 'sma' ? (
+          <Link href="?type=spei">show SPEI-3 map</Link>
+        ) : (
+          <Link href="?type=sma">show SMA-1 map</Link>
+        )}
       </div>
     </div>
   )
