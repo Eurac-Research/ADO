@@ -11,8 +11,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
     >
       <div
         className={
-          router.pathname !== '/impacts' &&
-          router.pathname !== '/impacts-nuts3' &&
+          !router.asPath.includes('impact') &&
           !router.asPath.includes('hydro') &&
           !router.asPath.includes('/md')
             ? 'sideBarItem active'
@@ -33,6 +32,19 @@ function SideBar({ posts, sideBarPositionRelative }) {
       >
         <Link href="/impacts">
           <a>Reported Impacts</a>
+        </Link>
+      </div>
+
+      <div
+        className={
+          router.pathname === '/impact-probabilities' ||
+          router.pathname === '/impact-probabilities'
+            ? 'sideBarItem active'
+            : 'sideBarItem'
+        }
+      >
+        <Link href="/impact-probabilities">
+          <a>Impacts and risk</a>
         </Link>
       </div>
 
