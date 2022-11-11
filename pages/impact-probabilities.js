@@ -90,31 +90,25 @@ export default function App({ impactData, allPosts }) {
 
   const [nutsMap, setNutsMap] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
-
   const [spei, setSpei] = useState('')
-
   const selectedIndicatorValue = spei ? spei : '-4'
-
   const [theme, setTheme] = useThemeContext()
-
   const [featuredId, setFeaturedId] = useState(null)
-
   const impactDataByIndicatorValue = impactData.filter(
     (item) => item.SPEI3 == selectedIndicatorValue
   )
+  const type =
+    router.query.type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
 
   function impactByNutsId(NUTS_ID) {
     const result = impactDataByIndicatorValue.find(
       (item) => item['NUTS3_ID'] === NUTS_ID
     )
-    if (result) {
+    if (result && result[`${type}`]) {
       return result // amount of impact items
     }
     return null
   }
-
-  const type =
-    router.query.type === 'sma' ? 'PredictedProbSMA' : 'PredictedProbSPEI'
 
   // https://docs.mapbox.com/mapbox-gl-js/example/data-join/
   // Build a GL match expression that defines the color for every vector tile feature
@@ -124,12 +118,14 @@ export default function App({ impactData, allPosts }) {
   // Calculate color values for each country based on 'hdi' value
   for (const row of impactDataByIndicatorValue) {
     // Convert the range of data values to a suitable color
-    const amount = row[`${type}`]
 
+    const amount = row[`${type}`]
     // use colormap to interpolate between two colors, 0 - 1
     const colormap = interpolate(['#fcebbf', '#dd0035'])
     const color = colormap(amount)
-    matchExpression.push(row['NUTS3_ID'], color)
+
+    // do not provide a color if amount is null
+    amount && matchExpression.push(row['NUTS3_ID'], color)
   }
   // Last value is the default, used where there is no data
   matchExpression.push('rgba(255, 255, 255, 1)')
@@ -265,7 +261,7 @@ export default function App({ impactData, allPosts }) {
                         DSM impact probability:{' '}
                         {(
                           impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
-                            .PredictedProbSMA * 100
+                            .DSM_PredictedProb * 100
                         ).toFixed(1)}
                         %
                       </div>
@@ -275,7 +271,7 @@ export default function App({ impactData, allPosts }) {
                         DH impact probability:{' '}
                         {(
                           impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
-                            .PredictedProbSPEI * 100
+                            .DH_PredictedProb * 100
                         ).toFixed(1)}
                         %
                       </div>
@@ -299,7 +295,7 @@ export default function App({ impactData, allPosts }) {
           <ControlPanelImpactsProbs
             spei={spei}
             type={type}
-            onChange={(value) => setSpei(value) + setNutsid(null)}
+            onChange={(value) => setSpei(value)}
           />
           <div className="navigation probabilities">
             <p>Indices</p>

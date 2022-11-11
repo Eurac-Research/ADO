@@ -20,40 +20,35 @@ function ControlPanelImpactsProbs(props) {
             <span style={{ color: '#333', fontWeight: '400' }}>
               Scenario {type}{' '}
             </span>
-            <span style={{ color: '' }}>-4 </span>
-            <span style={{ fontStyle: 'italic' }}>extremely dry</span>
+            -4 <span style={{ fontStyle: 'italic' }}>extremely dry</span>
           </>
         ) : selectedSpei === '-3' ? (
           <>
             <span style={{ color: '#333', fontWeight: '400' }}>
               Scenario {type}{' '}
             </span>
-            <span style={{ color: '' }}>-3 </span>
-            <span style={{ fontStyle: 'italic' }}>extremely dry</span>
+            -3 <span style={{ fontStyle: 'italic' }}>extremely dry</span>
           </>
         ) : selectedSpei === '-2' ? (
           <>
             <span style={{ color: '#333', fontWeight: '400' }}>
               Scenario {type}{' '}
             </span>
-            <span style={{ color: '' }}>-2 </span>
-            <span style={{ fontStyle: 'italic' }}>very dry</span>
+            -2 <span style={{ fontStyle: 'italic' }}>very dry</span>
           </>
         ) : selectedSpei === '-1' ? (
           <>
             <span style={{ color: '#333', fontWeight: '400' }}>
               Scenario {type}{' '}
             </span>
-            <span style={{ color: '' }}>-1 </span>
-            <span style={{ fontStyle: 'italic' }}>moderately dry</span>
+            -1 <span style={{ fontStyle: 'italic' }}>moderately dry</span>
           </>
         ) : (
           <>
             <span style={{ color: '#333', fontWeight: '400' }}>
               Scenario {type}{' '}
             </span>
-            <span style={{ color: '' }}>0 </span>
-            <span style={{ fontStyle: 'italic' }}>normal</span>
+            0 <span style={{ fontStyle: 'italic' }}>normal</span>
           </>
         )}
       </h1>
