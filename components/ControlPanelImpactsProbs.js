@@ -59,19 +59,6 @@ function ControlPanelImpactsProbs(props) {
       </h1>
 
       <div className="timerangeSlider">
-        {/*selectedYear > yearRange[0]
-          ? (
-            <button
-              title="prev"
-              type="submit"
-              value={selectedYear - 1} // WRONG - our range has holes
-              onClick={evt => props.onChange(evt.target.value)}>
-              &lt;
-            </button>
-          )
-          : <button disabled={true}>&lt;</button>
-          */}
-
         <input
           type="range"
           value={selectedSpei}
@@ -80,25 +67,6 @@ function ControlPanelImpactsProbs(props) {
           max="0"
           onChange={(evt) => props.onChange(evt.target.value)}
         />
-
-        {/* <datalist id="tickmarks">
-          {yearRange?.map((tick) => {
-            return <option key={tick} value={tick}></option>
-          })}
-        </datalist> */}
-
-        {/* selectedYear < yearRange[yearRange.length - 1]
-          ? (
-            <button
-              title="next"
-              type="submit"
-              value={selectedYear + 1}
-              onClick={evt => props.onChange(evt.target.value)}>
-              &gt;
-            </button>
-          )
-          : <button disabled={true}>&gt;</button>
-          */}
       </div>
     </div>
   )

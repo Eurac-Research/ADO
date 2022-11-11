@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Map, {
   Source,
   Layer,
@@ -33,7 +33,6 @@ export default function App({ impactData, allPosts }) {
   const router = useRouter()
   const mapRef = React.useRef()
 
-  const indices = ['spei', 'sma']
   const introHeadline = `Impact probabilities`
   const introText = (
     <>
@@ -89,21 +88,12 @@ export default function App({ impactData, allPosts }) {
     </>
   )
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
   const [nutsMap, setNutsMap] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
 
-  const [nutsData, setNutsData] = useState(null)
-  const [clickInfo, setClickInfo] = useState(null)
-
-  const [nutsid, setNutsid] = useState(null)
-  const [nutsName, setNutsName] = useState(null)
   const [spei, setSpei] = useState('')
 
   const selectedIndicatorValue = spei ? spei : '-4'
-
-  const [mapClicked, setMapClicked] = useState(false)
 
   const [theme, setTheme] = useThemeContext()
 
@@ -112,7 +102,6 @@ export default function App({ impactData, allPosts }) {
   const impactDataByIndicatorValue = impactData.filter(
     (item) => item.SPEI3 == selectedIndicatorValue
   )
-  //console.log('impactDataByIndicatorValue', impactDataByIndicatorValue)
 
   function impactByNutsId(NUTS_ID) {
     const result = impactDataByIndicatorValue.find(
@@ -123,32 +112,6 @@ export default function App({ impactData, allPosts }) {
     }
     return null
   }
-
-  const uniqueSPEI = [...new Set(impactData.map((item) => item.SPEI3))]
-
-  //console.log('uniqueSPEI', uniqueSPEI)
-  //console.log('spei', spei)
-
-  // const SPEIandPredictedProb = uniqueSPEI.map((spei) => {
-  //   return {
-  //     selectedIndicatorValue: spei,
-  //     PredictedProb: impactData.filter((item) => item.SPEI3 === spei).length,
-  //   }
-  // })
-
-  //console.log('SPEIandPredictedProb', SPEIandPredictedProb)
-
-  // const impactsBySPEIForMap = spei ? impactDataByIndicatorValue : impactData
-
-  // const uniqueImpactsByNutsID = impactsBySPEIForMap.reduce(
-  //   (acc, o) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
-  //   {}
-  // )
-  //console.log('unique arr', uniqueImpactsByNutsID)
-
-  // create array
-  // const impactEntries = Object.entries(uniqueImpactsByNutsID)
-  // console.log('impactEntries', impactEntries)
 
   const type =
     router.query.type === 'sma' ? 'PredictedProbSMA' : 'PredictedProbSPEI'
@@ -234,19 +197,6 @@ export default function App({ impactData, allPosts }) {
     [featuredId]
   )
 
-  const closeImpactsWrapper = useCallback(
-    (event) => {
-      removeNutsInformation()
-      setSpei('')
-      const map = mapRef.current.getMap()
-      map.setFeatureState(
-        { source: 'geojson', id: featuredId },
-        { hover: false }
-      )
-    },
-    [featuredId]
-  )
-
   return (
     <Layout posts={allPosts}>
       <Head>
@@ -312,7 +262,7 @@ export default function App({ impactData, allPosts }) {
                   <>
                     {router.query.type === 'sma' && (
                       <div>
-                        D<sub>SM</sub> impact probability:{' '}
+                        DSM impact probability:{' '}
                         {(
                           impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
                             .PredictedProbSMA * 100
@@ -322,7 +272,7 @@ export default function App({ impactData, allPosts }) {
                     )}
                     {router.query.type !== 'sma' && (
                       <div>
-                        D<sub>H</sub> impact probability:{' '}
+                        DH impact probability:{' '}
                         {(
                           impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
                             .PredictedProbSPEI * 100

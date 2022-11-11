@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Map, {
   Source,
   Layer,
@@ -78,19 +78,12 @@ export default function App({ impactData, allPosts }) {
       </p>
     </>
   )
-
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
   const [nutsMap, setNutsMap] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
-  const [nutsData, setNutsData] = useState(null)
-  const [clickInfo, setClickInfo] = useState(null)
 
   const [nutsid, setNutsid] = useState(null)
   const [nutsName, setNutsName] = useState(null)
   const [year, setYear] = useState('')
-
-  const [mapClicked, setMapClicked] = useState(false)
 
   const [theme, setTheme] = useThemeContext()
 
@@ -98,13 +91,7 @@ export default function App({ impactData, allPosts }) {
 
   const impactDataByYear = impactData.filter((item) => item.Year_start == year)
 
-  //console.log('impactData', impactData)
-
-  // console.log('impactDataByYear', impactDataByYear)
-
   const uniqueYears = [...new Set(impactData.map((item) => item.Year_start))]
-
-  // console.log("uniqueYears ", uniqueYears);
 
   const yearAndAmount = uniqueYears.map((yearOfImpact) => {
     return {
@@ -114,13 +101,6 @@ export default function App({ impactData, allPosts }) {
       ).length,
     }
   })
-
-  /*   console.log("yearAndAmount", yearAndAmount);
-   */
-
-  // count number of distict values AKA number of impacts for a given nutsid
-  // result: [ITC18: 4, ITC14: 11]
-  //console.log("impactData", impactData)
 
   const impactsByYearForMap = year ? impactDataByYear : impactData
 

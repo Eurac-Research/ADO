@@ -5,8 +5,6 @@ import Link from 'next/link'
 function ControlPanelImpacts(props) {
   const { year, yearRange } = props
 
-  // console.log('yearRange', [...yearRange].pop())
-
   const selectedYear = year ? year : [...yearRange].pop()
 
   const router = useRouter()

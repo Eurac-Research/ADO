@@ -27,7 +27,6 @@ function TimeSeries(props) {
       legendObject[item.toUpperCase()] = false // other indices inactive
     }
   }
-
   const [selecedDimensions, setSelecedDimensions] = useState(legendObject)
 
   const options = {
@@ -78,9 +77,6 @@ function TimeSeries(props) {
           <ReactECharts
             option={options}
             style={{ height: '400px', marginTop: '10px' }}
-            onEvents={{
-              legendselectchanged: onChartLegendselectchanged,
-            }}
           />
         </>
       ) : (
