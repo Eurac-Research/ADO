@@ -38,8 +38,19 @@ export default function App({ impactData, allPosts }) {
   const introText = (
     <>
       <p>
-        Scenarios of impact probabilities of hydrological drought (SPEI-3) or
-        soil-moisture drought (SMA-1) impacts for selected drought index levels.
+        Explore the probability of{' '}
+        <strong>soil-moisture drought impacts (DSM)</strong> and{' '}
+        <strong>hydrological drought impacts (DH)</strong> across the Alpine
+        Space!
+      </p>
+      <p>
+        DSM impacts cover mostly impacts on agriculture and forestry, and their
+        occurrence probability is calculated with the Soil moisture anomalies
+        (SMA-1). DH impacts cover mostly impacts on water supply, water quality,
+        and freshwater ecosystems, and their occurrence probability is
+        calculated with the Standardized Precipitation Evapotranspiration Index
+        (SPEI-3). Select different index-scenarios to visualize the impact
+        probability.
       </p>
       <p>
         <strong style={{ color: '#dd0035', fontWeight: 'bold' }}>
@@ -180,171 +191,6 @@ export default function App({ impactData, allPosts }) {
     bottom: 120,
   }
 
-  // const NewComponent = () => (
-  //   <div className="impactsWrapper">
-  //     <div className="closeImpactWrapper" onClick={closeImpactsWrapper}>
-  //       close x
-  //     </div>
-
-  //     {spei && (
-  //       <div className="impactsTitle">
-  //         <h1
-  //           style={{
-  //             fontSize: '30px',
-  //             marginBottom: '10px',
-  //             marginTop: '10px',
-  //           }}
-  //         >
-  //           {' '}
-  //           {spei}
-  //         </h1>
-  //       </div>
-  //     )}
-
-  //     {nutsid && (
-  //       <div className="impactsTitle">
-  //         <h1
-  //           style={{
-  //             fontSize: '30px',
-  //             marginBottom: '10px',
-  //             marginTop: '10px',
-  //           }}
-  //         >
-  //           {nutsName}
-  //         </h1>
-  //         <h2
-  //           style={{
-  //             fontSize: '18px',
-  //             marginBottom: '20px',
-  //             marginTop: '10px',
-  //           }}
-  //         >
-  //           {impactAmountByNutsId(nutsid)
-  //             ? impactAmountByNutsId(nutsid) > 1
-  //               ? `${impactAmountByNutsId(nutsid)} impacts`
-  //               : `${impactAmountByNutsId(nutsid)} impact`
-  //             : 'no impacts'}
-  //         </h2>
-  //       </div>
-  //     )}
-
-  //     <div className="impactsContent">
-  //       {/* year selected */}
-  //       {spei && (
-  //         <>
-  //           {impactData &&
-  //             impactData
-  //               .filter((item) => item.SPEI3 === parseInt(spei))
-  //               .map((item, index) => (
-  //                 <div key={item.ID} className="impactsItem">
-  //                   <p>
-  //                     <b>Description</b>
-  //                     <br />
-  //                     {item?.Impact_description}
-  //                   </p>
-
-  //                   {item?.NUTS3_ID &&
-  //                     nutsMap.features
-  //                       .filter(
-  //                         (nut) => nut.properties.NUTS_ID === item?.NUTS3_ID
-  //                       )
-  //                       .map((nut, index) => (
-  //                         <p key={index}>
-  //                           <b>Region</b>{' '}
-  //                           <span style={{ fontSize: '12px' }}>
-  //                             (
-  //                             <a
-  //                               href="https://ec.europa.eu/eurostat/web/nuts/background"
-  //                               target="_blank"
-  //                               rel="noreferrer"
-  //                             >
-  //                               NUTS-3
-  //                             </a>
-  //                             )
-  //                           </span>
-  //                           <br />
-  //                           {nut.properties.NUTS_NAME}
-  //                         </p>
-  //                       ))}
-  //                 </div>
-  //               ))}
-  //         </>
-  //       )}
-
-  //       {/* click on a region on the map */}
-  //       {nutsid && (
-  //         <>
-  //           {impactData &&
-  //             impactData
-  //               .filter((item) => item.NUTS2_ID === nutsid)
-  //               .reverse()
-  //               .map((item, index) => (
-  //                 <div key={item.ID} className="impactsItem">
-  //                   <p>
-  //                     <b>Description:</b>
-  //                     <br /> {item?.Impact_description}
-  //                   </p>
-  //                   <p>
-  //                     <b>Category:</b>
-  //                     <br />
-  //                     {impactCategories
-  //                       .filter((cat) => cat?.id === item?.Impact_category)
-  //                       .map((cat, index) => (
-  //                         <span key={cat.id}>{cat.categoryname}</span>
-  //                       ))}
-  //                   </p>
-  //                   <p>
-  //                     <b>Year:</b>
-  //                     <br /> {item?.Year_start}
-  //                   </p>
-  //                 </div>
-  //               ))}
-  //         </>
-  //       )}
-  //     </div>
-  //   </div>
-  // )
-
-  // const onClick = useCallback(
-  //   async (event) => {
-  //     const map = mapRef.current.getMap()
-
-  //     const { features } = event
-  //     const hoveredFeature = features && features[0]
-  //     const clickedNutsid = hoveredFeature
-  //       ? hoveredFeature?.properties?.NUTS_ID
-  //       : null
-  //     const clickedNutsName = hoveredFeature
-  //       ? hoveredFeature?.properties?.NUTS_NAME
-  //       : null
-  //     setNutsName(clickedNutsName)
-  //     setNutsid(clickedNutsid)
-  //     setSpei('')
-
-  //     if (featuredId === null && hoveredFeature) {
-  //       map.setFeatureState(
-  //         { source: 'geojson', id: hoveredFeature.id },
-  //         { hover: true }
-  //       )
-  //     }
-
-  //     if (featuredId !== null) {
-  //       map.setFeatureState(
-  //         { source: 'geojson', id: featuredId },
-  //         { hover: false }
-  //       )
-  //     }
-  //     if (clickedNutsid !== null) {
-  //       setFeaturedId(hoveredFeature.id)
-  //       map.setFeatureState(
-  //         { source: 'geojson', id: hoveredFeature.id },
-  //         { hover: true }
-  //       )
-  //     }
-  //   },
-  //   [featuredId]
-  // )
-
   useEffect(() => {
     /* global fetch */
     fetch(
@@ -360,12 +206,6 @@ export default function App({ impactData, allPosts }) {
       .catch((err) => console.error('Could not load data', err)) // eslint-disable-line
   }, [])
 
-  /*   const data = useMemo(() => {
-      return allDays ? earthquakes : filterFeaturesByDay(earthquakes, selectedTime);
-    }, [earthquakes, allDays, selectedTime]);
-   
-   */
-
   const onHover = useCallback((event) => {
     const {
       features,
@@ -373,7 +213,6 @@ export default function App({ impactData, allPosts }) {
     } = event
     const hoveredFeature = features && features[0]
 
-    //console.log('hoveredFeature', hoveredFeature)
     // prettier-ignore
     setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
   }, [])
@@ -408,12 +247,12 @@ export default function App({ impactData, allPosts }) {
     [featuredId]
   )
 
-  //console.log('impactData', impactData)
-
   return (
     <Layout posts={allPosts}>
       <Head>
-        <title>Impacts - Alpine Drought Observatory | Eurac Research</title>
+        <title>
+          Impact probabilities - Alpine Drought Observatory | Eurac Research
+        </title>
       </Head>
       <div>
         <div className="reactMap">
@@ -448,10 +287,6 @@ export default function App({ impactData, allPosts }) {
                 >
                   <Layer {...nutsLayer} beforeId="waterway-shadow" />
                 </Source>
-                {/*                 <Source id="my-data" type="geojson" data={geojson}>
-                  <Layer {...layerStyle} />
-                </Source>
-                */}
               </>
             )}
             <ScaleControl
@@ -475,30 +310,26 @@ export default function App({ impactData, allPosts }) {
                 </div>
                 {impactByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
                   <>
-                    <div
-                      style={{
-                        color: router.query.type !== 'sma' ? '#dd0035' : '',
-                      }}
-                    >
-                      SPEI-3 probability:{' '}
-                      {(
-                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
-                          .PredictedProbSPEI * 100
-                      ).toFixed(1)}
-                      %
-                    </div>
-                    <div
-                      style={{
-                        color: router.query.type === 'sma' ? '#dd0035' : '',
-                      }}
-                    >
-                      SMA-1 probability:{' '}
-                      {(
-                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
-                          .PredictedProbSMA * 100
-                      ).toFixed(1)}
-                      %
-                    </div>
+                    {router.query.type === 'sma' && (
+                      <div>
+                        D<sub>SM</sub> impact probability:{' '}
+                        {(
+                          impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
+                            .PredictedProbSMA * 100
+                        ).toFixed(1)}
+                        %
+                      </div>
+                    )}
+                    {router.query.type !== 'sma' && (
+                      <div>
+                        D<sub>H</sub> impact probability:{' '}
+                        {(
+                          impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
+                            .PredictedProbSPEI * 100
+                        ).toFixed(1)}
+                        %
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -510,42 +341,30 @@ export default function App({ impactData, allPosts }) {
           <div className="legend" style={{ maxWidth: 'none' }}>
             <div className="probabilityLegend"></div>
             <p className="probabilityLegendLabel">
-              <span>likely</span>
               <span>unlikely</span>
+              <span>likely</span>
             </p>
           </div>
 
           <ControlPanelImpactsProbs
             spei={spei}
+            type={type}
             onChange={(value) => setSpei(value) + setNutsid(null)}
           />
-          <div className="navigation">
+          <div className="navigation probabilities">
             <p>Indices</p>
             <Link href="?type=spei">
-              <a className={router.query.type !== 'sma' ? 'active' : 'adsf'}>
-                SPEI-3
+              <a className={router.query.type !== 'sma' ? 'active' : ''}>
+                DH impact probability
               </a>
             </Link>
             <Link href="?type=sma">
-              <a className={router.query.type === 'sma' ? 'active' : 'adsf'}>
-                SMA-1
+              <a className={router.query.type === 'sma' ? 'active' : ''}>
+                DSM impact probability
               </a>
             </Link>
           </div>
         </div>
-
-        {/* 
-        <div className="impactsYearRange">
-          {yearAndAmount && yearAndAmount.map((yearitem) => (
-            <div className={`selectYear${yearitem.impactYear === year ? ` active` : ``}`} key={`year-${yearitem.impactYear}`} onClick={() => setYear(yearitem.impactYear) + setNutsid(null)}>
-              <span>{yearitem.impactYear}<br />({yearitem.impactAmount} impacts)</span>
-            </div>
-          ))
-          }
-        </div> */}
-
-        {/* {spei && <NewComponent />}
-        {nutsid && <NewComponent />} */}
 
         <ReportedImpactsIntro headline={introHeadline} text={introText} />
       </div>
