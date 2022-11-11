@@ -305,7 +305,7 @@ export default function App({
         <div className="navigation">
           <p>Indices</p>
           {indices?.map((index) => (
-            <Link href={`/${index}`} key={index}>
+            <Link prefetch={false} href={`/${index}`} key={index}>
               <a className={router.query.slug === index ? 'active' : ''}>
                 {index}
               </a>
