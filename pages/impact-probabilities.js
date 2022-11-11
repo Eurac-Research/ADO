@@ -6,14 +6,14 @@ import Map, {
   ScaleControl,
   NavigationControl,
 } from 'react-map-gl'
+import Link from 'next/link'
 import ControlPanelImpactsProbs from '../components/ControlPanelImpactsProbs'
 import ReportedImpactsIntro from '../components/ReportedImpactsIntro'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/layout'
-import uniqolor from 'uniqolor'
-const { Color, ColorImmutable } = require('frostcolor')
+import interpolate from 'color-interpolate'
 
 import { getAllPosts } from '../lib/api'
 import { useThemeContext } from '../context/theme'
@@ -33,41 +33,48 @@ export default function App({ impactData, allPosts }) {
   const router = useRouter()
   const mapRef = React.useRef()
 
+  const indices = ['spei', 'sma']
   const introHeadline = `Impact probabilities`
   const introText = (
     <>
-      Scenarios of impact probabilities of hydrological drought (SPEI-3) or
-      soil-moisture drought (SMA-1) impacts for selected drought index levels.
-      <br />
-      <br />
-      <b style={{ color: '#f83e66' }}>
-        The darker the red, the more likely impacts occur.{' '}
-      </b>
-      Regions without any impacts are coloured in white.
-      <br />
-      <br />
-      These risk maps have been developed with impact data from the EDIIALPS
-      V1.0. Impacts in each NUTS region were assigned to two groups:
-      soil-moisture drought impacts (DSM) and hydrological drought impacts (DH).
-      The DSM impacts stem mostly from the impact categories Forestry, and
-      Agriculture and livestock farming (see Deliverable DT3.1.1). The so-called
-      hydrological drought impacts stem mostly from the impact categories Public
-      water supply, Freshwater ecosystems and Water quality. For each NUTS3
-      region, we fit a generalized linear model with a logit link to regress the
-      likelihood of a drought impact against SPEI-3 and SMA-1. With the fitted
-      model we then predicted impact occurrences for different SPEI-3 and SMA-1
-      values in order to estimate the occurrence probability for each NUTS 3
-      region. NUTS 3 regions without sufficient DSM or DH impact data to
-      estimate a model are shown as regions with missing ata. The method (model
-      and scenario mapping) follows the method by Blauhut et al. (2015).
-      <br />
-      For further details on the application for ADO, please read: Deliverable
-      DT3.2.1. Blauhut V., Gudmundsson L., Stahl K. (2015) Towards pan-European
-      drought risk maps: quantifying the link between drought indices and
-      reported drought impacts, Environmental Research Letters 10, 014008{' '}
-      <a href="https://doi.org/10.1088/1748-9326/10/1/014008">
-        https://doi.org/10.1088/1748-9326/10/1/014008
-      </a>
+      <p>
+        Scenarios of impact probabilities of hydrological drought (SPEI-3) or
+        soil-moisture drought (SMA-1) impacts for selected drought index levels.
+      </p>
+      <p>
+        <strong style={{ color: '#dd0035', fontWeight: 'bold' }}>
+          The darker the red, the more likely impacts occur.{' '}
+        </strong>
+        <br />
+        Regions without any impacts are coloured in white.
+      </p>
+      <p>
+        These risk maps have been developed with impact data from the EDIIALPS
+        V1.0. Impacts in each NUTS region were assigned to two groups:
+        soil-moisture drought impacts (DSM) and hydrological drought impacts
+        (DH). The DSM impacts stem mostly from the impact categories Forestry,
+        and Agriculture and livestock farming (see Deliverable DT3.1.1). The
+        so-called hydrological drought impacts stem mostly from the impact
+        categories Public water supply, Freshwater ecosystems and Water quality.
+        For each NUTS3 region, we fit a generalized linear model with a logit
+        link to regress the likelihood of a drought impact against SPEI-3 and
+        SMA-1. With the fitted model we then predicted impact occurrences for
+        different SPEI-3 and SMA-1 values in order to estimate the occurrence
+        probability for each NUTS 3 region. NUTS 3 regions without sufficient
+        DSM or DH impact data to estimate a model are shown as regions with
+        missing ata. The method (model and scenario mapping) follows the method
+        by Blauhut et al. (2015).
+      </p>
+      <p>
+        For further details on the application for ADO, please read: Deliverable
+        DT3.2.1. Blauhut V., Gudmundsson L., Stahl K. (2015) Towards
+        pan-European drought risk maps: quantifying the link between drought
+        indices and reported drought impacts, Environmental Research Letters 10,
+        014008{' '}
+        <a href="https://doi.org/10.1088/1748-9326/10/1/014008">
+          https://doi.org/10.1088/1748-9326/10/1/014008
+        </a>
+      </p>
     </>
   )
 
@@ -144,41 +151,14 @@ export default function App({ impactData, allPosts }) {
   for (const row of impactDataByIndicatorValue) {
     // Convert the range of data values to a suitable color
     const amount = row[`${type}`]
-    //const color = `rgba(${amount * 150}, 40, 100, ${amount})`
-    const color = `rgba(${amount * 250}, 60, 100, ${amount})`
 
+    // use colormap to interpolate between two colors, 0 - 1
+    const colormap = interpolate(['#fcebbf', '#dd0035'])
+    const color = colormap(amount)
     matchExpression.push(row['NUTS3_ID'], color)
   }
-
   // Last value is the default, used where there is no data
   matchExpression.push('rgba(255, 255, 255, 1)')
-
-  // // Calculate color values for each nuts3id
-  // if (impactDataByIndicatorValue.length > 1) {
-  //   for (const row of impactDataByIndicatorValue) {
-  //     const amount = row['PredictedProb']
-  //     console.log('amount', amount)
-  //     const color = uniqolor(amount, {
-  //       saturation: [50, 75],
-  //       lightness: [50, 70],
-  //       differencePoint: 90,
-  //     })
-
-  //     // get color by basecolor - darken color by amount of impacts per nutsregion
-  //     const mycolor = Color.fromString('#FFCEC3')
-  //       .darken(amount / 100)
-  //       .toHexString()
-  //     // console.log(`mycolor amount ${mycolor}, ${amount / 100}`);
-
-  //     matchExpression.push(row['PredictedProb'], mycolor)
-  //   }
-  // }
-
-  // Last value is the default, used where there is no data
-  //matchExpression.push('rgba(0, 0, 0, 0.1)')
-
-  // Add layer from the vector tile source to create the choropleth
-  // Insert it below the 'admin-1-boundary-bg' layer in the style
 
   const nutsLayer = {
     type: 'fill',
@@ -497,11 +477,10 @@ export default function App({ impactData, allPosts }) {
                   <>
                     <div
                       style={{
-                        color:
-                          router.query.type !== 'sma' ? '#f85065' : 'white',
+                        color: router.query.type !== 'sma' ? '#dd0035' : '',
                       }}
                     >
-                      probability SPEI-3:{' '}
+                      SPEI-3 probability:{' '}
                       {(
                         impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
                           .PredictedProbSPEI * 100
@@ -510,11 +489,10 @@ export default function App({ impactData, allPosts }) {
                     </div>
                     <div
                       style={{
-                        color:
-                          router.query.type === 'sma' ? '#f85065' : 'white',
+                        color: router.query.type === 'sma' ? '#dd0035' : '',
                       }}
                     >
-                      probability SMA-1:{' '}
+                      SMA-1 probability:{' '}
                       {(
                         impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
                           .PredictedProbSMA * 100
@@ -528,17 +506,33 @@ export default function App({ impactData, allPosts }) {
           </Map>
         </div>
 
-        {!nutsid && (
-          <div
-            className="controlContainer impacts"
-            onClick={removeNutsInformation}
-          >
-            <ControlPanelImpactsProbs
-              spei={spei}
-              onChange={(value) => setSpei(value) + setNutsid(null)}
-            />
+        <div className="controlContainer impacts">
+          <div className="legend" style={{ maxWidth: 'none' }}>
+            <div className="probabilityLegend"></div>
+            <p className="probabilityLegendLabel">
+              <span>likely</span>
+              <span>unlikely</span>
+            </p>
           </div>
-        )}
+
+          <ControlPanelImpactsProbs
+            spei={spei}
+            onChange={(value) => setSpei(value) + setNutsid(null)}
+          />
+          <div className="navigation">
+            <p>Indices</p>
+            <Link href="?type=spei">
+              <a className={router.query.type !== 'sma' ? 'active' : 'adsf'}>
+                SPEI-3
+              </a>
+            </Link>
+            <Link href="?type=sma">
+              <a className={router.query.type === 'sma' ? 'active' : 'adsf'}>
+                SMA-1
+              </a>
+            </Link>
+          </div>
+        </div>
 
         {/* 
         <div className="impactsYearRange">

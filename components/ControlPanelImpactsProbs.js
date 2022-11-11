@@ -16,14 +16,14 @@ function ControlPanelImpactsProbs(props) {
       </h2>
       <h1>
         {selectedSpei === '-4'
-          ? 'Extremely dry'
+          ? 'Extremely dry (-4)'
           : selectedSpei === '-3'
-          ? 'Very dry'
+          ? 'Very dry (-3)'
           : selectedSpei === '-2'
-          ? 'Moderately dry'
+          ? 'Moderately dry (-2)'
           : selectedSpei === '-1'
-          ? 'Moderately dry to normal ??'
-          : 'Normal'}
+          ? 'Moderately dry to normal ?? (-1)'
+          : 'Normal (0)'}
       </h1>
 
       <div className="timerangeSlider">
@@ -67,13 +67,6 @@ function ControlPanelImpactsProbs(props) {
           )
           : <button disabled={true}>&gt;</button>
           */}
-      </div>
-      <div className="switchImpactMap">
-        {router.query.type === 'sma' ? (
-          <Link href="?type=spei">show SPEI-3 map</Link>
-        ) : (
-          <Link href="?type=sma">show SMA-1 map</Link>
-        )}
       </div>
     </div>
   )

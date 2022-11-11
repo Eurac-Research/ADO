@@ -11,15 +11,7 @@ function ReportedImpactsIntro({ headline = 0, text = 0 }) {
         >
           {headline}
         </h1>
-        <p
-          style={{
-            fontSize: '12px',
-            marginBottom: '12px',
-            lineHeight: '1.2',
-          }}
-        >
-          {text}
-        </p>
+        {text}
       </div>
     </div>
   )
