@@ -21,8 +21,13 @@ import { useThemeContext } from '../context/theme'
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
 export async function getStaticProps({ params }) {
+  const type =
+    router.query.type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
+
+  const jsonUrl = router.query.type === 'sma' ? 'dsm-probs' : 'dh-probs'
+
   const response = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/impacts-predictedProb.json`
+    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/${jsonUrl}.json`
   )
   const impactData = await response.json()
   const allPosts = getAllPosts(['title', 'slug'])
@@ -97,8 +102,6 @@ export default function App({ impactData, allPosts }) {
   const impactDataByIndicatorValue = impactData.filter(
     (item) => item.SPEI3 == selectedIndicatorValue
   )
-  const type =
-    router.query.type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
 
   function impactByNutsId(NUTS_ID) {
     const result = impactDataByIndicatorValue.find(
