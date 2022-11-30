@@ -302,15 +302,15 @@ export default function App({ impactData, allPosts }) {
           />
           <div className="navigation probabilities">
             <p>Indices</p>
-            <Link href="?type=spei">
-              <a className={router.query.type !== 'sma' ? 'active' : ''}>
+            <Link href="?type=spei" className={router.query.type !== 'sma' ? 'active' : ''}>
+              
                 DH impact probability
-              </a>
+              
             </Link>
-            <Link href="?type=sma">
-              <a className={router.query.type === 'sma' ? 'active' : ''}>
+            <Link href="?type=sma" className={router.query.type === 'sma' ? 'active' : ''}>
+              
                 DSM impact probability
-              </a>
+              
             </Link>
           </div>
         </div>
@@ -318,5 +318,5 @@ export default function App({ impactData, allPosts }) {
         <ReportedImpactsIntro headline={introHeadline} text={introText} />
       </div>
     </Layout>
-  )
+  );
 }

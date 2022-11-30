@@ -14,15 +14,19 @@ function ControlPanelImpacts(props) {
       <h1>{selectedYear}</h1>
 
       <div className="impactsNutsSwitch">
-        <Link href="/impacts">
-          <a className={router.pathname === '/impacts' ? 'active' : ''}>
+        <Link
+          href="/impacts"
+          className={router.pathname === '/impacts' ? 'active' : ''}>
+          
             Nuts 2
-          </a>
+          
         </Link>
-        <Link href="/impacts-nuts3">
-          <a className={router.pathname === '/impacts-nuts3' ? 'active' : ''}>
+        <Link
+          href="/impacts-nuts3"
+          className={router.pathname === '/impacts-nuts3' ? 'active' : ''}>
+          
             Nuts 3
-          </a>
+          
         </Link>
       </div>
 
@@ -43,7 +47,7 @@ function ControlPanelImpacts(props) {
         </datalist>
       </div>
     </div>
-  )
+  );
 }
 
 export default React.memo(ControlPanelImpacts)

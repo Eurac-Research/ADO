@@ -19,7 +19,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         }
       >
         <Link href="/">
-          <a>Indices</a>
+          Indices
         </Link>
       </div>
 
@@ -31,7 +31,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         }
       >
         <Link href="/impacts">
-          <a>Reported Impacts</a>
+          Reported Impacts
         </Link>
       </div>
 
@@ -44,7 +44,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         }
       >
         <Link href="/impact-probabilities">
-          <a>Impacts and risk</a>
+          Impacts and risk
         </Link>
       </div>
 
@@ -54,7 +54,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         }
       >
         <Link href="/hydro/spei-1">
-          <a>Hydro</a>
+          Hydro
         </Link>
       </div>
 
@@ -69,7 +69,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
             }
           >
             <Link href={`/md/${item?.slug}`}>
-              <a>{item.title}</a>
+              {item.title}
             </Link>
           </div>
         ))}
@@ -92,7 +92,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         <p>Eurac Research, September 2022</p>
       </div> */}
     </div>
-  )
+  );
 }
 
 export default SideBar
