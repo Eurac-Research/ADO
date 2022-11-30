@@ -18,9 +18,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
             : 'sideBarItem'
         }
       >
-        <Link href="/">
-          Indices
-        </Link>
+        <Link href="/">Indices</Link>
       </div>
 
       <div
@@ -30,9 +28,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
             : 'sideBarItem'
         }
       >
-        <Link href="/impacts">
-          Reported Impacts
-        </Link>
+        <Link href="/impacts">Reported Impacts</Link>
       </div>
 
       <div
@@ -44,7 +40,8 @@ function SideBar({ posts, sideBarPositionRelative }) {
         }
       >
         <Link href="/impact-probabilities">
-          Impacts and risk
+          {/* Impacts and risk */}
+          Impact probabilities
         </Link>
       </div>
 
@@ -53,9 +50,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
           router.asPath.includes('hydro') ? 'sideBarItem active' : 'sideBarItem'
         }
       >
-        <Link href="/hydro/spei-1">
-          Hydro
-        </Link>
+        <Link href="/hydro/spei-1">Hydro</Link>
       </div>
 
       {posts &&
@@ -68,9 +63,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
                 : 'sideBarItem'
             }
           >
-            <Link href={`/md/${item?.slug}`}>
-              {item.title}
-            </Link>
+            <Link href={`/md/${item?.slug}`}>{item.title}</Link>
           </div>
         ))}
 
@@ -92,7 +85,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         <p>Eurac Research, September 2022</p>
       </div> */}
     </div>
-  );
+  )
 }
 
 export default SideBar

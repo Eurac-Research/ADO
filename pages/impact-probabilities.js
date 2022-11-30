@@ -21,20 +21,28 @@ import { useThemeContext } from '../context/theme'
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
 export async function getStaticProps({ params }) {
-  const type =
-    router.query.type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
+  // const router = useRouter()
 
-  const jsonUrl = router.query.type === 'sma' ? 'dsm-probs' : 'dh-probs'
+  // const jsonUrl = router.query.type === 'sma' ? 'dsm-probs' : 'dh-probs'
 
-  const response = await fetch(
-    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/${jsonUrl}.json`
+  const fetchDSM = await fetch(
+    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/dsm-probs.json`
   )
-  const impactData = await response.json()
+  const fetchDH = await fetch(
+    `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json//impacts/dh-probs.json`
+  )
+
+  const responseDSM = await fetchDSM.json()
+  const responseDH = await fetchDH.json()
+
+  const response = responseDSM.concat(responseDH)
+  const impactData = response
   const allPosts = getAllPosts(['title', 'slug'])
   return { props: { impactData, allPosts } }
 }
 
 export default function App({ impactData, allPosts }) {
+  //console.log('impactData', impactData)
   const router = useRouter()
   const mapRef = React.useRef()
 
@@ -99,13 +107,25 @@ export default function App({ impactData, allPosts }) {
   const selectedIndicatorValue = spei ? spei : '-4'
   const [theme, setTheme] = useThemeContext()
   const [featuredId, setFeaturedId] = useState(null)
+
+  const indexValue = router.query.type === 'sma' ? 'sma1' : 'spei3'
+
+  // {
+  //   "NUTS_ID": "AT122",
+  //   "NUTS_NAME": "Niederösterreich-Süd",
+  //   "sma1": -1, --> indexValue -4 to 0
+  //   "DSM_PredictedProb": "0.027"
+  // },
+
   const impactDataByIndicatorValue = impactData.filter(
-    (item) => item.SPEI3 == selectedIndicatorValue
+    (item) => item[indexValue] == selectedIndicatorValue
   )
+  const type =
+    router.query.type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
 
   function impactByNutsId(NUTS_ID) {
     const result = impactDataByIndicatorValue.find(
-      (item) => item['NUTS3_ID'] === NUTS_ID
+      (item) => item['NUTS_ID'] === NUTS_ID
     )
     if (result && result[`${type}`]) {
       return result // amount of impact items
@@ -118,7 +138,6 @@ export default function App({ impactData, allPosts }) {
   // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
-  // Calculate color values for each country based on 'hdi' value
   for (const row of impactDataByIndicatorValue) {
     // Convert the range of data values to a suitable color
 
@@ -128,7 +147,7 @@ export default function App({ impactData, allPosts }) {
     const color = colormap(amount)
 
     // do not provide a color if amount is null
-    amount && matchExpression.push(row['NUTS3_ID'], color)
+    amount && matchExpression.push(row['NUTS_ID'], color)
   }
   // Last value is the default, used where there is no data
   matchExpression.push('rgba(255, 255, 255, 1)')
@@ -302,15 +321,17 @@ export default function App({ impactData, allPosts }) {
           />
           <div className="navigation probabilities">
             <p>Indices</p>
-            <Link href="?type=spei" className={router.query.type !== 'sma' ? 'active' : ''}>
-              
-                DH impact probability
-              
+            <Link
+              href="?type=spei"
+              className={router.query.type !== 'sma' ? 'active' : ''}
+            >
+              DH impact probability
             </Link>
-            <Link href="?type=sma" className={router.query.type === 'sma' ? 'active' : ''}>
-              
-                DSM impact probability
-              
+            <Link
+              href="?type=sma"
+              className={router.query.type === 'sma' ? 'active' : ''}
+            >
+              DSM impact probability
             </Link>
           </div>
         </div>
@@ -318,5 +339,5 @@ export default function App({ impactData, allPosts }) {
         <ReportedImpactsIntro headline={introHeadline} text={introText} />
       </div>
     </Layout>
-  );
+  )
 }
