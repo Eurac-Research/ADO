@@ -526,6 +526,12 @@ body {
         margin-bottom: 24px;
       }
     }
+    &.probabilities h1 {
+      font-size: 18px;
+      @media (min-width: 768px) {
+        font-size: 24px;
+      }
+    }
 
     h2 {
       color: var(--text-strong-light);
@@ -665,6 +671,11 @@ body {
       color: #fff;
       font-weight: 500;
     }
+  }
+  &.probabilities a {
+    font-size: 14px;
+    width: auto;
+    padding: 0 10px;
   }
 }
 
@@ -849,14 +860,14 @@ body {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-
     white-space: nowrap;
+    font-size: 14px;
 
     @media (min-width: 768px) {
       text-align: right;
       display: block;
       height: auto;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     a {
@@ -873,7 +884,7 @@ body {
 
       @media (min-width: 768px) {
         display: inline-block;
-        padding: 10px 15px 10px 10px;
+        padding: 8px 15px 8px 8px;
         margin-right: 0px;
         box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
       }
@@ -885,7 +896,7 @@ body {
 
     &.active {
       font-weight: bold;
-      font-size: 20px;
+      font-size: 16px;
     }
   }
 
@@ -918,9 +929,9 @@ body {
   position: fixed;
   top: 80px;
   left: 20px;
-  background-color: #fff;
+  background-color: var(--bg-8-light);
+  color: var(--text-strong-light);
   z-index: 3;
-
   width: calc(100% - 40px);
 
   @media (min-width: 768px) {
@@ -930,7 +941,6 @@ body {
 
   .impactsItem {
     margin-bottom: 28px;
-
     border-bottom: 1px solid #ccc;
     padding-bottom: 28px;
 
@@ -967,6 +977,15 @@ body {
   height: 44vh;
   overflow: auto;
   padding: 10px 20px 10px 20px;
+
+  p {
+    font-size: 12px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    strong {
+      font-weight: bold;
+    }
+  }
 }
 
 .impactsNutsSwitch {
@@ -1221,5 +1240,23 @@ b {
       border-color: rgb(201 239 212 / 60%);
       font-weight: bold;
     }
+  }
+}
+.probabilityLegend {
+  height: 20px;
+  width: 140px;
+  background: rgb(249, 66, 103);
+  background: linear-gradient(107deg, #fcebbf 0%, #dd0035 100%);
+}
+.probabilityLegendLabel {
+  color: var(--text-strong-light);
+  font-size: 10px;
+  font-weight: 400;
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+
+  @media (min-width: 768px) {
+    font-size: 10px;
   }
 }

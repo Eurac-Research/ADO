@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Map, {
   Source,
   Layer,
@@ -7,6 +7,7 @@ import Map, {
   NavigationControl,
 } from 'react-map-gl'
 import ControlPanelImpacts from '../components/ControlPanelImpacts'
+import ReportedImpactsIntro from '../components/ReportedImpactsIntro'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
@@ -41,18 +42,48 @@ export default function App({ impactData, allPosts }) {
     return null
   }
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
+  const introHeadline = `Reported Impacts`
+  const introText = (
+    <>
+      <p>
+        The reported drought impacts stem from the Alpine Drought Impact report
+        Inventory (EDIIALPS V1.0) developed during the project period. To create
+        EDIIALPS, information was gathered and transcribed from national
+        databases and reports. Compiled knowledge on the impacts of historic and
+        recent drought events from a variety of available information sources is
+        presented as this has never been done across the European Alpine region.
+        The Alpine Space covers the Alps and their foothills, as well as
+        different climatic zones and therefore allows the consideration of water
+        and natural resource flow and exchange typical of mountain regions. With
+        the region&apos;s extent, we therefore include drought impacts not only
+        at high altitudes, but also in downstream areas of the water-rich source
+        regions (e.g. the river basins Po, Rhine, Danube etc.). Besides the most
+        prominent impact category &apos;agriculture and livestock farming&apos;,
+        many impact reports also relate to &apos;public water supply&apos;,
+        &apos;forestry&apos;, &apos;aquatic ecosystems&apos;.
+      </p>
+      <p>
+        For further information on the database please read: Stephan, R.,
+        Erfurt, M., Terzi, S., Žun, M., Kristan, B., Haslinger, K., and Stahl,
+        K.: An inventory of Alpine drought impact reports to explore past
+        droughts in a mountain region, Natural Hazards and Earth System Sciences
+        Discussions, 21, 2485–2501, available at{' '}
+        <a href="https://doi.org/10.5194/nhess-21-2485-2021">
+          https://doi.org/10.5194/nhess-21-2485-2021
+        </a>
+        , 2021. To access EDIIALPS as a plain dataset follow this link{' '}
+        <a href="https://doi.org/10.6094/UNIFR/218623">
+          https://doi.org/10.6094/UNIFR/218623
+        </a>
+      </p>
+    </>
+  )
   const [nutsMap, setNutsMap] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
-  const [nutsData, setNutsData] = useState(null)
-  const [clickInfo, setClickInfo] = useState(null)
 
   const [nutsid, setNutsid] = useState(null)
   const [nutsName, setNutsName] = useState(null)
   const [year, setYear] = useState('')
-
-  const [mapClicked, setMapClicked] = useState(false)
 
   const [theme, setTheme] = useThemeContext()
 
@@ -60,12 +91,7 @@ export default function App({ impactData, allPosts }) {
 
   const impactDataByYear = impactData.filter((item) => item.Year_start == year)
 
-  /*   console.log("impactDataByYear", impactDataByYear);
-   */
-
   const uniqueYears = [...new Set(impactData.map((item) => item.Year_start))]
-
-  // console.log("uniqueYears ", uniqueYears);
 
   const yearAndAmount = uniqueYears.map((yearOfImpact) => {
     return {
@@ -75,13 +101,6 @@ export default function App({ impactData, allPosts }) {
       ).length,
     }
   })
-
-  /*   console.log("yearAndAmount", yearAndAmount);
-   */
-
-  // count number of distict values AKA number of impacts for a given nutsid
-  // result: [ITC18: 4, ITC14: 11]
-  //console.log("impactData", impactData)
 
   const impactsByYearForMap = year ? impactDataByYear : impactData
 
@@ -785,7 +804,6 @@ export default function App({ impactData, allPosts }) {
       setYear('')
 
       if (featuredId === null && hoveredFeature) {
-        console.log('hadfasdfasfasdf')
         map.setFeatureState(
           { source: 'geojson', id: hoveredFeature.id },
           { hover: true }
@@ -988,6 +1006,10 @@ export default function App({ impactData, allPosts }) {
 
         {year && <NewComponent />}
         {nutsid && <NewComponent />}
+
+        {!nutsid && !year && (
+          <ReportedImpactsIntro headline={introHeadline} text={introText} />
+        )}
       </div>
     </Layout>
   )

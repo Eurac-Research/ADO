@@ -11,17 +11,14 @@ function SideBar({ posts, sideBarPositionRelative }) {
     >
       <div
         className={
-          router.pathname !== '/impacts' &&
-          router.pathname !== '/impacts-nuts3' &&
+          !router.asPath.includes('impact') &&
           !router.asPath.includes('hydro') &&
           !router.asPath.includes('/md')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
       >
-        <Link href="/">
-          <a>Indices</a>
-        </Link>
+        <Link href="/">Indices</Link>
       </div>
 
       <div
@@ -31,8 +28,20 @@ function SideBar({ posts, sideBarPositionRelative }) {
             : 'sideBarItem'
         }
       >
-        <Link href="/impacts">
-          <a>Impacts</a>
+        <Link href="/impacts">Reported Impacts</Link>
+      </div>
+
+      <div
+        className={
+          router.pathname === '/impact-probabilities' ||
+          router.pathname === '/impact-probabilities'
+            ? 'sideBarItem active'
+            : 'sideBarItem'
+        }
+      >
+        <Link href="/impact-probabilities">
+          {/* Impacts and risk */}
+          Impact probabilities
         </Link>
       </div>
 
@@ -41,9 +50,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
           router.asPath.includes('hydro') ? 'sideBarItem active' : 'sideBarItem'
         }
       >
-        <Link href="/hydro/spei-1">
-          <a>Hydro</a>
-        </Link>
+        <Link href="/hydro/spei-1">Hydro</Link>
       </div>
 
       {posts &&
@@ -56,9 +63,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
                 : 'sideBarItem'
             }
           >
-            <Link href={`/md/${item?.slug}`}>
-              <a>{item.title}</a>
-            </Link>
+            <Link href={`/md/${item?.slug}`}>{item.title}</Link>
           </div>
         ))}
 
