@@ -39,10 +39,26 @@ function SideBar({ posts, sideBarPositionRelative }) {
             : 'sideBarItem'
         }
       >
-        <Link href="/impact-probabilities">
-          {/* Impacts and risk */}
-          Impact probabilities
-        </Link>
+        <Link href="/impact-probabilities">Impacts and risk</Link>
+        <div
+          className={
+            router.pathname === '/impact-probabilities' ||
+            router.pathname === '/impact-probabilities'
+              ? 'sideBarItemSub active'
+              : 'sideBarItemSub'
+          }
+        >
+          <Link href="/impact-probabilities">Impact probabilities</Link>
+        </div>
+        <div
+          className={
+            router.pathname === '/vulnerabilities'
+              ? 'sideBarItemSub active'
+              : 'sideBarItemSub'
+          }
+        >
+          <Link href="/vulnerabilities">Vulnerabilities</Link>
+        </div>
       </div>
 
       <div

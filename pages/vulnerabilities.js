@@ -375,35 +375,107 @@ export default function App({ farmSize, allPosts }) {
 
   const type = router.query.type
 
-  const jsonRow =
-    type === 'farm_size'
-      ? 'farm_size_ha'
-      : type === 'livestock_density'
-      ? 'livestock_density'
-      : type === 'farm_input_intensity'
-      ? 'percentage'
-      : 'farm_size_ha'
-
   const dataObject =
     type === 'farm_size'
-      ? { row: 'farm_size_ha', divisor: 100 }
+      ? {
+          row: 'farm_size_ha',
+          divisor: 100 /* max value of this datatype - in order to get a 0 to 1 colormap */,
+          fun: 'bla',
+          color: [
+            'step',
+            ['get', 'value'],
+            'rgba(236,11,0,0.9)',
+            30,
+            'rgba(237,69,61,0.9)',
+            40,
+            'rgba(238,127,122,0.9)',
+            50,
+            'rgba(239,239,239,0.9)',
+            60,
+            'rgba(213,233,237,0.9)',
+            70,
+            'rgba(200,229,236,0.9)',
+            80,
+            'rgba(187,226,234,0.9)',
+          ],
+        }
       : type === 'livestock_density'
-      ? { row: 'livestock_density', divisor: 100 }
+      ? {
+          row: 'livestock_density',
+          divisor: 100,
+          color: [
+            'step',
+            ['get', 'value'],
+            'rgba(236,11,0,0.9)',
+            -2,
+            'rgba(237,69,61,0.9)',
+            -1.5,
+            'rgba(238,127,122,0.9)',
+            -1,
+            'rgba(239,239,239,0.9)',
+            0,
+            'rgba(213,233,237,0.9)',
+            1,
+            'rgba(200,229,236,0.9)',
+            1.5,
+            'rgba(187,226,234,0.9)',
+          ],
+        }
       : type === 'farm_input_intensity'
-      ? { row: 'percentage', divisor: 10 }
-      : { row: 'farm_size_ha', divisor: 100 }
+      ? {
+          row: 'percentage',
+          divisor: 10,
+          color: [
+            'step',
+            ['get', 'value'],
+            'rgba(236,11,0,0.9)',
+            -2,
+            'rgba(237,69,61,0.9)',
+            -1.5,
+            'rgba(238,127,122,0.9)',
+            -1,
+            'rgba(239,239,239,0.9)',
+            0,
+            'rgba(213,233,237,0.9)',
+            1,
+            'rgba(200,229,236,0.9)',
+            1.5,
+            'rgba(187,226,234,0.9)',
+          ],
+        }
+      : {
+          row: 'farm_size_ha',
+          divisor: 100,
+          color: [
+            'step',
+            ['get', 'value'],
+            'rgba(236,11,0,0.9)',
+            -2,
+            'rgba(237,69,61,0.9)',
+            -1.5,
+            'rgba(238,127,122,0.9)',
+            -1,
+            'rgba(239,239,239,0.9)',
+            0,
+            'rgba(213,233,237,0.9)',
+            1,
+            'rgba(200,229,236,0.9)',
+            1.5,
+            'rgba(187,226,234,0.9)',
+          ],
+        }
 
-  console.log('dataO', dataObject.row)
+  console.log('dataO', dataObject.fun)
 
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
   for (const row of farmSize) {
     // Convert the range of data values to a suitable color
-    const amount = row[`${jsonRow}`]
-
+    const amount = row[`${dataObject.row}`]
+    const zeroToOne = amount / dataObject.divisor
     // use colormap to interpolate between two colors, 0 - 1
     const colormap = interpolate(['#fcebbf', '#dd0035'])
-    const color = colormap(amount / 100)
+    const color = colormap(zeroToOne)
 
     // do not provide a color if amount is null
     amount && matchExpression.push(row['nuts_id'], color)
@@ -419,21 +491,21 @@ export default function App({ farmSize, allPosts }) {
     type: 'fill',
     id: 'geojson',
     paint: {
-      // 'fill-color': matchExpression,
       'fill-color': matchExpression,
+      //'fill-color': dataObject?.color,
 
-      'fill-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        1,
-        0.6,
-      ],
+      // 'fill-opacity': [
+      //   'case',
+      //   ['boolean', ['feature-state', 'hover'], false],
+      //   1,
+      //   0.6,
+      // ],
 
       'fill-outline-color': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         '#000',
-        '#999',
+        '#fff',
       ],
     },
   }
@@ -465,6 +537,12 @@ export default function App({ farmSize, allPosts }) {
       point: { x, y },
     } = event
     const hoveredFeature = features && features[0]
+    // const map = mapRef.current.getMap()
+
+    // map.setFeatureState(
+    //   { source: 'geojson', id: hoverInfo && hoverInfo.feature.id },
+    //   { hover: false }
+    // )
 
     // prettier-ignore
     setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
@@ -474,7 +552,6 @@ export default function App({ farmSize, allPosts }) {
     setHoverInfo(null)
   }, [])
 
-  console.log(hoverInfo)
   return (
     <Layout posts={allPosts}>
       <Head>
