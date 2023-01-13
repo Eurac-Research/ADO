@@ -90,28 +90,29 @@ export default function App({
       <p>
         The maps present factors identified to contribute agricultures
         vulnerability to drought based on the analyses with two case studies.
-        For further details read more. Read more text (in “About the data”): The
-        mapped vulnerability factors were identified by analyzing agriculture's
-        vulnerability to drought in the two case study regions of the project:
-        Thurgau (CH) and Podravska (SI). During semi-structured interviews
-        project partners and external experts were asked to identify the most
-        important factors contributing to the overall vulnerability an in
-        addition, whether the factor has an increasing or decreasing effect on
-        the final vulnerability in order to be able to quantitatively describe
-        the vulnerability component. They identified 10 common factors for both
-        study regions, whereas they identified 6 factors solely for Thurgau and
-        13 factors solely for Podravska. The applicability of these factors for
-        other parts of the Alpine region can be questioned especially when
-        considering the differences between the case study regions highlighting
-        the region-specific character of vulnerability. However, the factors
-        presented here and on the platform can be seen as a first estimate how
-        vulnerable the agriculture across the Alpine Space is.
+        For further details read more. Read more text (in &quot;About the
+        data&quot;): The mapped vulnerability factors were identified by
+        analyzing agriculture&apos;s vulnerability to drought in the two case
+        study regions of the project: Thurgau (CH) and Podravska (SI). During
+        semi-structured interviews project partners and external experts were
+        asked to identify the most important factors contributing to the overall
+        vulnerability an in addition, whether the factor has an increasing or
+        decreasing effect on the final vulnerability in order to be able to
+        quantitatively describe the vulnerability component. They identified 10
+        common factors for both study regions, whereas they identified 6 factors
+        solely for Thurgau and 13 factors solely for Podravska. The
+        applicability of these factors for other parts of the Alpine region can
+        be questioned especially when considering the differences between the
+        case study regions highlighting the region-specific character of
+        vulnerability. However, the factors presented here and on the platform
+        can be seen as a first estimate how vulnerable the agriculture across
+        the Alpine Space is.
       </p>
       <p>
         For further details read: Deliverable DT3.3.1 and Stephan, R., Terzi,
         S., Erfurt, M., Cocuccioni, S., Stahl, K., and Zebisch, M.: Assessing
-        agriculture's vulnerability to drought in European pre-Alpine regions,
-        EGUsphere, 2022, 1–28,{' '}
+        agriculture&apos;s vulnerability to drought in European pre-Alpine
+        regions, EGUsphere, 2022, 1–28,{' '}
         <a href="https://doi.org/10.5194/egusphere-2022-744">
           https://doi.org/10.5194/egusphere-2022-744
         </a>
