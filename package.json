@@ -16,6 +16,7 @@
     "external-svg-loader": "^1.6.1",
     "frostcolor": "^3.0.0",
     "gray-matter": "^4.0.3",
+    "json5": "2.2.2",
     "mapbox-gl": "^2.7.0",
     "moment": "^2.29.3",
     "next": "^13.0.5",
