@@ -82,52 +82,6 @@ export default function App({
   const router = useRouter()
   const mapRef = React.useRef()
 
-  const introHeadline = `Vulnerability factors`
-  const introText = (
-    <>
-      <p>
-        <strong>
-          The maps present factors identified to contribute agricultures
-          vulnerability to drought based on the analyses with two case studies.
-        </strong>
-      </p>
-      <p>
-        For further details <Link href="/md/about-the-data">read more</Link>.
-      </p>
-      {/* <p>
-        The mapped vulnerability factors were identified by analyzing
-        agriculture&apos;s vulnerability to drought in the two case study
-        regions of the project: Thurgau (CH) and Podravska (SI). During
-        semi-structured interviews project partners and external experts were
-        asked to identify the most important factors contributing to the overall
-        vulnerability an in addition, whether the factor has an increasing or
-        decreasing effect on the final vulnerability in order to be able to
-        quantitatively describe the vulnerability component. They identified 10
-        common factors for both study regions, whereas they identified 6 factors
-        solely for Thurgau and 13 factors solely for Podravska. The
-        applicability of these factors for other parts of the Alpine region can
-        be questioned especially when considering the differences between the
-        case study regions highlighting the region-specific character of
-        vulnerability. However, the factors presented here and on the platform
-        can be seen as a first estimate how vulnerable the agriculture across
-        the Alpine Space is.
-      </p>
-      <p>
-        For further details read: Deliverable DT3.3.1 and Stephan, R., Terzi,
-        S., Erfurt, M., Cocuccioni, S., Stahl, K., and Zebisch, M.: Assessing
-        agriculture&apos;s vulnerability to drought in European pre-Alpine
-        regions, EGUsphere, 2022, 1–28,{' '}
-        <a href="https://doi.org/10.5194/egusphere-2022-744">
-          https://doi.org/10.5194/egusphere-2022-744
-        </a>
-        , available at:
-        <a href="https://egusphere.copernicus.org/preprints/egusphere-2022-744/">
-          https://egusphere.copernicus.org/preprints/egusphere-2022-744/
-        </a>
-        , 2022.
-      </p> */}
-    </>
-  )
   const [nutsMap, setNutsMap] = useState(null)
   const [hoverInfo, setHoverInfo] = useState(null)
   const [theme, setTheme] = useThemeContext()
@@ -210,8 +164,6 @@ export default function App({
             [41.9, 51.1, '253,141,60'],
             [51.1, 60.6, '240,59,32'],
             [60.6, 83.2, '189,0,38'],
-
-            [83.2, 1000, '18,255,17'],
           ],
           title: 'High input farming [%]',
           variableName:
@@ -341,6 +293,71 @@ export default function App({
             'https://ec.europa.eu/eurostat/databrowser/view/AEI_EF_LU$DEFAULTVIEW/default/table',
         }
 
+  const introHeadline = `Vulnerability factors`
+  const introText = (
+    <>
+      <p>
+        <strong>
+          The maps present factors identified to contribute agricultures
+          vulnerability to drought based on the analyses with two case studies.
+        </strong>
+      </p>
+      <p>
+        For further details <Link href="/md/about-the-data">read more</Link>.
+      </p>
+
+      <hr style={{ margin: '1.5rem 0' }} />
+      <h2 style={{ marginBottom: '1rem', fontSize: '20px' }}>
+        {dataObject.title}
+      </h2>
+      <p>
+        <strong>{dataObject.variableName}</strong>
+      </p>
+
+      <p>
+        {dataObject.desc}
+        <br /> Latest update: {dataObject.update}
+      </p>
+      <p>
+        Underlying dataset:
+        <br />
+        <a href="{dataObject.dataset}">{dataObject.dataset}</a>
+      </p>
+      {/* <p>
+              The mapped vulnerability factors were identified by analyzing
+              agriculture&apos;s vulnerability to drought in the two case study
+              regions of the project: Thurgau (CH) and Podravska (SI). During
+              semi-structured interviews project partners and external experts were
+              asked to identify the most important factors contributing to the overall
+              vulnerability an in addition, whether the factor has an increasing or
+              decreasing effect on the final vulnerability in order to be able to
+              quantitatively describe the vulnerability component. They identified 10
+              common factors for both study regions, whereas they identified 6 factors
+              solely for Thurgau and 13 factors solely for Podravska. The
+              applicability of these factors for other parts of the Alpine region can
+              be questioned especially when considering the differences between the
+              case study regions highlighting the region-specific character of
+              vulnerability. However, the factors presented here and on the platform
+              can be seen as a first estimate how vulnerable the agriculture across
+              the Alpine Space is.
+            </p>
+            <p>
+              For further details read: Deliverable DT3.3.1 and Stephan, R., Terzi,
+              S., Erfurt, M., Cocuccioni, S., Stahl, K., and Zebisch, M.: Assessing
+              agriculture&apos;s vulnerability to drought in European pre-Alpine
+              regions, EGUsphere, 2022, 1–28,{' '}
+              <a href="https://doi.org/10.5194/egusphere-2022-744">
+                https://doi.org/10.5194/egusphere-2022-744
+              </a>
+              , available at:
+              <a href="https://egusphere.copernicus.org/preprints/egusphere-2022-744/">
+                https://egusphere.copernicus.org/preprints/egusphere-2022-744/
+              </a>
+              , 2022.
+            </p> */}
+    </>
+  )
+
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
   // return true if in range, otherwise false
@@ -395,7 +412,7 @@ export default function App({
   function getDataByNutsId(NUTS_ID) {
     const result = dataToUse.find((item) => item['nuts_id'] === NUTS_ID)
     if (result) {
-      console.log('result', result)
+      //console.log('result', result)
       return result // amount of impact items
     }
     return null
@@ -492,20 +509,24 @@ export default function App({
                 className="tooltip"
                 style={{ left: hoverInfo.x, top: hoverInfo.y }}
               >
-                <div>
+                <div style={{ marginBottom: '6px' }}>
                   {hoverInfo.feature.properties.NUTS_NAME} (
                   {hoverInfo.feature.properties.NUTS_ID})
                 </div>
-                {getDataByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
-                  <div>
-                    Value:{' '}
-                    {
-                      getDataByNutsId(hoverInfo.feature.properties.NUTS_ID)[
-                        `${dataObject.row}`
-                      ]
-                    }
-                    {dataObject?.postfix}
-                  </div>
+                {getDataByNutsId(hoverInfo?.feature?.properties?.NUTS_ID) && (
+                  <>
+                    <div style={{ marginBottom: '6px' }}>
+                      {dataObject.variableName}
+                    </div>
+                    <div style={{ fontWeight: '600' }}>
+                      {new Intl.NumberFormat('en-EN').format(
+                        getDataByNutsId(hoverInfo.feature.properties.NUTS_ID)[
+                          `${dataObject.row}`
+                        ]
+                      )}
+                      {dataObject?.postfix}
+                    </div>
+                  </>
                 )}
               </div>
             )}
@@ -514,8 +535,11 @@ export default function App({
 
         <div className="controlContainer impacts">
           <div className="legend" style={{ maxWidth: 'none' }}>
+            <p style={{ fontSize: '12px', marginBottom: '6px' }}>
+              Unit: {dataObject.postfix}
+            </p>
             {dataObject?.colorRange?.map((range, index) => (
-              <div style={{ fontSize: '12px' }} key={index}>
+              <div className="vulnerabilityLegend" key={index}>
                 <span
                   style={{
                     width: '20px',
