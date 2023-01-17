@@ -137,6 +137,8 @@ export default function App({
       ? livestock_density
       : type === 'farm_input_intensity'
       ? farm_input_intensity
+      : type === 'farm_input_intensity_ha'
+      ? farm_input_intensity
       : type === 'share_permanent_grassland'
       ? share_permanent_grassland
       : type === 'share_utilised_agric_area'
@@ -188,6 +190,18 @@ export default function App({
             [60.6, 83.2, '189,0,38'],
 
             [83.2, 1000, '18,255,17'],
+          ],
+        }
+      : type === 'farm_input_intensity_ha'
+      ? {
+          row: 'hectares',
+          postfix: ' ha',
+          colorRange: [
+            [0, 37055, '255,255,178'],
+            [37055, 109098, '254,204,92'],
+            [109098, 201533, '253,141,60'],
+            [201533, 276551, '240,59,32'],
+            [276551, 531503, '189,0,38'],
           ],
         }
       : type === 'intensity_farming'
@@ -446,6 +460,15 @@ export default function App({
               }
             >
               High input farming (%)
+            </Link>
+
+            <Link
+              href="?type=farm_input_intensity_ha"
+              className={
+                router.query.type === 'farm_input_intensity_ha' ? 'active' : ''
+              }
+            >
+              High input farming (ha)
             </Link>
           </div>
         </div>
