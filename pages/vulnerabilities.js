@@ -11,8 +11,6 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/layout'
-import uniqolor from 'uniqolor'
-import interpolate from 'color-interpolate'
 
 import { getAllPosts } from '../lib/api'
 import { useThemeContext } from '../context/theme'
@@ -149,6 +147,8 @@ export default function App({
       ? share_permanent_grassland
       : type === 'share_utilised_agric_area'
       ? share_utilised_agric_area
+      : type === 'share_utilised_agric_area_ha'
+      ? share_utilised_agric_area
       : type === 'intensity_farming'
       ? intensity_farming
       : farm_size
@@ -169,6 +169,8 @@ export default function App({
             [75.9, 1000, '18,255,17'],
           ],
           title: 'Farm size',
+          variableName:
+            'Average utilised agricultural area per agricultural holding [ha]',
           unit: 'ha',
           desc: 'This factor has been calculated by dividing the total number of holdings with the utilised agricultural area (ha)',
           update: '2013',
@@ -191,6 +193,7 @@ export default function App({
             [12.92, 1000, '18,255,17'],
           ],
           title: 'Livestock density',
+          variableName: 'Livestock units per hectare',
           unit: 'units/ha',
           desc: 'This factor has been calculated by dividing the total number of livestock units by the hectares of permanent grassland (livestock/ha).',
           update: '2016',
@@ -211,6 +214,8 @@ export default function App({
             [83.2, 1000, '18,255,17'],
           ],
           title: 'High input farming [%]',
+          variableName:
+            'Percentage of high input utilised agricultural area over total utilised agricultural area',
           unit: '%',
           desc: 'This dataset shows the hectares and the percentage of utilised agricultural area (UAA) managed by high-input farms. The inputs considered are purchased fertilisers and soil improvers, plant protection products such as pesticides, traps, bird scarers, anti-hail shells, frost protection etc. High intensity level means that the input level is greater than the 66th UAA quantiles.',
           update: '2019',
@@ -228,33 +233,91 @@ export default function App({
             [201533, 276551, '240,59,32'],
             [276551, 531503, '189,0,38'],
           ],
+          title: 'High input farming [ha]',
+          variableName: 'Hectares of high input utilised agricultural area',
+          unit: 'ha',
+          desc: 'This dataset shows the hectares and the percentage of utilised agricultural area (UAA) managed by high-input farms. The inputs considered are purchased fertilisers and soil improvers, plant protection products such as pesticides, traps, bird scarers, anti-hail shells, frost protection etc. High intensity level means that the input level is greater than the 66th UAA quantiles.',
+          update: '2019',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/AEI_PS_INP__custom_2982600/default/table',
         }
       : type === 'intensity_farming'
       ? {
-          row: 'total_farm_intensity',
-          divisor: 10,
-          color: [
-            'step',
-            ['get', 'value'],
-            'rgba(236,11,0,0.9)',
-            -2,
-            'rgba(237,69,61,0.9)',
-            -1.5,
-            'rgba(238,127,122,0.9)',
-            -1,
-            'rgba(239,239,239,0.9)',
-            0,
-            'rgba(213,233,237,0.9)',
-            1,
-            'rgba(200,229,236,0.9)',
-            1.5,
-            'rgba(187,226,234,0.9)',
+          row: 'total',
+          postfix: ' t/ha',
+          colorRange: [
+            [0, 0, '255,255,178'],
+            [0, 4.5, '254,204,92'],
+            [4.5, 8.1, '253,141,60'],
+            [8.1, 11, '240,59,32'],
+            [11, 14.3, '189,0,38'],
           ],
-          title: '',
-          unit: '',
-          desc: '',
-          update: '',
-          dataset: '',
+          title: 'Production intensity',
+          variableName: 'Crop production per hectare',
+          unit: 't/ha',
+          desc: 'This factor is calculated dividing the sum of crop production of cereals, dry pulses and protein (t) by the area of cultivation (ha)',
+          update: '2020',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/APRO_CPSHR__custom_2974283/default/table',
+        }
+      : type === 'share_utilised_agric_area'
+      ? {
+          row: 'share_utilised_agri_area',
+          postfix: ' %',
+          colorRange: [
+            [7.5, 22.6, '255,255,178'],
+            [22.6, 30, '254,204,92'],
+            [30, 41.4, '253,141,60'],
+            [41.4, 44.5, '240,59,32'],
+            [44.5, 50.3, '189,0,38'],
+          ],
+          title: 'Share utilised agricultural area',
+          variableName:
+            'Percentage of utilised agricultural area over the total NUTS2 area',
+          unit: '%',
+          desc: 'This factor shows the hectares of utilised agricultural areas and the share calculated by dividing the utilised agricultural area by the total area at each NUTS2 region.',
+          update: '2016',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_MAIN__custom_2950047/default/table',
+        }
+      : type === 'share_utilised_agric_area_ha'
+      ? {
+          row: 'utilised_agric_area_ha',
+          postfix: ' ha',
+          colorRange: [
+            [6360, 179822, '255,255,178'],
+            [179822, 308870, '254,204,92'],
+            [308870, 391130, '253,141,60'],
+            [391130, 713314, '240,59,32'],
+            [713314, 1464350, '189,0,38'],
+          ],
+          title: 'Utilised agricultural area',
+          variableName: 'Utilised agricultural area',
+          unit: 'ha',
+          desc: 'This factor shows the hectares of utilised agricultural areas and the share calculated by dividing the utilised agricultural area by the total area at each NUTS2 region.',
+          update: '2016',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_MAIN__custom_2950047/default/table',
+        }
+      : type === 'share_permanent_grassland'
+      ? {
+          row: 'share_permanent_grassland',
+          postfix: ' %',
+          colorRange: [
+            [6, 20, '255,255,178'],
+            [20, 30, '254,204,92'],
+            [30, 50, '253,141,60'],
+            [50, 77, '240,59,32'],
+            [77, 99, '189,0,38'],
+          ],
+          title: 'Share permanent grassland',
+          variableName:
+            'Percentage of permanent grassland over total utlised agricultural area',
+          unit: '%',
+          desc: 'This factor is calculated by substracting agricultural grassland not in use (ha) to permanent grassland (ha), and then dividing by the total utilised agricultural area.',
+          update: '2016',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_PEGRASS__custom_2963027/default/table',
         }
       : {
           row: 'farm_size_ha',
@@ -269,6 +332,8 @@ export default function App({
             [75.9, 1000, '18,255,17'],
           ],
           title: 'Farm size',
+          variableName:
+            'Average utilised agricultural area per agricultural holding [ha]',
           unit: 'ha',
           desc: 'This factor has been calculated by dividing the total number of holdings with the utilised agricultural area (ha)',
           update: '2013',
@@ -468,6 +533,7 @@ export default function App({
             <p>Indices</p>
             <Link
               href="?type=farm_size"
+              title="Farm size"
               className={
                 router.query.type === 'farm_size' || !router.query.type
                   ? 'active'
@@ -478,6 +544,7 @@ export default function App({
             </Link>
             <Link
               href="?type=livestock_density"
+              title="Livestock density"
               className={
                 router.query.type === 'livestock_density' ? 'active' : ''
               }
@@ -487,20 +554,68 @@ export default function App({
 
             <Link
               href="?type=farm_input_intensity"
+              title="High input farming [%]"
               className={
                 router.query.type === 'farm_input_intensity' ? 'active' : ''
               }
             >
-              High input farming (%)
+              High input farming [%]
             </Link>
 
             <Link
               href="?type=farm_input_intensity_ha"
+              title="High input farming [ha]"
               className={
                 router.query.type === 'farm_input_intensity_ha' ? 'active' : ''
               }
             >
-              High input farming (ha)
+              hif [ha]
+            </Link>
+
+            <Link
+              href="?type=intensity_farming"
+              title="Production intensity"
+              className={
+                router.query.type === 'intensity_farming' ? 'active' : ''
+              }
+            >
+              Production intensity
+            </Link>
+
+            <Link
+              href="?type=share_utilised_agric_area"
+              title="Utilised agricultural area [%]"
+              className={
+                router.query.type === 'share_utilised_agric_area'
+                  ? 'active'
+                  : ''
+              }
+            >
+              Utilised agricultural area [%]
+            </Link>
+
+            <Link
+              href="?type=share_utilised_agric_area_ha"
+              title="Utilised agricultural area [ha]"
+              className={
+                router.query.type === 'share_utilised_agric_area_ha'
+                  ? 'active'
+                  : ''
+              }
+            >
+              uaa [ha]
+            </Link>
+
+            <Link
+              href="?type=share_permanent_grassland"
+              title="Share permanent grassland"
+              className={
+                router.query.type === 'share_permanent_grassland'
+                  ? 'active'
+                  : ''
+              }
+            >
+              Share permanent grassland
             </Link>
           </div>
         </div>
