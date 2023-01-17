@@ -88,12 +88,18 @@ export default function App({
   const introText = (
     <>
       <p>
-        The maps present factors identified to contribute agricultures
-        vulnerability to drought based on the analyses with two case studies.
-        For further details read more. Read more text (in &quot;About the
-        data&quot;): The mapped vulnerability factors were identified by
-        analyzing agriculture&apos;s vulnerability to drought in the two case
-        study regions of the project: Thurgau (CH) and Podravska (SI). During
+        <strong>
+          The maps present factors identified to contribute agricultures
+          vulnerability to drought based on the analyses with two case studies.
+        </strong>
+      </p>
+      <p>
+        For further details <Link href="/md/about-the-data">read more</Link>.
+      </p>
+      {/* <p>
+        The mapped vulnerability factors were identified by analyzing
+        agriculture&apos;s vulnerability to drought in the two case study
+        regions of the project: Thurgau (CH) and Podravska (SI). During
         semi-structured interviews project partners and external experts were
         asked to identify the most important factors contributing to the overall
         vulnerability an in addition, whether the factor has an increasing or
@@ -121,7 +127,7 @@ export default function App({
           https://egusphere.copernicus.org/preprints/egusphere-2022-744/
         </a>
         , 2022.
-      </p>
+      </p> */}
     </>
   )
   const [nutsMap, setNutsMap] = useState(null)
@@ -150,6 +156,7 @@ export default function App({
     type === 'farm_size'
       ? {
           row: 'farm_size_ha',
+          postfix: ' ha',
           colorRange: [
             [0, 0, '255,255,178'],
             [0, 7.3, '254,204,92'],
@@ -159,6 +166,12 @@ export default function App({
 
             [75.9, 1000, '18,255,17'],
           ],
+          title: 'Farm size',
+          unit: 'ha',
+          desc: 'This factor has been calculated by dividing the total number of holdings with the utilised agricultural area (ha)',
+          update: '2013',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/AEI_EF_LU$DEFAULTVIEW/default/table',
         }
       : type === 'livestock_density'
       ? {
@@ -175,6 +188,12 @@ export default function App({
 
             [12.92, 1000, '18,255,17'],
           ],
+          title: 'Livestock density',
+          unit: 'units/ha',
+          desc: 'This factor has been calculated by dividing the total number of livestock units by the hectares of permanent grassland (livestock/ha).',
+          update: '2016',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/EF_LSK_MAIN$DEFAULTVIEW/default/table',
         }
       : type === 'farm_input_intensity'
       ? {
@@ -189,6 +208,12 @@ export default function App({
 
             [83.2, 1000, '18,255,17'],
           ],
+          title: 'High input farming [%]',
+          unit: '%',
+          desc: 'This dataset shows the hectares and the percentage of utilised agricultural area (UAA) managed by high-input farms. The inputs considered are purchased fertilisers and soil improvers, plant protection products such as pesticides, traps, bird scarers, anti-hail shells, frost protection etc. High intensity level means that the input level is greater than the 66th UAA quantiles.',
+          update: '2019',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/AEI_PS_INP__custom_2982600/default/table',
         }
       : type === 'intensity_farming'
       ? {
@@ -211,9 +236,15 @@ export default function App({
             1.5,
             'rgba(187,226,234,0.9)',
           ],
+          title: '',
+          unit: '',
+          desc: '',
+          update: '',
+          dataset: '',
         }
       : {
           row: 'farm_size_ha',
+          postfix: ' ha',
           colorRange: [
             [0, 0, '255,255,178'],
             [0, 7.3, '254,204,92'],
@@ -223,9 +254,13 @@ export default function App({
 
             [75.9, 1000, '18,255,17'],
           ],
+          title: 'Farm size',
+          unit: 'ha',
+          desc: 'This factor has been calculated by dividing the total number of holdings with the utilised agricultural area (ha)',
+          update: '2013',
+          dataset:
+            'https://ec.europa.eu/eurostat/databrowser/view/AEI_EF_LU$DEFAULTVIEW/default/table',
         }
-
-  //console.log('data color', dataObject.color)
 
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
@@ -242,7 +277,6 @@ export default function App({
         //console.log('getColor return', range[2])
         return range[2]
       }
-      //return '18,255,17'
     }
   }
   for (const row of dataToUse) {
@@ -295,8 +329,6 @@ export default function App({
     )
       .then((resp) => resp.json())
       .then((json) => {
-        // Note: In a real application you would do a validation of JSON data before doing anything with it,
-        // but for demonstration purposes we ingore this part here and just trying to select needed data...
         const features = json
         setNutsMap(features)
       })
