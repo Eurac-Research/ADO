@@ -25,7 +25,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
   ? process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
   : process.env.NEXT_PUBLIC_ADO_DATA_URL
-console.log('ADO_DATA_URL', ADO_DATA_URL)
+//console.log('ADO_DATA_URL', ADO_DATA_URL)
 const indices = [
   'spei-1',
   'spei-2',
@@ -307,15 +307,14 @@ export default function App({
         <div className="navigation">
           <p>Indices</p>
           {indices?.map((index) => (
-            (<Link
+            <Link
               prefetch={false}
               href={`/${index}`}
               key={index}
-              className={router.query.slug === index ? 'active' : ''}>
-
+              className={router.query.slug === index ? 'active' : ''}
+            >
               {index}
-
-            </Link>)
+            </Link>
           ))}
         </div>
       </div>
@@ -368,5 +367,5 @@ export default function App({
         </>
       )}
     </Layout>
-  );
+  )
 }
