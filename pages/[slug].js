@@ -22,9 +22,12 @@ import { useThemeContext } from '../context/theme'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
-  ? process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
-  : process.env.NEXT_PUBLIC_ADO_DATA_URL
+// const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
+//   ? process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
+//   : process.env.NEXT_PUBLIC_ADO_DATA_URL
+
+const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
+
 //console.log('ADO_DATA_URL', ADO_DATA_URL)
 const indices = [
   'spei-1',
