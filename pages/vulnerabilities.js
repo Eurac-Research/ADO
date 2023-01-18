@@ -114,13 +114,10 @@ export default function App({
           row: 'farm_size_ha',
           postfix: ' ha',
           colorRange: [
-            [0, 0, '255,255,178'],
-            [0, 7.3, '254,204,92'],
-            [7.3, 16.5, '253,141,60'],
-            [16.5, 23.3, '240,59,32'],
-            [23.3, 75.9, '189,0,38'],
-
-            [75.9, 1000, '18,255,17'],
+            [0, 7.3, '255, 255, 212'],
+            [7.3, 16.5, '254, 217, 142'],
+            [16.5, 23.3, '254, 153, 41'],
+            [23.3, 75.9, '217, 95, 14'],
           ],
           title: 'Farm size',
           variableName:
@@ -136,15 +133,11 @@ export default function App({
           row: 'livestock_density',
           postfix: ' units/ha',
           colorRange: [
-            [-1000, 0.32, '18,255,17'],
-
-            [0.32, 0.73, '255,255,178'],
-            [0.73, 1.39, '254,204,92'],
-            [1.39, 2.7, '253,141,60'],
-            [2.7, 3.42, '240,59,32'],
-            [3.42, 12.92, '189,0,38'],
-
-            [12.92, 1000, '18,255,17'],
+            [0, 0.73, '255, 255, 212'],
+            [0.73, 1.39, '254, 217, 142'],
+            [1.39, 2.7, '254, 153, 41'],
+            [2.7, 3.42, '217, 95, 14'],
+            [3.42, 12.92, '153, 52, 4'],
           ],
           title: 'Livestock density',
           variableName: 'Livestock units per hectare',
@@ -159,11 +152,11 @@ export default function App({
           row: 'percentage',
           postfix: '%',
           colorRange: [
-            [0, 31.6, '255,255,178'],
-            [31.6, 41.9, '254,204,92'],
-            [41.9, 51.1, '253,141,60'],
-            [51.1, 60.6, '240,59,32'],
-            [60.6, 83.2, '189,0,38'],
+            [0, 31.6, '255, 255, 212'],
+            [31.6, 41.9, '254, 217, 142'],
+            [41.9, 51.1, '254, 153, 41'],
+            [51.1, 60.6, '217, 95, 14'],
+            [60.6, 83.2, '153, 52, 4'],
           ],
           title: 'High input farming [%]',
           variableName:
@@ -179,11 +172,11 @@ export default function App({
           row: 'hectares',
           postfix: ' ha',
           colorRange: [
-            [0, 37055, '255,255,178'],
-            [37055, 109098, '254,204,92'],
-            [109098, 201533, '253,141,60'],
-            [201533, 276551, '240,59,32'],
-            [276551, 531503, '189,0,38'],
+            [0, 37055, '255, 255, 212'],
+            [37055, 109098, '254, 217, 142'],
+            [109098, 201533, '254, 153, 41'],
+            [201533, 276551, '217, 95, 14'],
+            [276551, 531503, '153, 52, 4'],
           ],
           title: 'High input farming [ha]',
           variableName: 'Hectares of high input utilised agricultural area',
@@ -198,11 +191,10 @@ export default function App({
           row: 'total',
           postfix: ' t/ha',
           colorRange: [
-            [0, 0, '255,255,178'],
-            [0, 4.5, '254,204,92'],
-            [4.5, 8.1, '253,141,60'],
-            [8.1, 11, '240,59,32'],
-            [11, 14.3, '189,0,38'],
+            [0, 4.5, '255, 255, 212'],
+            [4.5, 8.1, '254, 217, 142'],
+            [8.1, 11, '254, 153, 41'],
+            [11, 14.3, '217, 95, 14'],
           ],
           title: 'Production intensity',
           variableName: 'Crop production per hectare',
@@ -217,11 +209,11 @@ export default function App({
           row: 'share_utilised_agri_area',
           postfix: ' %',
           colorRange: [
-            [7.5, 22.6, '255,255,178'],
-            [22.6, 30, '254,204,92'],
-            [30, 41.4, '253,141,60'],
-            [41.4, 44.5, '240,59,32'],
-            [44.5, 50.3, '189,0,38'],
+            [7.5, 22.6, '255, 255, 212'],
+            [22.6, 30, '254, 217, 142'],
+            [30, 41.4, '254, 153, 41'],
+            [41.4, 44.5, '217, 95, 14'],
+            [44.5, 50.3, '153, 52, 4'],
           ],
           title: 'Share utilised agricultural area',
           variableName:
@@ -237,11 +229,11 @@ export default function App({
           row: 'utilised_agric_area_ha',
           postfix: ' ha',
           colorRange: [
-            [6360, 179822, '255,255,178'],
-            [179822, 308870, '254,204,92'],
-            [308870, 391130, '253,141,60'],
-            [391130, 713314, '240,59,32'],
-            [713314, 1464350, '189,0,38'],
+            [6360, 179822, '255, 255, 212'],
+            [179822, 308870, '254, 217, 142'],
+            [308870, 391130, '254, 153, 41'],
+            [391130, 713314, '217, 95, 14'],
+            [713314, 1464350, '153, 52, 4'],
           ],
           title: 'Utilised agricultural area',
           variableName: 'Utilised agricultural area',
@@ -256,11 +248,11 @@ export default function App({
           row: 'share_permanent_grassland',
           postfix: ' %',
           colorRange: [
-            [6, 20, '255,255,178'],
-            [20, 30, '254,204,92'],
-            [30, 50, '253,141,60'],
-            [50, 77, '240,59,32'],
-            [77, 99, '189,0,38'],
+            [6, 20, '255, 255, 212'],
+            [20, 30, '254, 217, 142'],
+            [30, 50, '254, 153, 41'],
+            [50, 77, '217, 95, 14'],
+            [77, 99, '153, 52, 4'],
           ],
           title: 'Share permanent grassland',
           variableName:
@@ -275,13 +267,11 @@ export default function App({
           row: 'farm_size_ha',
           postfix: ' ha',
           colorRange: [
-            [0, 0, '255,255,178'],
-            [0, 7.3, '254,204,92'],
-            [7.3, 16.5, '253,141,60'],
-            [16.5, 23.3, '240,59,32'],
-            [23.3, 75.9, '189,0,38'],
-
-            [75.9, 1000, '18,255,17'],
+            [0, 0, '255, 255, 212'],
+            [0, 7.3, '254, 217, 142'],
+            [7.3, 16.5, '254, 153, 41'],
+            [16.5, 23.3, '217, 95, 14'],
+            [23.3, 75.9, '153, 52, 4'],
           ],
           title: 'Farm size',
           variableName:
@@ -298,8 +288,8 @@ export default function App({
     <>
       <p>
         <strong>
-          The maps present factors identified to contribute agricultures
-          vulnerability to drought based on the analyses with two case studies.
+          The maps present the identified factors contributing to agriculture's
+          vulnerability to drought based on the analyses of two case studies.
         </strong>
       </p>
       <p>
@@ -321,7 +311,7 @@ export default function App({
       <p>
         Underlying dataset:
         <br />
-        <a href="{dataObject.dataset}">{dataObject.dataset}</a>
+        <a href={dataObject.dataset}>{dataObject.dataset}</a>
       </p>
       {/* <p>
               The mapped vulnerability factors were identified by analyzing
@@ -548,7 +538,8 @@ export default function App({
                     background: `rgb(${range[2]}`,
                   }}
                 ></span>
-                {range[0]} - {range[1]}
+                {new Intl.NumberFormat('en-EN').format(range[0])} -{' '}
+                {new Intl.NumberFormat('en-EN').format(range[1])}
               </div>
             ))}
           </div>
@@ -593,7 +584,7 @@ export default function App({
                 router.query.type === 'farm_input_intensity_ha' ? 'active' : ''
               }
             >
-              hif [ha]
+              High input farming [ha]
             </Link>
 
             <Link
@@ -615,7 +606,7 @@ export default function App({
                   : ''
               }
             >
-              Utilised agricultural area [%]
+              uaa [%]
             </Link>
 
             <Link
