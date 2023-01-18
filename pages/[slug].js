@@ -27,7 +27,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 //   : process.env.NEXT_PUBLIC_ADO_DATA_URL
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
 
-console.log('ADO_DATA_URL', ADO_DATA_URL)
+//console.log('ADO_DATA_URL', ADO_DATA_URL)
 const indices = [
   'spei-1',
   'spei-2',

@@ -288,8 +288,9 @@ export default function App({
     <>
       <p>
         <strong>
-          The maps present the identified factors contributing to agriculture's
-          vulnerability to drought based on the analyses of two case studies.
+          The maps present the identified factors contributing to
+          agriculture&apos;s vulnerability to drought based on the analyses of
+          two case studies.
         </strong>
       </p>
       <p>
