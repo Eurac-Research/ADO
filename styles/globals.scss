@@ -394,7 +394,7 @@ body {
   }
 
   .mapLink {
-    background-color: #eee;
+    background: var(--bg-10-light);
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     padding: 25px;
@@ -496,6 +496,24 @@ body {
         @media (min-width: 768px) {
           font-size: 12px;
         }
+      }
+    }
+
+    .vulnerabilityLegend {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-strong-light);
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+
+      @media (min-width: 768px) {
+        font-size: 12px;
+      }
+
+      span {
+        margin-right: 6px;
       }
     }
   }
@@ -958,7 +976,7 @@ body {
   right: -15px;
   z-index: 5;
   font-size: 12px;
-  background-color: #fff;
+  background-color: var(--bg-8-light);
   width: 50px;
   height: 40px;
   display: flex;
@@ -977,6 +995,7 @@ body {
   height: 44vh;
   overflow: auto;
   padding: 10px 20px 10px 20px;
+  word-break: break-word;
 
   p {
     font-size: 12px;
