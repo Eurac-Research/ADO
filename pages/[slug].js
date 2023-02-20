@@ -263,11 +263,17 @@ export default function App({
                 https://docs.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures/
                 --> example, added a question to the mapbox team there. */}
 
-                <span
-                  className="indexValueColorDot"
-                  style={{ backgroundColor: hoverInfo?.rgbaColor }}
-                ></span>
-                {hoverInfo.feature.properties.value}
+                {hoverInfo?.feature?.properties?.value ? (
+                  <>
+                    <span
+                      className="indexValueColorDot"
+                      style={{ backgroundColor: hoverInfo?.rgbaColor }}
+                    ></span>
+                    {hoverInfo.feature.properties.value}
+                  </>
+                ) : (
+                  'no value'
+                )}
               </span>
               <span className="tooltipLocation">
                 {hoverInfo.feature.properties.NUTS_NAME}
@@ -307,15 +313,14 @@ export default function App({
         <div className="navigation">
           <p>Indices</p>
           {indices?.map((index) => (
-            (<Link
+            <Link
               prefetch={false}
               href={`/${index}`}
               key={index}
-              className={router.query.slug === index ? 'active' : ''}>
-
+              className={router.query.slug === index ? 'active' : ''}
+            >
               {index}
-
-            </Link>)
+            </Link>
           ))}
         </div>
       </div>
@@ -368,5 +373,5 @@ export default function App({
         </>
       )}
     </Layout>
-  );
+  )
 }
