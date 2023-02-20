@@ -9,15 +9,37 @@ The ADO project is generating a wide array of datasets for monitoring of drought
 
 ## Drought Indices
 
-* [Standardised Precipitation Index (SPI)](https://doi.org/10.48784/15abe686-534a-11ec-b9ef-02000a08f41d "SPI")
-* [Standardised Precipitation-Evapotranspiration Index (SPEI)](https://doi.org/10.48784/166E51EE-534A-11EC-9143-02000A08F41D "SPEI")
-* [Standardised Snow Pack Index (SSPI)](https://doi.org/10.48784/0ca021a6-7942-11ec-a314-02000a08f41d "SSPI")
-* [Soil Moisture Anomalies (SMA)](https://doi.org/10.48784/ea665ca2-0ceb-11ed-86c5-02000a08f4e5 "SMA")
-* [Vegetation Health Index (VHI)](https://doi.org/10.48784/161b3496-534a-11ec-b78a-02000a08f41d "VHI")
-* [Vegetation Condition Index (VCI)](https://doi.org/10.48784/16367c6a-534a-11ec-b0a3-02000a08f41d "VCI")
+- [Standardised Precipitation Index (SPI)](https://doi.org/10.48784/15abe686-534a-11ec-b9ef-02000a08f41d "SPI")
+- [Standardised Precipitation-Evapotranspiration Index (SPEI)](https://doi.org/10.48784/166E51EE-534A-11EC-9143-02000A08F41D "SPEI")
+- [Standardised Snow Pack Index (SSPI)](https://doi.org/10.48784/0ca021a6-7942-11ec-a314-02000a08f41d "SSPI")
+- [Soil Moisture Anomalies (SMA)](https://doi.org/10.48784/ea665ca2-0ceb-11ed-86c5-02000a08f4e5 "SMA")
+- [Vegetation Health Index (VHI)](https://doi.org/10.48784/161b3496-534a-11ec-b78a-02000a08f41d "VHI")
+- [Vegetation Condition Index (VCI)](https://doi.org/10.48784/16367c6a-534a-11ec-b0a3-02000a08f41d "VCI")
 
 ## Hydrogical Data
 
 ## Drought Impacts
 
-## Vulnerability
+### Reported impacts
+
+The reported drought impacts stem from the Alpine Drought Impact report Inventory (EDIIALPS V1.0) developed during the project period. To create EDIIALPS, information was gathered and transcribed from national databases and reports. Compiled knowledge on the impacts of historic and recent drought events from a variety of available information sources is presented as this has never been done across the European Alpine region. The Alpine Space covers the Alps and their foothills, as well as different climatic zones and therefore allows the consideration of water and natural resource flow and exchange typical of mountain regions. With the region's extent, we therefore include drought impacts not only at high altitudes, but also in downstream areas of the water-rich source regions (e.g. the river basins Po, Rhine, Danube etc.). Besides the most prominent impact category 'agriculture and livestock farming', many impact reports also relate to 'public water supply', 'forestry', 'aquatic ecosystems'.
+
+For further information on the database please read: Stephan, R., Erfurt, M., Terzi, S., Žun, M., Kristan, B., Haslinger, K., and Stahl, K.: An inventory of Alpine drought impact reports to explore past droughts in a mountain region, Natural Hazards and Earth System Sciences Discussions, 21, 2485–2501, available at [https://doi.org/10.5194/nhess-21-2485-2021](https://doi.org/10.5194/nhess-21-2485-2021), 2021. To access EDIIALPS as a plain dataset follow this link [https://doi.org/10.6094/UNIFR/218623](https://doi.org/10.6094/UNIFR/218623)
+
+### Impact probabilities
+
+Explore the probability of soil-moisture drought impacts (DSM) and hydrological drought impacts (DH) across the Alpine Space!
+
+DSM impacts cover mostly impacts on agriculture and forestry, and their occurrence probability is calculated with the Soil moisture anomalies (SMA-1). DH impacts cover mostly impacts on water supply, water quality, and freshwater ecosystems, and their occurrence probability is calculated with the Standardized Precipitation Evapotranspiration Index (SPEI-3). Select different index-scenarios to visualize the impact probability.
+
+The darker the red, the more likely impacts occur. Regions without any impacts are coloured in white.
+
+These risk maps have been developed with impact data from the EDIIALPS V1.0. Impacts in each NUTS region were assigned to two groups: soil-moisture drought impacts (DSM) and hydrological drought impacts (DH). The DSM impacts stem mostly from the impact categories Forestry, and Agriculture and livestock farming (see Deliverable DT3.1.1). The so-called hydrological drought impacts stem mostly from the impact categories Public water supply, Freshwater ecosystems and Water quality. For each NUTS3 region, we fit a generalized linear model with a logit link to regress the likelihood of a drought impact against SPEI-3 and SMA-1. With the fitted model we then predicted impact occurrences for different SPEI-3 and SMA-1 values in order to estimate the occurrence probability for each NUTS 3 region. NUTS 3 regions without sufficient DSM or DH impact data to estimate a model are shown as regions with missing ata. The method (model and scenario mapping) follows the method by Blauhut et al. (2015).
+
+For further details on the application for ADO, please read: Deliverable DT3.2.1. Blauhut V., Gudmundsson L., Stahl K. (2015) Towards pan-European drought risk maps: quantifying the link between drought indices and reported drought impacts, Environmental Research Letters 10, 014008 [https://doi.org/10.1088/1748-9326/10/1/014008](https://doi.org/10.1088/1748-9326/10/1/014008)
+
+### Vulnerability
+
+The mapped vulnerability factors were identified by analyzing agriculture's vulnerability to drought in the two case study regions of the project: Thurgau (CH) and Podravska (SI). During semi-structured interviews project partners and external experts were asked to identify the most important factors contributing to the overall vulnerability an in addition, whether the factor has an increasing or decreasing effect on the final vulnerability in order to be able to quantitatively describe the vulnerability component. They identified 10 common factors for both study regions, whereas they identified 6 factors solely for Thurgau and 13 factors solely for Podravska. The applicability of these factors for other parts of the Alpine region can be questioned especially when considering the differences between the case study regions highlighting the region-specific character of vulnerability. However, the factors presented here and on the platform can be seen as a first estimate how vulnerable the agriculture across the Alpine Space is.
+
+For further details read: Deliverable DT3.3.1 and Stephan, R., Terzi, S., Erfurt, M., Cocuccioni, S., Stahl, K., and Zebisch, M.: Assessing agriculture's vulnerability to drought in European pre-Alpine regions, Nat. Hazards Earth Syst. Sci., 23, 45–64, [https://doi.org/10.5194/nhess-23-45-2023](https://doi.org/10.5194/nhess-23-45-2023), 2023.
