@@ -25,9 +25,13 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 // const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
 //   ? process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
 //   : process.env.NEXT_PUBLIC_ADO_DATA_URL
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
+const ADO_DATA_URL =
+  process.env.NODE_ENV !== 'production'
+    ? process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
+    : process.env.NEXT_PUBLIC_ADO_DATA_URL
 
-//console.log('ADO_DATA_URL', ADO_DATA_URL)
+console.log('ADO_DATA_URL', ADO_DATA_URL)
+
 const indices = [
   'spei-1',
   'spei-2',
@@ -353,6 +357,11 @@ export default function App({
               indices={indices}
               index={datatype}
               metadata={staticMetaData}
+              firstDate={format(
+                new Date(day).setDate(new Date(day).getDate() - 365),
+                'YYYY-MM-DD'
+              )}
+              lastDate={day}
               style={{
                 width: '100%',
                 height: '100%',
