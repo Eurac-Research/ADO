@@ -9,15 +9,17 @@ The ADO project is generating a wide array of datasets for monitoring of drought
 
 ## Drought Indices
 
-### Fact Sheets 
-- [Standardised Precipitation Index (SPI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/blob/main/factsheets/SPI_4.pdf "SPI - Fact Sheet")
-- [Standardised Precipitation-Evapotranspiration Index (SPEI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/blob/main/factsheets/SPEI_4.pdf "SPEI - Fact Sheet")
-- [Standardised Snow Pack Index (SSPI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/blob/main/factsheets/SSPI_4.pdf "SSPI - Fact Sheet")
-- [Soil Moisture Anomalies (SMA)](https://raw.githubusercontent.com/Eurac-Research/ado-data/blob/main/factsheets/SMA_4.pdf "SMA - Fact Sheet")
-- [Vegetation Health Index (VHI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/blob/main/factsheets/VHI_4.pdf "VHI/VCI - Fact Sheet")
-- [Vegetation Condition Index (VCI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/blob/main/factsheets/VHI_4.pdf "VHI/VCI - Fact Sheet")
+### Fact Sheets
+
+- [Standardised Precipitation Index (SPI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/main/factsheets/SPI_4.pdf "SPI - Fact Sheet")
+- [Standardised Precipitation-Evapotranspiration Index (SPEI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/main/factsheets/SPEI_4.pdf "SPEI - Fact Sheet")
+- [Standardised Snow Pack Index (SSPI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/main/factsheets/SSPI_4.pdf "SSPI - Fact Sheet")
+- [Soil Moisture Anomalies (SMA)](https://raw.githubusercontent.com/Eurac-Research/ado-data/main/factsheets/SMA_4.pdf "SMA - Fact Sheet")
+- [Vegetation Health Index (VHI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/main/factsheets/VHI_4.pdf "VHI/VCI - Fact Sheet")
+- [Vegetation Condition Index (VCI)](https://raw.githubusercontent.com/Eurac-Research/ado-data/main/factsheets/VHI_4.pdf "VHI/VCI - Fact Sheet")
 
 ### Metadata, Citation and Raw Data Access on the Environmental Data Platform
+
 - [Standardised Precipitation Index (SPI)](https://doi.org/10.48784/15abe686-534a-11ec-b9ef-02000a08f41d "SPI")
 - [Standardised Precipitation-Evapotranspiration Index (SPEI)](https://doi.org/10.48784/166E51EE-534A-11EC-9143-02000A08F41D "SPEI")
 - [Standardised Snow Pack Index (SSPI)](https://doi.org/10.48784/0ca021a6-7942-11ec-a314-02000a08f41d "SSPI")
