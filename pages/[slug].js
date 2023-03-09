@@ -22,12 +22,10 @@ import { useThemeContext } from '../context/theme'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
-// const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
-//   ? process.env.NEXT_PUBLIC_ADO_DEV_DATA_URL
-//   : process.env.NEXT_PUBLIC_ADO_DATA_URL
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
+// dev data branch
+// const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/dev'
 
-//console.log('ADO_DATA_URL', ADO_DATA_URL)
 const indices = [
   'spei-1',
   'spei-2',
@@ -265,11 +263,17 @@ export default function App({
                 https://docs.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures/
                 --> example, added a question to the mapbox team there. */}
 
-                <span
-                  className="indexValueColorDot"
-                  style={{ backgroundColor: hoverInfo?.rgbaColor }}
-                ></span>
-                {hoverInfo.feature.properties.value}
+                {hoverInfo?.feature?.properties?.value ? (
+                  <>
+                    <span
+                      className="indexValueColorDot"
+                      style={{ backgroundColor: hoverInfo?.rgbaColor }}
+                    ></span>
+                    {hoverInfo.feature.properties.value}
+                  </>
+                ) : (
+                  'no value'
+                )}
               </span>
               <span className="tooltipLocation">
                 {hoverInfo.feature.properties.NUTS_NAME}
@@ -339,14 +343,17 @@ export default function App({
               </p>
             )}
             <p>{clickInfo.feature.properties.NUTS_NAME}</p>
-
             <TimeSeriesLegend />
-
             <TimeSeries
               data={nutsData}
               indices={indices}
               index={datatype}
               metadata={staticMetaData}
+              firstDate={format(
+                new Date(day).setDate(new Date(day).getDate() - 365),
+                'YYYY-MM-DD'
+              )}
+              lastDate={day}
               style={{
                 width: '100%',
                 height: '100%',
@@ -356,13 +363,37 @@ export default function App({
                 left: '0',
               }}
             />
-            {staticMetaData?.doi && (
-              <p style={{ marginTop: '1rem', fontSize: '10px' }}>
+            {(staticMetaData?.doi || staticMetaData?.factsheet) && (
+              <p
+                style={{
+                  marginTop: '1rem',
+                  fontSize: '10px',
+                  lineHeight: '2',
+                }}
+              >
                 More information about the data:
                 <br />
-                <a href={staticMetaData?.doi} target="_blank" rel="noreferrer">
-                  {staticMetaData?.doi}
-                </a>
+                {staticMetaData?.factsheet && (
+                  <>
+                    <a
+                      href={staticMetaData?.factsheet}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Download {staticMetaData?.short_name} Factsheet
+                    </a>
+                    <br />
+                  </>
+                )}
+                {staticMetaData?.doi && (
+                  <a
+                    href={staticMetaData?.doi}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {staticMetaData?.doi}
+                  </a>
+                )}
               </p>
             )}
           </div>
