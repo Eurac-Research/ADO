@@ -22,9 +22,9 @@ import { useThemeContext } from '../context/theme'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
+// const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
 // dev data branch
-// const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/dev'
+const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/dev'
 
 const indices = [
   'spei-1',
