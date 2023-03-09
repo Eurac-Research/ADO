@@ -344,9 +344,7 @@ export default function App({
               </p>
             )}
             <p>{clickInfo.feature.properties.NUTS_NAME}</p>
-
             <TimeSeriesLegend />
-
             <TimeSeries
               data={nutsData}
               indices={indices}
@@ -366,13 +364,37 @@ export default function App({
                 left: '0',
               }}
             />
-            {staticMetaData?.doi && (
-              <p style={{ marginTop: '1rem', fontSize: '10px' }}>
+            {(staticMetaData?.doi || staticMetaData?.factsheet) && (
+              <p
+                style={{
+                  marginTop: '1rem',
+                  fontSize: '10px',
+                  lineHeight: '2',
+                }}
+              >
                 More information about the data:
                 <br />
-                <a href={staticMetaData?.doi} target="_blank" rel="noreferrer">
-                  {staticMetaData?.doi}
-                </a>
+                {staticMetaData?.factsheet && (
+                  <>
+                    <a
+                      href={staticMetaData?.factsheet}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Download {staticMetaData?.short_name} Factsheet
+                    </a>
+                    <br />
+                  </>
+                )}
+                {staticMetaData?.doi && (
+                  <a
+                    href={staticMetaData?.doi}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {staticMetaData?.doi}
+                  </a>
+                )}
               </p>
             )}
           </div>
