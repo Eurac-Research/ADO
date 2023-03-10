@@ -82,9 +82,16 @@ function ControlPanel(props) {
             <h3 className="overlayTitle">
               {metadata?.short_name} - {metadata?.long_name}
             </h3>
-            <p>{metadata?.abstract}</p>
+            <p style={{ marginBottom: '1rem' }}>{metadata?.abstract}</p>
+            {metadata?.factsheet && (
+              <p style={{ marginBottom: '1rem' }}>
+                <a href={metadata?.factsheet} target="_blank" rel="noreferrer">
+                  Download {metadata?.short_name} Factsheet
+                </a>
+              </p>
+            )}
             {metadata?.doi && (
-              <p style={{ marginTop: '1rem' }}>
+              <p>
                 <a href={metadata?.doi} target="_blank" rel="noreferrer">
                   {metadata?.doi}
                 </a>
