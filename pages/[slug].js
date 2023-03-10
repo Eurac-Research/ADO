@@ -350,7 +350,7 @@ export default function App({
               index={datatype}
               metadata={staticMetaData}
               firstDate={format(
-                new Date(day).setDate(new Date(day).getDate() - 365),
+                new Date(day).setDate(new Date(day).getDate() - 3 * 365),
                 'YYYY-MM-DD'
               )}
               lastDate={day}
