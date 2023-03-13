@@ -209,6 +209,7 @@ export default function App({
         <title>
           {`${staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research`}
         </title>
+        <meta description="The Alpine Drought Observatory (ADO) provides a tool for an easy overview of the current drought situation and past drought situations in the last 40 years." />
       </Head>
 
       <div className="reactMap">
