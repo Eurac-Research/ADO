@@ -5,6 +5,7 @@ slug: about-the-project
 
 Droughts are becoming an increasing concern in the Alps and in the lowland areas that receive Alpine water.
 **The Alpine Drought Observatory (ADO)** provides a tool for a quick and easy overview of the current drought situation in the Alpine region and past drought situations in the last 6 months as maps and the last 40 years as timeseries.
+
 ADO is integrating data from climate models, satellite data observations and ground station data from all Alpine countries as well as historical entries. The data is harmonized with all Alpine countries and continuously updated daily or every two weeks depending on the observation index. All data is offered on open access under the CC-BY 4.0 license.
 
 ADO provides the following data for the entire alpine space on political and hydrological relevant boundaries:
