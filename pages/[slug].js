@@ -33,6 +33,7 @@ const indices = [
   'spei-6',
   'spei-12',
   'spi-1',
+  'spi-2',
   'spi-3',
   'spi-6',
   'spi-12',
