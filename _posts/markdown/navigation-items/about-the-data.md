@@ -31,7 +31,7 @@ The ADO project is generating a wide array of datasets for monitoring of drought
 ### Access to Hydrological Database
 The database contains observational daily discharge and water level data deriving from the first measurement (which differs for each region) to the present, with more than 1400 stations. These datasets were collected from multiple data providers within the ADO study region, covering the countries Austria, France, Germany, Italy, Slovenia, and Switzerland. The spanned period is 1869-2021. For some regions in Italy there are records to 2022. The missing data were added to have a continuous time series.
 
-Access the [Hydrological Data Base directly via Environmental Data Platform]([https://edp-portal.eurac.edu/cdb_doc/ado/](https://edp-portal.eurac.edu/cdb_doc/ado/ado/) "Hydrological Database on EDP")
+Access the [Hydrological Database directly via the Environmental Data Platform](https://edp-portal.eurac.edu/cdb_doc/ado/ado/ "Hydrological Database on EDP")
 
 ## Drought Impacts
 
