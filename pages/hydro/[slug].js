@@ -169,15 +169,15 @@ export default function App({
   }, [])
 
   const metadata = useMemo(() => {
-    return staticMetaData
-  }, [staticMetaData])
+    return catchmentData
+  }, [catchmentData])
 
   const timestamp = format(day, 'X')
   const dayFromTimestamp = timestamp / 60 / 60 / 24
   const firstDayTimestamp =
-    format(metadata?.timerange?.properties?.firstDate, 'X') / 60 / 60 / 24
+    format(catchmentData?.metadata?.properties?.firstDate, 'X') / 60 / 60 / 24
   const lastDayTimestamp =
-    format(metadata?.timerange?.properties?.lastDate, 'X') / 60 / 60 / 24
+    format(catchmentData?.metadata?.properties?.lastDate, 'X') / 60 / 60 / 24
 
   // indices does not have common timeranges ...
   // compare timestamps and set to last possible date if selected date is not available in an index
@@ -344,10 +344,10 @@ export default function App({
         </div>
 
         <ControlPanel
-          metadata={metadata}
+          metadata={staticMetaData}
           day={day}
-          firstDay={metadata ? metadata?.timerange?.properties?.firstDate : ''}
-          lastDay={metadata ? metadata?.timerange?.properties?.lastDate : ''}
+          firstDay={catchmentData?.metadata?.properties?.firstDate}
+          lastDay={catchmentData?.metadata?.properties?.lastDate}
           onChange={(value) =>
             setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
           }
@@ -356,15 +356,14 @@ export default function App({
         <div className="navigation">
           <p>Indices</p>
           {indices?.map((index) => (
-            (<Link
+            <Link
               prefetch={false}
               href={`/hydro/${index}`}
               key={index}
-              className={router.query.slug === index ? 'active' : ''}>
-
+              className={router.query.slug === index ? 'active' : ''}
+            >
               {index}
-
-            </Link>)
+            </Link>
           ))}
         </div>
       </div>
@@ -389,6 +388,11 @@ export default function App({
               data={timeseriesData}
               indices={indices}
               index={datatype}
+              firstDate={format(
+                new Date(day).setDate(new Date(day).getDate() - 3 * 365),
+                'YYYY-MM-DD'
+              )}
+              lastDate={day}
               style={{
                 width: '100%',
                 height: '100%',
@@ -431,5 +435,5 @@ export default function App({
         </>
       )}
     </Layout>
-  );
+  )
 }
