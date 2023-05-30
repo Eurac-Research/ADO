@@ -29,7 +29,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
             : 'sideBarItem'
         }
       >
-        <Link href="/impacts">Reported Impacts</Link>
+        <Link href="/impacts" prefetch={false}>
+          Reported Impacts
+        </Link>
       </div>
 
       <div
@@ -41,7 +43,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
             : 'sideBarItem'
         }
       >
-        <Link href="/impact-probabilities">Impacts and risk</Link>
+        <Link href="/impact-probabilities" prefetch={false}>
+          Impacts and risk
+        </Link>
         <div
           className={
             router.pathname === '/impact-probabilities' ||
@@ -50,7 +54,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
               : 'sideBarItemSub'
           }
         >
-          <Link href="/impact-probabilities">Impact probabilities</Link>
+          <Link href="/impact-probabilities" prefetch={false}>
+            Impact probabilities
+          </Link>
         </div>
         <div
           className={
@@ -59,7 +65,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
               : 'sideBarItemSub'
           }
         >
-          <Link href="/vulnerabilities">Vulnerabilities</Link>
+          <Link href="/vulnerabilities" prefetch={false}>
+            Vulnerabilities
+          </Link>
         </div>
       </div>
 
@@ -68,7 +76,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
           router.asPath.includes('hydro') ? 'sideBarItem active' : 'sideBarItem'
         }
       >
-        <Link href="/hydro/spei-1">Hydro</Link>
+        <Link href="/hydro/spei-1" prefetch={false}>
+          Hydro
+        </Link>
       </div>
 
       {posts &&
@@ -81,27 +91,11 @@ function SideBar({ posts, sideBarPositionRelative }) {
                 : 'sideBarItem'
             }
           >
-            <Link href={`/md/${item?.slug}`}>{item.title}</Link>
+            <Link href={`/md/${item?.slug}`} prefetch={false}>
+              {item.title}
+            </Link>
           </div>
         ))}
-
-      {/* <div className="alphaInfo">
-        <h3>⚠️</h3>
-        <p>This page is in public BETA and still under development.</p>
-        <p>
-          More information about the project at{' '}
-          <a href="https://www.alpine-space.org/projects/ado/en/home">
-            https://www.alpine-space.org/projects/ado/
-          </a>
-        </p>
-        <p>
-          Data can be found in the public repository{' '}
-          <a href="https://github.com/Eurac-Research/ado-data">
-            https://github.com/Eurac-Research/ado-data
-          </a>
-        </p>
-        <p>Eurac Research, September 2022</p>
-      </div> */}
     </div>
   )
 }
