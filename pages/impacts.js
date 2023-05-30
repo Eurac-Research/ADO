@@ -9,11 +9,10 @@ import Map, {
 import ControlPanelImpacts from '../components/ControlPanelImpacts'
 import ReportedImpactsIntro from '../components/ReportedImpactsIntro'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/layout'
 import uniqolor from 'uniqolor'
-const { Color, ColorImmutable } = require('frostcolor')
+const { Color } = require('frostcolor')
 
 import { getAllPosts } from '../lib/api'
 import { useThemeContext } from '../context/theme'
@@ -30,7 +29,6 @@ export async function getStaticProps({ params }) {
 }
 
 export default function App({ impactData, allPosts }) {
-  const router = useRouter()
   const mapRef = React.useRef()
 
   function impactAmountByNutsId(NUTS_ID) {
