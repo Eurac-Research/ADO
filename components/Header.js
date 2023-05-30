@@ -4,7 +4,6 @@ export default function Header({ headerModeWithBackground }) {
   return (
     <div className={headerModeWithBackground === 0 ? `header` : `header  bg`}>
       <Link href="/" className="logobox">
-
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 62.36 62.36"
@@ -93,7 +92,6 @@ export default function Header({ headerModeWithBackground }) {
             </g>
           </g>
         </svg> */}
-
       </Link>
       <div className="logos">
         <a href="https://www.eurac.edu/en" className="eurac-logo">
@@ -110,7 +108,7 @@ export default function Header({ headerModeWithBackground }) {
           </svg>
         </a>
 
-        <a href="https://www.alpine-space.org/projects/ado/en/home">
+        <a href="https://www.alpine-space.eu/project/ado/">
           <svg
             className="alpinespace"
             xmlns="http://www.w3.org/2000/svg"
@@ -153,5 +151,5 @@ export default function Header({ headerModeWithBackground }) {
         </a>
       </div>
     </div>
-  );
+  )
 }

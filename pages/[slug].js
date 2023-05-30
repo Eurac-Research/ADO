@@ -33,6 +33,7 @@ const indices = [
   'spei-6',
   'spei-12',
   'spi-1',
+  'spi-2',
   'spi-3',
   'spi-6',
   'spi-12',
@@ -209,6 +210,10 @@ export default function App({
         <title>
           {`${staticMetaData?.long_name} - Alpine Drought Observatory | Eurac Research`}
         </title>
+        <meta
+          name="description"
+          content="The Alpine Drought Observatory (ADO) provides a tool for an easy overview of the current drought situation and past drought situations in the last 40 years."
+        />
       </Head>
 
       <div className="reactMap">
@@ -350,7 +355,7 @@ export default function App({
               index={datatype}
               metadata={staticMetaData}
               firstDate={format(
-                new Date(day).setDate(new Date(day).getDate() - 365),
+                new Date(day).setDate(new Date(day).getDate() - 3 * 365),
                 'YYYY-MM-DD'
               )}
               lastDate={day}
