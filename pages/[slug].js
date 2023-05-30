@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import Map, {
   Source,
   Layer,
@@ -24,7 +24,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
 // dev data branch
-// const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/dev'
+//const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/dev'
 
 const indices = [
   'spei-1',
@@ -77,7 +77,6 @@ export default function App({
   const paint = staticMetaData ? staticMetaData?.colormap : []
   const dataLayer = paint
 
-  const [metaData, setMetaData] = useState()
   const [day, setDay] = useState(staticData?.metadata?.properties?.lastDate)
   const [hoverInfo, setHoverInfo] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
