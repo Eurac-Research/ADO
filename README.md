@@ -1,6 +1,6 @@
 This is the website project repository for the "Alpine Drought Observatory" (https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment/projects/ado). It consists of a map showing diffenrent indices and charts regarding drought.
 
-Enjoy on https://ado-eurac.vercel.app
+Enjoy on https://ado.eurac.edu
 
 ## Stack
 
@@ -40,7 +40,7 @@ export async function getStaticPaths() {
     'vci',
     'vhi',
   ]
-  // Get the paths we want to pre-render based on posts
+  // Get the paths we want to pre-render
   const paths = indices.map((index) => ({
     params: { slug: index },
   }))
