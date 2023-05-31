@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import * as React from 'react'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Map, {
@@ -15,7 +16,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../../components/layout'
-import TimeSeries from '../../components/timeseries'
+
+const TimeSeries = dynamic(() => import('../../components/timeseries'), {
+  loading: () => <p>Loading...</p>,
+})
 import TimeSeriesLegend from '../../components/timeSeriesLegend'
 
 import { getAllPosts } from '../../lib/api'
