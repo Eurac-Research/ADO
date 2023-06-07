@@ -8,6 +8,10 @@ function MyApp({ Component, pageProps }) {
     <PlausibleProvider domain="ado.eurac.edu, rollup.eurac.edu">
       <Head>
         <title>Alpine Drought Observatory | Eurac Research</title>
+        <meta
+          property="og:image"
+          content="https://ado.eurac.edu/og-image.png"
+        />
       </Head>
       <ThemeProvider>
         <Component {...pageProps} />
