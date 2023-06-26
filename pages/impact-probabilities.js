@@ -233,6 +233,7 @@ export default function App({ impactData, allPosts }) {
               pitch: 0,
               minZoom: 5,
               zoom: 5,
+              maxPitch: 85,
             }}
             style={{ width: '100vw', height: '100vh' }}
             mapStyle={

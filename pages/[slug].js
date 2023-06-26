@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic'
 import * as React from 'react'
 import { useState, useCallback, useMemo } from 'react'
+
 import Map, {
   Source,
   Layer,
@@ -227,6 +228,7 @@ export default function App({
             longitude: 9,
             minZoom: 3,
             zoom: 5,
+            maxPitch: 85,
             bearing: 0,
             pitch: 0,
           }}
