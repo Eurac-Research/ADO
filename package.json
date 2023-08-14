@@ -13,7 +13,7 @@
     "date-format-parse": "^0.2.7",
     "echarts": "^5.3.2",
     "echarts-for-react": "^3.0.2",
-    "external-svg-loader": "^1.6.1",
+    "external-svg-loader": "^1.6.9",
     "frostcolor": "^3.0.0",
     "gray-matter": "^4.0.3",
     "json5": "2.2.2",
