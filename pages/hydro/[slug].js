@@ -48,7 +48,24 @@ export async function getStaticProps({ params }) {
 
   const fetchCatchments = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`
-  )
+  ).catch(function (error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data)
+      console.log(error.response.status)
+      console.log(error.response.headers)
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request)
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message)
+    }
+    console.log(error.config)
+  })
   const catchmentData = await fetchCatchments.data
   // const fetchCatchments = await fetch(
   //   `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`
@@ -57,7 +74,24 @@ export async function getStaticProps({ params }) {
 
   const responseMeta = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/metadata/${datatype}.json`
-  )
+  ).catch(function (error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data)
+      console.log(error.response.status)
+      console.log(error.response.headers)
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request)
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message)
+    }
+    console.log(error.config)
+  })
   const staticMetaData = await responseMeta.data
   // const responseMeta = await fetch(
   //   `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/metadata/${datatype}.json`
@@ -66,7 +100,24 @@ export async function getStaticProps({ params }) {
 
   const fetchStations = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/gauging_stations.geojson`
-  )
+  ).catch(function (error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data)
+      console.log(error.response.status)
+      console.log(error.response.headers)
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request)
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message)
+    }
+    console.log(error.config)
+  })
   const stationData = await fetchStations.data
   // const fetchStations = await fetch(
   //   `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/gauging_stations.geojson`
