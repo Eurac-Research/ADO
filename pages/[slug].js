@@ -51,14 +51,32 @@ const indices = [
 
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
-  const response = await fetch(
+
+  const response = await axios(
     `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
   )
-  const staticData = await response.json()
-  const responseMeta = await fetch(
+  const staticData = await response.data
+  // const response = await fetch(
+  //   `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
+  // )
+  // if (!response.ok) {
+  //   const message = `An error for response has occured: ${response.status}`;
+  //   throw new Error(message);
+  // }
+  // const staticData = await response.json()
+
+  const responseMeta = await axios(
     `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
   )
-  const staticMetaData = await responseMeta.json()
+  const staticMetaData = await responseMeta.data
+  // const responseMeta = await fetch(
+  //   `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
+  // )
+  // if (!responseMeta.ok) {
+  //   const message = `An error for responseMeta has occured: ${responseMeta.status}`;
+  //   throw new Error(message);
+  // }
+  // const staticMetaData = await responseMeta.json()
   const allPosts = getAllPosts(['title', 'slug'])
   return { props: { datatype, staticData, staticMetaData, allPosts } }
 }

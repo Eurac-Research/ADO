@@ -46,20 +46,32 @@ const indices = [
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
 
-  const fetchCatchments = await fetch(
+  const fetchCatchments = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`
   )
-  const catchmentData = await fetchCatchments.json()
+  const catchmentData = await fetchCatchments.data
+  // const fetchCatchments = await fetch(
+  //   `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`
+  // )
+  // const catchmentData = await fetchCatchments.json()
 
-  const responseMeta = await fetch(
+  const responseMeta = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/metadata/${datatype}.json`
   )
-  const staticMetaData = await responseMeta.json()
+  const staticMetaData = await responseMeta.data
+  // const responseMeta = await fetch(
+  //   `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/metadata/${datatype}.json`
+  // )
+  // const staticMetaData = await responseMeta.json()
 
-  const fetchStations = await fetch(
+  const fetchStations = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/gauging_stations.geojson`
   )
-  const stationData = await fetchStations.json()
+  const stationData = await fetchStations.data
+  // const fetchStations = await fetch(
+  //   `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/gauging_stations.geojson`
+  // )
+  // const stationData = await fetchStations.json()
 
   const allPosts = getAllPosts(['title', 'slug'])
 
