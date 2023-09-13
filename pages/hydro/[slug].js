@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 import * as React from 'react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import Map, {
   Source,
   Layer,
@@ -45,6 +45,11 @@ const indices = [
 
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
+
+  // check if slug is part of indices
+  if (indices.includes(datatype.toLowerCase()) === false) {
+    return { notFound: true }
+  }
 
   const fetchCatchments = await axios(
     `https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/hydro/${datatype}-latest.geojson`
@@ -135,10 +140,11 @@ export async function getStaticProps({ params }) {
 export async function getStaticPaths() {
   // Get the paths we want to pre-render based on posts
   const paths = indices.map((index) => ({
-    params: { slug: `${index}` },
+    params: { slug: index },
   }))
+
   // { fallback: false } means other routes should 404.
-  return { paths, fallback: 'blocking' }
+  return { paths, fallback: false }
 }
 
 export default function App({
@@ -398,7 +404,7 @@ export default function App({
         style={{ opacity: clickInfo ? '0' : '1' }}
       >
         <div className="legend">
-          {staticMetaData.colormap.legend.stops.map((item, index) => {
+          {staticMetaData?.colormap?.legend.stops.map((item, index) => {
             return (
               <div key={`legend${index}`} className="legendItem">
                 <div
