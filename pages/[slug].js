@@ -52,6 +52,11 @@ const indices = [
 export async function getStaticProps({ params }) {
   const datatype = params.slug ? params.slug.toUpperCase() : 'SPEI-1'
 
+  // check if slug is part of indices
+  if (indices.includes(datatype.toLowerCase()) === false) {
+    return
+  }
+
   const response = await axios(
     `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
   ).catch(function (error) {
