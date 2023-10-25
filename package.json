@@ -18,7 +18,7 @@
     "gray-matter": "^4.0.3",
     "json5": "2.2.2",
     "mapbox-gl": "^2.7.0",
-    "next": "^13.0.5",
+    "next": "^13.5.0",
     "next-plausible": "^3.2.0",
     "react": "^18.2.0",
     "react-cookie-consent": "^8.0.1",
