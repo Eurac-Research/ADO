@@ -32,6 +32,23 @@ const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL
 // dev data branch
 //const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/dev'
 
+// const indices = [
+//   'spei-1',
+//   'spei-2',
+//   'spei-3',
+//   'spei-6',
+//   'spei-12',
+//   'spi-1',
+//   'spi-2',
+//   'spi-3',
+//   'spi-6',
+//   'spi-12',
+//   'sspi-10',
+//   'sma',
+//   'vci',
+//   'vhi',
+// ]
+
 const indices = [
   'spei-1',
   'spei-2',
@@ -44,7 +61,7 @@ const indices = [
   'spi-6',
   'spi-12',
   'sspi-10',
-  'sma',
+  // 'sma',
   'vci',
   'vhi',
 ]
