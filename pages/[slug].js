@@ -61,7 +61,7 @@ const indices = [
   'spi-6',
   'spi-12',
   'sspi-10',
-  // 'sma',
+  'sma',
   'vci',
   'vhi',
 ]
