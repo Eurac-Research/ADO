@@ -480,11 +480,11 @@ export default function App({
             <div className="mapLink">
               View all hydrological stations in the alpine region{' '}
               <a
-                href="https://maps.eurac.edu/maps/85/view"
+                href="https://maps.eurac.edu/catalogue/#/map/85"
                 rel="noreferrer"
                 target="_blank"
               >
-                https://maps.eurac.edu/maps/85/view
+                https://maps.eurac.edu/catalogue/#/map/85
               </a>
             </div>
 
