@@ -19,6 +19,7 @@ import Layout from '../../components/layout'
 
 const TimeSeries = dynamic(() => import('../../components/timeseries'), {
   loading: () => <p>Loading...</p>,
+  ssr: false,
 })
 import TimeSeriesLegend from '../../components/timeSeriesLegend'
 

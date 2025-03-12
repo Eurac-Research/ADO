@@ -1,4 +1,7 @@
+import './global.css'
+
 import '../styles/globals.scss'
+
 import { ThemeProvider } from '../context/theme'
 import PlausibleProvider from 'next-plausible'
 import Head from 'next/head'

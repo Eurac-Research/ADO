@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { registerTheme } from 'echarts'
 
@@ -193,6 +193,7 @@ function TimeSeries(props) {
   })
 
   const { data, indices, index, firstDate, lastDate } = props
+  const [showTooltip, setShowTooltip] = useState(false)
 
   /* second y-axis for vci and vhi */
   const series = indices?.map((index) => {
@@ -222,12 +223,28 @@ function TimeSeries(props) {
 
   const [selecedDimensions, setSelecedDimensions] = useState(legendObject)
 
-  // const onChartLegendselectchanged = (params, echartInstance) => {
-  //   console.log('params', params)
-  // }
-  // const onEvents = {
-  //   legendselectchanged: onChartLegendselectchanged,
-  // }
+  // Show tooltip after chart loads
+  useEffect(() => {
+    if (data) {
+      // Check if user has seen the tooltip before
+      const hasSeenTooltip = localStorage.getItem('hasSeenDataZoomTooltip')
+
+      if (!hasSeenTooltip) {
+        // Small delay to ensure chart is rendered
+        const timer = setTimeout(() => {
+          setShowTooltip(true)
+        }, 1000)
+
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [data])
+
+  // Hide tooltip and save in localStorage
+  const dismissTooltip = () => {
+    setShowTooltip(false)
+    localStorage.setItem('hasSeenDataZoomTooltip', 'true')
+  }
 
   const options = {
     toolbox: {
@@ -254,6 +271,7 @@ function TimeSeries(props) {
     },
     xAxis: {
       type: 'category',
+
     },
     yAxis: [
       {
@@ -297,6 +315,10 @@ function TimeSeries(props) {
       show: true,
       startValue: firstDate,
       endValue: lastDate,
+      showDetail: true,
+      handleLabel: {
+        show: true,
+      },
     },
     legend: {
       type: 'scroll',
@@ -308,20 +330,56 @@ function TimeSeries(props) {
   }
 
   return (
-    <>
+    <div className="relative">
       {data ? (
         <>
           <ReactECharts
             option={options}
             style={{ height: '400px', marginTop: '10px' }}
             theme={'mytheme'}
-            // onEvents={onEvents}
           />
+
+          {/* DataZoom Tooltip with improved arrow */}
+          {showTooltip && (
+            <>
+              <div
+                className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded shadow-lg max-w-xs text-center"
+                style={{
+                  zIndex: 1000,
+                  animation: 'fadeIn 0.5s'
+                }}
+              >
+                <p>Try using this slider to zoom in on specific time periods or expand the timespan back to 1979!</p>
+                <button
+                  onClick={dismissTooltip}
+                  className="mt-2 bg-white text-blue-500 px-2 py-1 rounded text-xs font-bold"
+                >
+                  Got it
+                </button>
+              </div>
+
+              {/* Separate prominent arrow with animation */}
+              <div
+                className="absolute bottom-7 left-[88%] transform -translate-x-1/2"
+                style={{
+                  zIndex: 999,
+                  animation: 'bounce 1.5s infinite'
+                }}
+              >
+
+                <svg className='w-14 h-14 rotate-[5deg] fill-blue-500' xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 302.816 302.816">
+                  <path d="M298.423 152.996c-5.857-5.858-15.354-5.858-21.213 0l-35.137 35.136c-5.871-59.78-50.15-111.403-112.001-123.706-45.526-9.055-92.479 5.005-125.596 37.612-5.903 5.813-5.977 15.31-.165 21.213 5.813 5.903 15.31 5.977 21.212.164 26.029-25.628 62.923-36.679 98.695-29.565 48.865 9.72 83.772 50.677 88.07 97.978l-38.835-38.835c-5.857-5.857-15.355-5.858-21.213.001-5.858 5.858-5.858 15.355 0 21.213l62.485 62.485c2.929 2.929 6.768 4.393 10.606 4.393s7.678-1.464 10.607-4.393l62.483-62.482c5.86-5.858 5.86-15.356.002-21.214z" />
+                </svg>
+              </div>
+            </>
+          )}
         </>
       ) : (
         <>loading ...</>
       )}
-    </>
+
+
+    </div>
   )
 }
 export default TimeSeries

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Map, {
   Source,
   Layer,
@@ -30,6 +30,7 @@ export async function getStaticProps({ params }) {
 
 export default function App({ impactData, allPosts }) {
   const mapRef = React.useRef()
+  const [mapInstance, setMapInstance] = useState(null)
 
   function impactAmountByNutsId(NUTS_ID) {
     const result = impactEntries.find((item) => item[0] === NUTS_ID)
@@ -785,9 +786,24 @@ export default function App({ impactData, allPosts }) {
     </div>
   )
 
+  // Add safe map access function
+  const getMap = useCallback(() => {
+    if (mapRef.current && mapRef.current.getMap) {
+      return mapRef.current.getMap();
+    }
+    return null;
+  }, []);
+
+  // Handle map initialization
+  const onMapLoad = useCallback(() => {
+    setMapInstance(mapRef.current.getMap());
+  }, []);
+
+  // Modified onClick to safely access map
   const onClick = useCallback(
     async (event) => {
-      const map = mapRef.current.getMap()
+      const map = getMap();
+      if (!map) return;
 
       const { features } = event
       const hoveredFeature = features && features[0]
@@ -822,8 +838,49 @@ export default function App({ impactData, allPosts }) {
         )
       }
     },
-    [featuredId]
+    [featuredId, getMap]
   )
+
+  // Safe reset for feature state
+  const removeNutsInformation = useCallback(
+    (event) => {
+      const map = getMap();
+      if (!map || featuredId === null) return;
+
+      map.setFeatureState(
+        { source: 'geojson', id: featuredId },
+        { hover: false }
+      )
+      setNutsid(null)
+      setFeaturedId(null)
+    },
+    [featuredId, getMap]
+  )
+
+  const closeImpactsWrapper = useCallback(
+    (event) => {
+      removeNutsInformation()
+      setYear('')
+    },
+    [removeNutsInformation]
+  )
+
+  // Clean up when component unmounts
+  useEffect(() => {
+    return () => {
+      const map = getMap();
+      if (map && featuredId !== null) {
+        try {
+          map.setFeatureState(
+            { source: 'geojson', id: featuredId },
+            { hover: false }
+          );
+        } catch (e) {
+          // Ignore errors during unmount
+        }
+      }
+    };
+  }, [featuredId, getMap]);
 
   useEffect(() => {
     /* global fetch */
@@ -861,32 +918,6 @@ export default function App({ impactData, allPosts }) {
     setHoverInfo(null)
   }, [])
 
-  const removeNutsInformation = useCallback(
-    (event) => {
-      const map = mapRef.current.getMap()
-      map.setFeatureState(
-        { source: 'geojson', id: featuredId },
-        { hover: false }
-      )
-      setNutsid(null)
-      setFeaturedId(null)
-    },
-    [featuredId]
-  )
-
-  const closeImpactsWrapper = useCallback(
-    (event) => {
-      removeNutsInformation()
-      setYear('')
-      const map = mapRef.current.getMap()
-      map.setFeatureState(
-        { source: 'geojson', id: featuredId },
-        { hover: false }
-      )
-    },
-    [featuredId]
-  )
-
   return (
     <Layout posts={allPosts}>
       <Head>
@@ -896,6 +927,7 @@ export default function App({ impactData, allPosts }) {
         <div className="reactMap">
           <Map
             ref={mapRef}
+            onLoad={onMapLoad}
             initialViewState={{
               latitude: 46,
               longitude: 9,
@@ -917,22 +949,17 @@ export default function App({ impactData, allPosts }) {
             onMouseLeave={onOut}
             onClick={onClick}
           >
-            {nutsMap && (
-              <>
-                <Source
-                  id="geojson"
-                  type="geojson"
-                  data={nutsMap}
-                  generateId={true}
-                >
-                  <Layer {...nutsLayer} beforeId="waterway-shadow" />
-                </Source>
-                {/*                 <Source id="my-data" type="geojson" data={geojson}>
-                  <Layer {...layerStyle} />
-                </Source>
-                */}
-              </>
+            {nutsMap && mapInstance && (
+              <Source
+                id="geojson"
+                type="geojson"
+                data={nutsMap}
+                generateId={true}
+              >
+                <Layer {...nutsLayer} beforeId="waterway-shadow" />
+              </Source>
             )}
+
             <ScaleControl
               maxWidth={100}
               unit="metric"

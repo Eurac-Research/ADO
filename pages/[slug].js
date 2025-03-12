@@ -21,6 +21,7 @@ import TimeSeriesLegend from '../components/timeSeriesLegend'
 
 const TimeSeries = dynamic(() => import('../components/timeseries'), {
   loading: () => <p>Loading...</p>,
+  ssr: false // Add this line to prevent server-side rendering
 })
 
 import { getAllPosts } from '../lib/api'
@@ -191,8 +192,8 @@ export default function App({
     setClickInfo(
       hoveredFeature
         ? {
-            feature: hoveredFeature,
-          }
+          feature: hoveredFeature,
+        }
         : null
     )
     const nutsId = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
@@ -219,13 +220,13 @@ export default function App({
   const fixedDay =
     dayFromTimestamp > lastDayTimestamp
       ? setDay(
-          format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
-        )
+        format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+      )
       : dayFromTimestamp < firstDayTimestamp
-      ? setDay(
+        ? setDay(
           format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
         )
-      : day
+        : day
 
   // console.log("day", day)
   // console.log("fixedDay", fixedDay)
@@ -244,9 +245,8 @@ export default function App({
       setIsError(false)
       setIsLoading(true)
       try {
-        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${
-          overlayNutsId ? `${overlayNutsId}` : ''
-        }.json`
+        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${overlayNutsId ? `${overlayNutsId}` : ''
+          }.json`
         const result = await axios(url)
         setNutsData(result.data)
       } catch (error) {
@@ -355,6 +355,40 @@ export default function App({
                       style={{ backgroundColor: hoverInfo?.rgbaColor }}
                     ></span>
                     {hoverInfo.feature.properties.value}
+
+                    {/* show the translated value - got the info from metadata.colormap.legend.stops */}
+                    {/* Show translated value based on legend */}
+                    <span className="block text-xs">
+                      {(() => {
+                        const value = parseFloat(hoverInfo.feature.properties.value);
+                        const stops = metadata.colormap.legend.stops;
+
+                        // Sort stops by their numeric value to ensure proper comparison
+                        const sortedStops = [...stops].sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+
+                        // Handle special case: value is less than the first stop
+                        if (value < parseFloat(sortedStops[0][0])) {
+                          return sortedStops[0]['1'];
+                        }
+
+                        // Handle special case: value is greater than or equal to the last stop
+                        if (value >= parseFloat(sortedStops[sortedStops.length - 1][0])) {
+                          return sortedStops[sortedStops.length - 1]['1'];
+                        }
+
+                        // Find the appropriate range
+                        for (let i = 0; i < sortedStops.length - 1; i++) {
+                          const currentValue = parseFloat(sortedStops[i][0]);
+                          const nextValue = parseFloat(sortedStops[i + 1][0]);
+
+                          if (value >= currentValue && value < nextValue) {
+                            return sortedStops[i]['1'];
+                          }
+                        }
+
+                        return '--'; // Fallback if no match is found
+                      })()}
+                    </span>
                   </>
                 ) : (
                   'no value'
@@ -364,7 +398,7 @@ export default function App({
                 {hoverInfo.feature.properties.NUTS_NAME}
               </span>
               {/* <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div> */}
-              <span className="tooltipCTA">Click to view details</span>
+              <span className="tooltipCTA mt-2 text-white/60 leading-[120%]">Click to view details <br />and historical data</span>
             </div>
           )}
         </Map>
@@ -435,7 +469,7 @@ export default function App({
               index={datatype}
               metadata={staticMetaData}
               firstDate={format(
-                new Date(day).setDate(new Date(day).getDate() - 3 * 365),
+                new Date(day).setDate(new Date(day).getDate() - 5 * 365),
                 'YYYY-MM-DD'
               )}
               lastDate={day}
@@ -464,6 +498,7 @@ export default function App({
                       href={staticMetaData?.factsheet}
                       target="_blank"
                       rel="noreferrer"
+                      className='text-blue-600 underline'
                     >
                       Download {staticMetaData?.short_name} Factsheet
                     </a>
@@ -475,6 +510,7 @@ export default function App({
                     href={staticMetaData?.doi}
                     target="_blank"
                     rel="noreferrer"
+                    className='text-blue-600 underline'
                   >
                     {staticMetaData?.doi}
                   </a>
