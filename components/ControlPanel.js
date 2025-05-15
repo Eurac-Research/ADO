@@ -49,41 +49,54 @@ function ControlPanel(props) {
           <span className="getMoreInfoIcon">i</span>
         </h2>
 
-        <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4">
+        <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4" role="group" aria-label="Time range selection">
           <button
             onClick={() => setTimeSpan(30)}
             className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
+            aria-pressed={timeSpan === 30}
+            aria-label="Show last 30 days"
           >
             Last 30 days
           </button>
           <button
             onClick={() => setTimeSpan(90)}
             className={`px-3 py-1 rounded ${timeSpan === 90 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
+            aria-pressed={timeSpan === 90}
+            aria-label="Show last 90 days"
           >
             Last 90 days
           </button>
           <button
             onClick={resetTimeRange}
             className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
+            aria-pressed={timeSpan === null}
+            aria-label={`Show all ${Math.round(lastDayTimestamp - originalFirstDayTimestamp)} days`}
           >
             Last {Math.round(lastDayTimestamp - originalFirstDayTimestamp)} days
           </button>
         </div>
 
-        <h1>{day}</h1>
-        <div key={'day'} className="timerangeSlider">
+        <h1 id="selected-date" aria-live="polite">{day}</h1>
+        <div key={'day'} className="timerangeSlider" role="group" aria-label="Day selection controls">
           {dayFromTimestamp > currentFirstDay ? (
             <button
-              title="prev"
+              title="Previous day"
               type="submit"
               value={dayFromTimestamp - 1}
               onClick={(evt) => props.onChange(evt.target.value)}
               className='p-2'
+              aria-label="Go to previous day"
+              aria-controls="selected-date"
             >
               &lt;
             </button>
           ) : (
-            <button disabled={true} className='p-2'>&lt;</button>
+            <button
+              disabled={true}
+              className='p-2'
+              aria-label="Previous day (not available)"
+              aria-disabled="true"
+            >&lt;</button>
           )}
 
           <input
@@ -100,21 +113,33 @@ function ControlPanel(props) {
             max={lastDayTimestamp}
             step={1}
             onChange={(evt) => props.onChange(evt.target.value)}
+            aria-label="Select date"
+            aria-controls="selected-date"
+            aria-valuemin={currentFirstDay}
+            aria-valuemax={lastDayTimestamp}
+            aria-valuenow={dayFromTimestamp}
           />
           <datalist id="tickmarks">{rows}</datalist>
 
           {dayFromTimestamp < lastDayTimestamp ? (
             <button
-              title="next"
+              title="Next day"
               type="submit"
               value={dayFromTimestamp + 1}
               onClick={(evt) => props.onChange(evt.target.value)}
               className='p-2'
+              aria-label="Go to next day"
+              aria-controls="selected-date"
             >
               &gt;
             </button>
           ) : (
-            <button disabled={true} className='p-2'>&gt;</button>
+            <button
+              disabled={true}
+              className='p-2'
+              aria-label="Next day (not available)"
+              aria-disabled="true"
+            >&gt;</button>
           )}
         </div>
       </div>

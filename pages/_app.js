@@ -15,6 +15,7 @@ function MyApp({ Component, pageProps }) {
           property="og:image"
           content="https://ado.eurac.edu/og-image.png"
         />
+        <meta name="google-site-verification" content="OdAWzIPNr_gquodYDcLJpB5xjGfw0mJ1Mowe5Do9k6U" />
       </Head>
       <ThemeProvider>
         <Component {...pageProps} />
