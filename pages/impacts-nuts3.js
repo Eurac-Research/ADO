@@ -12,7 +12,28 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import Head from 'next/head'
 import Layout from '../components/layout'
 import uniqolor from 'uniqolor'
-const { Color, ColorImmutable } = require('frostcolor')
+
+// Replace frostcolor with a simple color darkening function
+const darkenColor = (hexColor, amount) => {
+  // Convert hex to RGB
+  const hex = hexColor.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  // Darken by reducing RGB values
+  const newR = Math.max(0, r - Math.floor(amount * 255));
+  const newG = Math.max(0, g - Math.floor(amount * 255));
+  const newB = Math.max(0, b - Math.floor(amount * 255));
+
+  // Convert back to hex
+  const toHex = (n) => {
+    const hex = n.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+
+  return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+};
 
 import { getAllPosts } from '../lib/api'
 import { useThemeContext } from '../context/theme'
@@ -147,9 +168,7 @@ export default function App({ impactData, allPosts }) {
       })
 
       // get color by basecolor - darken color by amount of impacts per nutsregion
-      const mycolor = Color.fromString('#FFCEC3')
-        .darken(amount / 100)
-        .toHexString()
+      const mycolor = darkenColor('#FFCEC3', amount / 100)
       // console.log(`mycolor amount ${mycolor}, ${amount / 100}`);
 
       matchExpression.push(row['0'], mycolor)
