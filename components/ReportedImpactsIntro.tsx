@@ -1,10 +1,16 @@
 import { useState, useCallback } from 'react'
+import type { ReportedImpactsIntroProps } from '@/types'
 
-function ReportedImpactsIntro({ headline = 0, text = 0 }) {
+export default function ReportedImpactsIntro({ 
+  headline, 
+  text 
+}: ReportedImpactsIntroProps) {
   const [introOpen, setIntroOpen] = useState(true)
-  const onClose = useCallback(async (event) => {
-    setIntroOpen()
+  
+  const onClose = useCallback(() => {
+    setIntroOpen(false)
   }, [])
+
   return (
     <>
       {introOpen && (
@@ -30,5 +36,3 @@ function ReportedImpactsIntro({ headline = 0, text = 0 }) {
     </>
   )
 }
-
-export default ReportedImpactsIntro

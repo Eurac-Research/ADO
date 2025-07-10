@@ -1,9 +1,11 @@
+'use client'
+
 import * as React from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 
 function SideBar({ posts, sideBarPositionRelative }) {
-  const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <div
@@ -11,10 +13,10 @@ function SideBar({ posts, sideBarPositionRelative }) {
     >
       <div
         className={
-          !router.asPath.includes('impact') &&
-          !router.asPath.includes('hydro') &&
-          !router.asPath.includes('/md') &&
-          !router.asPath.includes('/vulnerabilities')
+          !pathname.includes('impact') &&
+          !pathname.includes('hydro') &&
+          !pathname.includes('/md') &&
+          !pathname.includes('/vulnerabilities')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -24,7 +26,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
 
       <div
         className={
-          router.pathname === '/impacts' || router.pathname === '/impacts-nuts3'
+          pathname === '/impacts' || pathname === '/impacts-nuts3'
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -36,9 +38,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
 
       <div
         className={
-          router.pathname === '/impact-probabilities' ||
-          router.pathname === '/impact-probabilities' ||
-          router.asPath.includes('/vulnerabilities')
+          pathname === '/impact-probabilities' ||
+          pathname === '/impact-probabilities' ||
+          pathname.includes('/vulnerabilities')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -48,8 +50,8 @@ function SideBar({ posts, sideBarPositionRelative }) {
         </Link>
         <div
           className={
-            router.pathname === '/impact-probabilities' ||
-            router.pathname === '/impact-probabilities'
+            pathname === '/impact-probabilities' ||
+            pathname === '/impact-probabilities'
               ? 'sideBarItemSub active'
               : 'sideBarItemSub'
           }
@@ -60,7 +62,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         </div>
         <div
           className={
-            router.pathname === '/vulnerabilities'
+            pathname === '/vulnerabilities'
               ? 'sideBarItemSub active'
               : 'sideBarItemSub'
           }
@@ -73,7 +75,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
 
       <div
         className={
-          router.asPath.includes('hydro') ? 'sideBarItem active' : 'sideBarItem'
+          pathname.includes('hydro') ? 'sideBarItem active' : 'sideBarItem'
         }
       >
         <Link href="/hydro/spei-1" prefetch={false}>
@@ -86,7 +88,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
           <div
             key={`${item}-${index}`}
             className={
-              router.asPath.includes(item.slug)
+              pathname.includes(item.slug)
                 ? 'sideBarItem active'
                 : 'sideBarItem'
             }

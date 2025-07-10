@@ -2,20 +2,29 @@ import SideBar from './SideBar'
 import Header from '../components/Header'
 import { useThemeContext } from '../context/theme'
 import CookieConsent from 'react-cookie-consent'
+import type { LayoutProps } from '@/types'
 
-export default function Layout({ children, posts, headerMode = 0 } = {}) {
+interface LayoutComponentProps extends LayoutProps {
+  headerMode?: number
+}
+
+export default function Layout({
+  children,
+  posts,
+  headerMode = 0
+}: LayoutComponentProps) {
   const [theme, setTheme] = useThemeContext()
 
   return (
     <div className={theme}>
       <Header headerModeWithBackground={headerMode} />
       <SideBar posts={posts} sideBarPositionRelative={headerMode} />
-      <main>{children}</main>
+      <main className="bg-white dark:bg-gray-900 min-h-screen">{children}</main>
 
       <div
         className="darkModeToggle"
         onClick={() => {
-          theme == 'light' ? setTheme('dark') : setTheme('light')
+          setTheme(theme === 'light' ? 'dark' : 'light')
         }}
         title={
           theme === 'light' ? 'switch to dark mode' : 'switch to light mode'
@@ -25,14 +34,12 @@ export default function Layout({ children, posts, headerMode = 0 } = {}) {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 512 512"
-            title="moon"
           >
             <path d="M283.21 512c78.96 0 151.08-35.92 198.86-94.8 7.07-8.7-.64-21.42-11.56-19.34-124.2 23.65-238.27-71.58-238.27-196.96a200.43 200.43 0 0 1 101.5-174.39C343.43 21 341 6.31 330 4.28A258.16 258.16 0 0 0 283.2 0c-141.3 0-256 114.51-256 256 0 141.3 114.51 256 256 256z" />
           </svg>
         ) : (
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            title="sun"
             fill="none"
             stroke="#000"
             strokeLinecap="round"

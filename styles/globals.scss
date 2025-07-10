@@ -303,6 +303,8 @@ body {
   left: 0;
   height: 100%;
   width: 100%;
+
+  transition: opacity 0.2s ease-in-out;
 }
 
 .tooltip {
@@ -689,6 +691,42 @@ body {
     font-size: 14px;
     width: auto;
     padding: 0 10px;
+  }
+
+  /* Make navigation buttons look identical to links */
+  button {
+    background: var(--bg-8-light);
+    border: none;
+    padding: 0;
+    margin-right: 6px;
+    text-transform: uppercase;
+    text-decoration: none;
+    flex-shrink: 0;
+    height: 100%;
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-light);
+    transition: background-color 300ms ease-in-out, color 300ms;
+    box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+
+    &:hover {
+      background-color: var(--bg-light);
+      color: var(--text-strong-light);
+      font-weight: 500;
+    }
+
+    &.active {
+      background-color: rgba(34, 34, 34, 0.8);
+      color: #fff;
+      font-weight: 500;
+    }
   }
 }
 
@@ -1287,3 +1325,29 @@ b {
     color: #0969da;
   }
 }
+
+/* Smooth transitions for map and page changes */
+.reactMap {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Prevent layout shift during navigation */
+.controlContainer {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Smooth button transitions for navigation */
+.navigation button {
+  transition: all 0.15s ease-in-out;
+}
+
+.navigation button:hover {
+  opacity: 0.8;
+}
+
+/* Optimize map rendering */
+.mapboxgl-map {
+  will-change: transform;
+}
+
+

@@ -193,6 +193,10 @@ function TimeSeries(props) {
   })
 
   const { data, indices, index, firstDate, lastDate } = props
+
+  console.log("index", index);
+
+
   const [showTooltip, setShowTooltip] = useState(false)
 
   /* second y-axis for vci and vhi */
