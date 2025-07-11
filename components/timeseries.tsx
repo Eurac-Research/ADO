@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { registerTheme } from 'echarts'
+import type { TimeSeriesProps } from '@/types'
 
-function TimeSeries(props) {
+function TimeSeries(props: TimeSeriesProps) {
   registerTheme('mytheme', {
     seriesCnt: '13',
     backgroundColor: 'rgba(0,0,0,0)',
@@ -11,51 +12,6 @@ function TimeSeries(props) {
     textColorShow: false,
     textColor: '#333',
     markTextColor: '#eeeeee',
-    // color: [
-    //   '#c1232b',
-    //   '#27727b',
-    //   '#fcce10',
-    //   '#e87c25',
-    //   '#b5c334',
-    //   '#fe8463',
-    //   '#9bca63',
-    //   '#fad860',
-    //   '#f3a43b',
-    //   '#60c0dd',
-    //   '#d7504b',
-    //   '#c6e579',
-    //   '#f4e001',
-    //   '#f0805a',
-    //   '#26c0c0',
-    // ],
-    // color: [
-    //   '#4992ff',
-    //   '#7cffb2',
-    //   '#fddd60',
-    //   '#ff6e76',
-    //   '#58d9f9',
-    //   '#05c091',
-    //   '#ff8a45',
-    //   '#8d48e3',
-    //   '#dd79ff',
-    // ],
-    // color: [
-    //   '#37A2DA',
-    //   '#32C5E9',
-    //   '#67E0E3',
-    //   '#9FE6B8',
-    //   '#FFDB5C',
-    //   '#ff9f7f',
-    //   '#fb7293',
-    //   '#E062AE',
-    //   '#E690D1',
-    //   '#e7bcf3',
-    //   '#9d96f5',
-    //   '#8378EA',
-    //   '#96BFFF',
-    // ],
-    //
-    //https://medialab.github.io/iwanthue/
     color: [
       '#607cba',
       '#b34190',
@@ -194,38 +150,33 @@ function TimeSeries(props) {
 
   const { data, indices, index, firstDate, lastDate } = props
 
-  console.log("index", index);
+  // console.log("index", index)
 
+  const [showTooltip, setShowTooltip] = useState<boolean>(false)
 
-  const [showTooltip, setShowTooltip] = useState(false)
-
-  /* second y-axis for vci and vhi */
-  const series = indices?.map((index) => {
+  const series = indices?.map((indexName) => {
     return {
       type: 'line',
       showSymbol: false,
-      yAxisIndex: index === 'vci' ? 1 : index === 'vhi' ? 1 : 0,
+      yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
     }
   })
 
-  const dimensionsArray = indices?.map((index) => {
-    return index.toUpperCase()
+  const dimensionsArray = indices?.map((indexName) => {
+    return indexName.toUpperCase()
   })
-  const dimensions = ['date'].concat(dimensionsArray)
+  const dimensions = ['date'].concat(dimensionsArray || [])
 
-  /* 
-    create object for chart options and assign values 
-  */
-  const legendObject = {}
+  const legendObject: Record<string, boolean> = {}
   for (const item of indices) {
     if (index === item.toUpperCase()) {
-      legendObject[item.toUpperCase()] = true // index active
+      legendObject[item.toUpperCase()] = true
     } else {
-      legendObject[item.toUpperCase()] = false // other indices inactive
+      legendObject[item.toUpperCase()] = false
     }
   }
 
-  const [selecedDimensions, setSelecedDimensions] = useState(legendObject)
+  const [selectedDimensions, setSelectedDimensions] = useState<Record<string, boolean>>(legendObject)
 
   // Show tooltip after chart loads
   useEffect(() => {
@@ -245,7 +196,7 @@ function TimeSeries(props) {
   }, [data])
 
   // Hide tooltip and save in localStorage
-  const dismissTooltip = () => {
+  const dismissTooltip = (): void => {
     setShowTooltip(false)
     localStorage.setItem('hasSeenDataZoomTooltip', 'true')
   }
@@ -275,7 +226,6 @@ function TimeSeries(props) {
     },
     xAxis: {
       type: 'category',
-
     },
     yAxis: [
       {
@@ -329,7 +279,7 @@ function TimeSeries(props) {
       orient: 'horizontal',
       top: '40',
       icon: 'roundRect',
-      selected: selecedDimensions,
+      selected: selectedDimensions,
     },
   }
 
@@ -343,7 +293,6 @@ function TimeSeries(props) {
             theme={'mytheme'}
           />
 
-          {/* DataZoom Tooltip with improved arrow */}
           {showTooltip && (
             <>
               <div
@@ -362,7 +311,6 @@ function TimeSeries(props) {
                 </button>
               </div>
 
-              {/* Separate prominent arrow with animation */}
               <div
                 className="absolute bottom-7 left-[88%] transform -translate-x-1/2"
                 style={{
@@ -370,7 +318,6 @@ function TimeSeries(props) {
                   animation: 'bounce 1.5s infinite'
                 }}
               >
-
                 <svg className='w-14 h-14 rotate-[5deg] fill-blue-500' xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 302.816 302.816">
                   <path d="M298.423 152.996c-5.857-5.858-15.354-5.858-21.213 0l-35.137 35.136c-5.871-59.78-50.15-111.403-112.001-123.706-45.526-9.055-92.479 5.005-125.596 37.612-5.903 5.813-5.977 15.31-.165 21.213 5.813 5.903 15.31 5.977 21.212.164 26.029-25.628 62.923-36.679 98.695-29.565 48.865 9.72 83.772 50.677 88.07 97.978l-38.835-38.835c-5.857-5.857-15.355-5.858-21.213.001-5.858 5.858-5.858 15.355 0 21.213l62.485 62.485c2.929 2.929 6.768 4.393 10.606 4.393s7.678-1.464 10.607-4.393l62.483-62.482c5.86-5.858 5.86-15.356.002-21.214z" />
                 </svg>
@@ -381,9 +328,8 @@ function TimeSeries(props) {
       ) : (
         <>loading ...</>
       )}
-
-
     </div>
   )
 }
+
 export default TimeSeries

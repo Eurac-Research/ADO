@@ -10,6 +10,10 @@ interface DroughtMonitorClientProps {
   allPosts: PostData[]
   indices: string[]
   initialIndex?: string
+  initialData?: {
+    staticData: any
+    staticMetaData: any
+  } | null
 }
 
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
@@ -17,7 +21,8 @@ const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercont
 function DroughtMonitorContent({
   allPosts,
   indices,
-  initialIndex = 'spei-1'
+  initialIndex = 'spei-1',
+  initialData = null
 }: DroughtMonitorClientProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -26,17 +31,37 @@ function DroughtMonitorContent({
   const urlIndex = searchParams.get('index')
   const startingIndex = urlIndex || initialIndex
   const [currentIndex, setCurrentIndex] = useState(startingIndex)
-  const [dataCache, setDataCache] = useState<Map<string, { staticData: any, staticMetaData: any }>>(new Map())
+
+  // Initialize cache with pre-fetched initial data
+  const [dataCache, setDataCache] = useState<Map<string, { staticData: any, staticMetaData: any }>>(
+    () => {
+      const initialCache = new Map()
+
+      // Pre-populate cache with initial data if available
+      if (initialData && startingIndex === 'spei-1') {
+        initialCache.set('spei-1', initialData)
+        console.log('✓ Using pre-fetched data for instant SPEI-1 load')
+      }
+
+      return initialCache
+    }
+  )
+
   const [loadingIndex, setLoadingIndex] = useState<string | null>(null)
 
-  // Fetch data for a specific index
+  // Fetch data for a specific index with browser caching
   const fetchIndexData = useCallback(async (index: string) => {
     const datatype = index.toUpperCase()
 
     try {
       const [staticDataResponse, metadataResponse] = await Promise.all([
-        fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`),
-        fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`)
+        fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`, {
+          // Let browser handle caching - don't force reload
+          cache: 'default'
+        }),
+        fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
+          cache: 'default'
+        })
       ])
 
       if (!staticDataResponse.ok || !metadataResponse.ok) {
@@ -74,7 +99,7 @@ function DroughtMonitorContent({
     }
   }, [indices, dataCache, loadingIndex, fetchIndexData])
 
-  // Load data for current index
+  // Load data for current index (only if not cached)
   useEffect(() => {
     const loadData = async () => {
       if (dataCache.has(currentIndex)) {
@@ -167,7 +192,8 @@ function DroughtMonitorContent({
 export default function DroughtMonitorClient({
   allPosts,
   indices,
-  initialIndex
+  initialIndex,
+  initialData
 }: DroughtMonitorClientProps) {
   return (
     <Suspense fallback={
@@ -180,7 +206,12 @@ export default function DroughtMonitorClient({
         </div>
       </Layout>
     }>
-      <DroughtMonitorContent allPosts={allPosts} indices={indices} initialIndex={initialIndex} />
+      <DroughtMonitorContent
+        allPosts={allPosts}
+        indices={indices}
+        initialIndex={initialIndex}
+        initialData={initialData}
+      />
     </Suspense>
   )
 }

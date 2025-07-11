@@ -1,10 +1,11 @@
 'use client'
 
-import * as React from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { SideBarProps } from '@/types'
 
-function SideBar({ posts, sideBarPositionRelative }) {
+function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
   const pathname = usePathname()
 
   return (
@@ -14,9 +15,9 @@ function SideBar({ posts, sideBarPositionRelative }) {
       <div
         className={
           !pathname.includes('impact') &&
-          !pathname.includes('hydro') &&
-          !pathname.includes('/md') &&
-          !pathname.includes('/vulnerabilities')
+            !pathname.includes('hydro') &&
+            !pathname.includes('/md') &&
+            !pathname.includes('/vulnerabilities')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -39,8 +40,8 @@ function SideBar({ posts, sideBarPositionRelative }) {
       <div
         className={
           pathname === '/impact-probabilities' ||
-          pathname === '/impact-probabilities' ||
-          pathname.includes('/vulnerabilities')
+            pathname === '/impact-probabilities' ||
+            pathname.includes('/vulnerabilities')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -51,7 +52,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
         <div
           className={
             pathname === '/impact-probabilities' ||
-            pathname === '/impact-probabilities'
+              pathname === '/impact-probabilities'
               ? 'sideBarItemSub active'
               : 'sideBarItemSub'
           }
@@ -86,7 +87,7 @@ function SideBar({ posts, sideBarPositionRelative }) {
       {posts &&
         posts.map((item, index) => (
           <div
-            key={`${item}-${index}`}
+            key={`${item.slug}-${index}`}
             className={
               pathname.includes(item.slug)
                 ? 'sideBarItem active'

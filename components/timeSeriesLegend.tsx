@@ -1,3 +1,5 @@
+import React from 'react'
+
 function TimeSeriesLegend() {
   return (
     <div className="timeSeriesLegend">
@@ -61,4 +63,5 @@ function TimeSeriesLegend() {
     </div>
   )
 }
+
 export default TimeSeriesLegend

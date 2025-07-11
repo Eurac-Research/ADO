@@ -379,7 +379,7 @@ export default function HydroClient({
     // Check cache first
     const cachedData = stationCache.getTimeseries(stationId)
     if (cachedData) {
-      console.log('Timeseries data loaded from cache for station:', stationId)
+      // console.log('Timeseries data loaded from cache for station:', stationId)
       setTimeseriesData(cachedData)
       setIsLoading(false)
       return
@@ -399,7 +399,7 @@ export default function HydroClient({
           try {
             const result = await axios(url)
             if (result.data) {
-              console.log('Timeseries data loaded from:', url)
+              // console.log('Timeseries data loaded from:', url)
               // Cache the result
               stationCache.setTimeseries(stationId, result.data)
               setTimeseriesData(result.data)
@@ -628,6 +628,7 @@ export default function HydroClient({
         <ControlPanel
           metadata={metadata}
           day={day}
+          hideDaySwitchTabs={true}
           firstDay={staticData?.metadata?.properties?.firstDate || staticMetaData?.timerange?.properties?.firstDate}
           lastDay={staticData?.metadata?.properties?.lastDate || staticMetaData?.timerange?.properties?.lastDate}
           onChange={(value: any) => {
@@ -661,10 +662,11 @@ export default function HydroClient({
         />
 
         <div className="navigation">
+
           <p>Hydro Indices</p>
           {indices?.map((index) => (
             <Link
-              prefetch={false}
+              prefetch={true}
               href={`/hydro/${index}`}
               key={index}
               className={datatype.toLowerCase() === index ? 'active' : ''}

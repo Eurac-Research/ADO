@@ -1,6 +1,4 @@
-import { getAllPosts } from '@/lib/api'
-import DroughtMonitorClient from './drought-monitor-client'
-import type { PostData } from '@/types'
+import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -8,20 +6,28 @@ export const metadata: Metadata = {
   description: 'Interactive drought monitoring across the Alpine region with multiple drought indices',
 }
 
-// Available indices
-const indices = [
-  'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12',
-  'spi-1', 'spi-2', 'spi-3', 'spi-6', 'spi-12',
-  'sspi-10', 'sma', 'vci', 'vhi',
-]
+interface DroughtMonitorPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-export default async function DroughtMonitorPage() {
-  const allPosts = getAllPosts(['title', 'slug']) as PostData[]
+export default async function DroughtMonitorPage({ searchParams }: DroughtMonitorPageProps) {
+  // Await the search params
+  const params = await searchParams
 
-  return (
-    <DroughtMonitorClient
-      allPosts={allPosts}
-      indices={indices}
-    />
-  )
+  // Redirect to main page with search params preserved
+  const urlParams = new URLSearchParams()
+
+  // Preserve any search parameters
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      urlParams.set(key, value)
+    } else if (Array.isArray(value)) {
+      urlParams.set(key, value[0]) // Take first value if array
+    }
+  })
+
+  const queryString = urlParams.toString()
+  const redirectUrl = queryString ? `/?${queryString}` : '/'
+
+  redirect(redirectUrl)
 }
