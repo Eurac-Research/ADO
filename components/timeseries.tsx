@@ -159,6 +159,7 @@ function TimeSeries(props: TimeSeriesProps) {
       type: 'line',
       showSymbol: false,
       yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+      connectNulls: false, // This ensures gaps are shown for null/undefined values
     }
   })
 
