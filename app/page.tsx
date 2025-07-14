@@ -27,8 +27,6 @@ async function fetchInitialIndexData(index: string): Promise<InitialData | null>
   const datatype = index.toUpperCase()
 
   try {
-    console.log(`Pre-fetching initial index data for ${index} at build time...`)
-
     const [staticDataResponse, metadataResponse] = await Promise.all([
       fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`, {
         next: { revalidate: false } // Cache until next build
@@ -39,7 +37,6 @@ async function fetchInitialIndexData(index: string): Promise<InitialData | null>
     ])
 
     if (!staticDataResponse.ok || !metadataResponse.ok) {
-      console.error(`Failed to fetch initial data for ${index}: ${staticDataResponse.status} / ${metadataResponse.status}`)
       return null
     }
 
@@ -48,10 +45,8 @@ async function fetchInitialIndexData(index: string): Promise<InitialData | null>
       metadataResponse.json()
     ])
 
-    console.log(`✓ Successfully pre-fetched initial data for ${index}`)
     return { staticData, staticMetaData }
   } catch (error) {
-    console.error(`Failed to fetch initial data for ${index}:`, error)
     return null
   }
 }
@@ -65,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'The Alpine Drought Observatory (ADO) provides a tool for an easy overview of the current drought situation and past drought situations in the last 40 years.',
     }
   } catch (error) {
-    console.error('Failed to fetch metadata for SPEI-1:', error)
+    // Fallback metadata if fetch fails
   }
 
   return {

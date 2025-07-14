@@ -40,7 +40,6 @@ function DroughtMonitorContent({
       // Pre-populate cache with initial data if available
       if (initialData && startingIndex === 'spei-1') {
         initialCache.set('spei-1', initialData)
-        console.log('✓ Using pre-fetched data for instant SPEI-1 load')
       }
 
       return initialCache
@@ -75,7 +74,6 @@ function DroughtMonitorContent({
 
       return { staticData, staticMetaData }
     } catch (error) {
-      console.error('Error fetching data for', index, ':', error)
       return null
     }
   }, [])

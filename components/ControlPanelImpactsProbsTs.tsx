@@ -11,9 +11,6 @@ function ControlPanelImpactsProbsTs({ spei, type, onChange }: ControlPanelImpact
   const selectedSpei = spei || '-4'
   const indexType = type === 'sma' ? 'SMA-1' : 'SPEI-3'
 
-  console.log('ControlPanelImpactsProbs spei:', selectedSpei);
-
-
   return (
     <div className="controlpanel probabilities">
       <h2>

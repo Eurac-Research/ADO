@@ -166,14 +166,14 @@ function ControlPanel(props: ControlPanelProps) {
             <p style={{ marginBottom: '1rem' }}>{metadata?.abstract}</p>
             {metadata?.factsheet && (
               <p style={{ marginBottom: '1rem' }}>
-                <a href={metadata?.factsheet} target="_blank" rel="noreferrer">
+                <a href={metadata?.factsheet} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
                   Download {metadata?.short_name} Factsheet
                 </a>
               </p>
             )}
             {metadata?.doi && (
               <p>
-                <a href={metadata?.doi} target="_blank" rel="noreferrer">
+                <a href={metadata?.doi} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
                   {metadata?.doi}
                 </a>
               </p>

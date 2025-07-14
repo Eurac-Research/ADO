@@ -343,6 +343,7 @@ export default function IndexClient({
         <div className="navigation">
           <p>Indices</p>
           {indices?.map((index) => (
+
             onIndexChange ? (
               <button
                 key={index}
