@@ -7,37 +7,61 @@ function ControlPanel(props: ControlPanelProps) {
   const { day, metadata, firstDay, lastDay } = props
   const timestamp = format(new Date(day), 'X')
   const dayFromTimestamp = parseInt(timestamp) / 60 / 60 / 24
-  const originalFirstDayTimestamp = parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
-  const lastDayTimestamp = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
 
   const [overlay, setOverlay] = useState<boolean>(false)
   const [timeSpan, setTimeSpan] = useState<number | null>(30)
-  const [currentFirstDay, setCurrentFirstDay] = useState<number>(originalFirstDayTimestamp)
+  const [currentFirstDay, setCurrentFirstDay] = useState<number>(() => {
+    // Initialize with the correct value based on firstDay prop
+    return parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
+  })
+  const [currentOriginalFirstDayTimestamp, setCurrentOriginalFirstDayTimestamp] = useState<number>(() => {
+    return parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
+  })
+  const [currentLastDayTimestamp, setCurrentLastDayTimestamp] = useState<number>(() => {
+    return parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
+  })
 
   const onClose = useCallback(() => {
     setOverlay(false)
   }, [])
 
-  // Effect to handle timespan changes
+  // Effect to handle timespan changes and prop changes (when index changes)
   useEffect(() => {
+    console.log('ControlPanel: Props changed', { firstDay, lastDay, timeSpan })
+    const newOriginalFirstDayTimestamp = parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
+    const newLastDayTimestamp = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
+
+    console.log('ControlPanel: Calculated timestamps', {
+      newOriginalFirstDayTimestamp,
+      newLastDayTimestamp,
+      firstDay,
+      lastDay
+    })
+
+    // Update state with new values
+    setCurrentOriginalFirstDayTimestamp(newOriginalFirstDayTimestamp)
+    setCurrentLastDayTimestamp(newLastDayTimestamp)
+
+    // Reset currentFirstDay based on current timeSpan
     if (timeSpan) {
-      // Calculate new first day based on timespan
       const newFirstDay = Math.max(
-        originalFirstDayTimestamp,
-        lastDayTimestamp - timeSpan
+        newOriginalFirstDayTimestamp,
+        newLastDayTimestamp - timeSpan
       )
       setCurrentFirstDay(newFirstDay)
+    } else {
+      setCurrentFirstDay(newOriginalFirstDayTimestamp)
     }
-  }, [timeSpan, lastDayTimestamp, originalFirstDayTimestamp])
+  }, [firstDay, lastDay, timeSpan])
 
   // Reset to full range
   const resetTimeRange = useCallback(() => {
-    setCurrentFirstDay(originalFirstDayTimestamp)
+    setCurrentFirstDay(currentOriginalFirstDayTimestamp)
     setTimeSpan(null)
-  }, [originalFirstDayTimestamp])
+  }, [currentOriginalFirstDayTimestamp])
 
   let rows: React.ReactElement[] = []
-  for (let i = currentFirstDay; i <= lastDayTimestamp; i++) {
+  for (let i = currentFirstDay; i <= currentLastDayTimestamp; i++) {
     rows.push(<option key={i} value={i}></option>)
   }
 
@@ -79,9 +103,9 @@ function ControlPanel(props: ControlPanelProps) {
               onClick={resetTimeRange}
               className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
               aria-pressed={timeSpan === null}
-              aria-label={`Show all ${Math.round(lastDayTimestamp - originalFirstDayTimestamp)} days`}
+              aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days`}
             >
-              Last {Math.round(lastDayTimestamp - originalFirstDayTimestamp)} days
+              Last {Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days
             </button>
           </div>
 
@@ -113,25 +137,25 @@ function ControlPanel(props: ControlPanelProps) {
             type="range"
             list="tickmarks"
             value={
-              dayFromTimestamp > lastDayTimestamp
-                ? lastDayTimestamp
+              dayFromTimestamp > currentLastDayTimestamp
+                ? currentLastDayTimestamp
                 : dayFromTimestamp < currentFirstDay
-                  ? lastDayTimestamp
+                  ? currentLastDayTimestamp
                   : dayFromTimestamp
             }
             min={currentFirstDay}
-            max={lastDayTimestamp}
+            max={currentLastDayTimestamp}
             step={1}
             onChange={(evt) => props.onChange(evt.target.value)}
             aria-label="Select date"
             aria-controls="selected-date"
             aria-valuemin={currentFirstDay}
-            aria-valuemax={lastDayTimestamp}
+            aria-valuemax={currentLastDayTimestamp}
             aria-valuenow={dayFromTimestamp}
           />
           <datalist id="tickmarks">{rows}</datalist>
 
-          {dayFromTimestamp < lastDayTimestamp ? (
+          {dayFromTimestamp < currentLastDayTimestamp ? (
             <button
               title="Next day"
               type="button"
@@ -185,4 +209,4 @@ function ControlPanel(props: ControlPanelProps) {
   )
 }
 
-export default React.memo(ControlPanel)
+export default ControlPanel

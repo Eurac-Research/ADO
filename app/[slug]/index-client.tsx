@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Map, {
   Source,
@@ -84,13 +84,24 @@ export default function IndexClient({
     return staticMetaData
   }, [staticMetaData])
 
-
   const timestamp = format(day, 'X')
   const dayFromTimestamp = parseInt(timestamp) / 60 / 60 / 24
   const firstDayTimestamp =
     parseInt(format(staticData?.metadata?.properties?.firstDate, 'X')) / 60 / 60 / 24
   const lastDayTimestamp =
     parseInt(format(staticData?.metadata?.properties?.lastDate, 'X')) / 60 / 60 / 24
+
+  // Effect to update day when staticData changes (when index changes)
+  useEffect(() => {
+    console.log('IndexClient: staticData changed', {
+      lastDate: staticData?.metadata?.properties?.lastDate,
+      firstDate: staticData?.metadata?.properties?.firstDate,
+      datatype
+    })
+    if (staticData?.metadata?.properties?.lastDate) {
+      setDay(staticData.metadata.properties.lastDate)
+    }
+  }, [staticData?.metadata?.properties?.lastDate, staticData?.metadata?.properties?.firstDate, datatype])
 
   // Fix day if it's out of range
   const fixedDay =
@@ -212,6 +223,8 @@ export default function IndexClient({
 
   const scaleControlStyle = {}
   const navControlStyle = {}
+
+
 
   return (
     <Layout posts={allPosts}>

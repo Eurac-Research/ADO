@@ -166,7 +166,7 @@ function DroughtMonitorContent({
       <Layout posts={allPosts}>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center p-8 bg-white dark:bg-gray-800 rounded shadow-lg">
-            <h1 className="text-2xl font-bold mb-4 text-red-600">Error Loading Data</h1>
+            <h1 className="text-2xl font-bold mb-4">Error Loading Data</h1>
             <p>Failed to load data for {currentIndex.toUpperCase()}. Please try again.</p>
           </div>
         </div>
