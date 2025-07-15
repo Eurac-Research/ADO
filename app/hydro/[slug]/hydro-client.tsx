@@ -156,7 +156,7 @@ export default function HydroClient({
             }
           }
 
-          console.log(`Found closest available date: ${closestDate}`);
+          // console.log(`Found closest available date: ${closestDate}`);
           setDay(closestDate);
         } else {
           // If no dates available, use the last date from metadata
@@ -164,7 +164,7 @@ export default function HydroClient({
             staticMetaData?.timerange?.properties?.lastDate;
 
           if (fallbackDate) {
-            console.log(`No dates found in data, falling back to metadata lastDate: ${fallbackDate}`);
+
             setDay(fallbackDate);
           }
         }
@@ -215,11 +215,6 @@ export default function HydroClient({
 
   const data = useMemo(() => {
     if (!staticData || !staticData.features || !day) {
-      console.log('Missing required data for map:', {
-        hasStaticData: !!staticData,
-        hasFeatures: staticData?.features?.length > 0,
-        day
-      });
       return null;
     }
 
@@ -254,19 +249,10 @@ export default function HydroClient({
 
         // Try alternate ways of accessing if the main path fails
         if (f.properties[datatype] && day in f.properties[datatype]) {
-          console.log(`Using original case datatype for feature`, { id: f.properties.id || f.id });
+          //console.log(`Using original case datatype for feature`, { id: f.properties.id || f.id });
           return f.properties[datatype][day];
         }
 
-        // Only log once per 100 features to avoid console spam
-        if (Math.random() < 0.01) {
-          console.log(`No data for feature on day ${day}`, {
-            id: f.properties.id || f.id,
-            hasProperty: !!f.properties[dtUpper],
-            availableDays: f.properties[dtUpper] ? Object.keys(f.properties[dtUpper]).slice(0, 3) : []
-          });
-        }
-        return null;
       } catch (e) {
         console.error('Error accessing property for feature:', {
           featureId: f.properties.id || f.id,
@@ -337,7 +323,6 @@ export default function HydroClient({
     // Check cache first
     const cachedData = stationCache.getHtml(stationId)
     if (cachedData) {
-      console.log('HTML data loaded from cache for station:', stationId)
       setHtmlData(cachedData)
       return
     }
@@ -354,14 +339,13 @@ export default function HydroClient({
           try {
             const result = await axios(url)
             if (result.data) {
-              console.log('HTML data loaded from:', url)
               // Cache the result
               stationCache.setHtml(stationId, result.data)
               setHtmlData(result.data)
               return
             }
           } catch (error) {
-            console.log('Failed to fetch from:', url)
+            // Failed to fetch from this URL, try next
           }
         }
 
@@ -407,7 +391,7 @@ export default function HydroClient({
               return
             }
           } catch (error) {
-            console.log('Failed to fetch from:', url)
+            // Failed to fetch from this URL, try next
           }
         }
 
@@ -635,11 +619,6 @@ export default function HydroClient({
             try {
               // Parse the timestamp value received from the slider
               const timestamp = parseFloat(value);
-              console.log('Slider change:', {
-                rawValue: value,
-                parsedTimestamp: timestamp,
-                currentDay: day
-              });
 
               // Create a date from the timestamp (seconds since epoch * 24 hours)
               const date = new Date(timestamp * 60 * 60 * 24 * 1000);
@@ -648,11 +627,6 @@ export default function HydroClient({
               // In legacy: format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
               const formattedDate = date.toISOString().split('T')[0];
 
-              console.log('Formatted date:', {
-                date: date.toString(),
-                formattedDate,
-                availableInData: staticData?.features?.[0]?.properties?.[datatype.toUpperCase()]?.[formattedDate] !== undefined
-              });
 
               setDay(formattedDate);
             } catch (error) {

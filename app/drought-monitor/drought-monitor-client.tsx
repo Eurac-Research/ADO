@@ -11,8 +11,10 @@ interface DroughtMonitorClientProps {
   indices: string[]
   initialIndex?: string
   initialData?: {
-    staticData: any
+    features: any[]
     staticMetaData: any
+    baseGeometry: any // Add baseGeometry here
+    extractedMetadata?: any // Add extracted metadata
   } | null
 }
 
@@ -33,13 +35,18 @@ function DroughtMonitorContent({
   const [currentIndex, setCurrentIndex] = useState(startingIndex)
 
   // Initialize cache with pre-fetched initial data
-  const [dataCache, setDataCache] = useState<Map<string, { staticData: any, staticMetaData: any }>>(
+  const [dataCache, setDataCache] = useState<Map<string, { features: any[], staticMetaData: any, extractedMetadata?: any }>>(
     () => {
       const initialCache = new Map()
 
       // Pre-populate cache with initial data if available
       if (initialData && startingIndex === 'spei-1') {
-        initialCache.set('spei-1', initialData)
+        // Initial data already contains features in the correct format
+        initialCache.set('spei-1', {
+          features: initialData.features,
+          staticMetaData: initialData.staticMetaData,
+          extractedMetadata: initialData.extractedMetadata
+        })
       }
 
       return initialCache
@@ -48,33 +55,78 @@ function DroughtMonitorContent({
 
   const [loadingIndex, setLoadingIndex] = useState<string | null>(null)
 
-  // Fetch data for a specific index with browser caching
+  // Use server-provided base geometry instead of fetching client-side
+  const [baseGeometry, setBaseGeometry] = useState<any>(initialData?.baseGeometry || null)
+  const [baseGeometryLoaded, setBaseGeometryLoaded] = useState(!!initialData?.baseGeometry)
+
+  // Fetch data for a specific index - only the feature values
   const fetchIndexData = useCallback(async (index: string) => {
     const datatype = index.toUpperCase()
 
     try {
-      const [staticDataResponse, metadataResponse] = await Promise.all([
-        fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.min.geojson`, {
-          // Let browser handle caching - don't force reload
-          cache: 'default'
+      const [featuresResponse, metadataResponse] = await Promise.all([
+        fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest-features.json`, {
+          cache: 'force-cache',
+          next: { revalidate: false }
         }),
         fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
-          cache: 'default'
+          cache: 'force-cache',
+          next: { revalidate: false }
         })
       ])
 
-      if (!staticDataResponse.ok || !metadataResponse.ok) {
+      if (!featuresResponse.ok || !metadataResponse.ok) {
         throw new Error('Failed to fetch data')
       }
 
-      const [staticData, staticMetaData] = await Promise.all([
-        staticDataResponse.json(),
+      const [features, staticMetaData] = await Promise.all([
+        featuresResponse.json(),
         metadataResponse.json()
       ])
 
-      return { staticData, staticMetaData }
+      // Handle the new structure where features are nested under a 'features' property
+      const actualFeatures = features.features || features
+      const extractedMetadata = features.metadata || null
+
+      return {
+        features: actualFeatures,
+        staticMetaData,
+        extractedMetadata
+      }
     } catch (error) {
       return null
+    }
+  }, [])
+
+  // Merge geometry with feature data
+  const mergeGeometryWithFeatures = useCallback((features: any[], geometry: any) => {
+    if (!geometry || !features) return null
+
+    // Create a lookup map for features by NUTS_ID
+    const featureMap = new Map()
+    features.forEach(feature => {
+      if (feature.NUTS_ID) {
+        featureMap.set(feature.NUTS_ID, feature)
+      }
+    })
+
+    // Merge geometry with feature data
+    const mergedFeatures = geometry.features.map((geoFeature: any) => {
+      const nutsId = geoFeature.properties.NUTS_ID
+      const featureData = featureMap.get(nutsId)
+
+      return {
+        ...geoFeature,
+        properties: {
+          ...geoFeature.properties,
+          ...featureData
+        }
+      }
+    })
+
+    return {
+      ...geometry,
+      features: mergedFeatures
     }
   }, [])
 
@@ -146,7 +198,12 @@ function DroughtMonitorContent({
 
   // Get current data
   const currentData = dataCache.get(currentIndex)
-  const isLoading = !currentData && loadingIndex === currentIndex
+  const isLoading = (!currentData && loadingIndex === currentIndex) || !baseGeometryLoaded
+
+  // Merge geometry with current data when both are available
+  const mergedStaticData = currentData && baseGeometry
+    ? mergeGeometryWithFeatures(currentData.features, baseGeometry)
+    : null
 
   if (isLoading) {
     return (
@@ -161,7 +218,7 @@ function DroughtMonitorContent({
     )
   }
 
-  if (!currentData) {
+  if (!currentData || !mergedStaticData) {
     return (
       <Layout posts={allPosts}>
         <div className="flex items-center justify-center h-screen">
@@ -177,8 +234,9 @@ function DroughtMonitorContent({
   return (
     <IndexClient
       datatype={currentIndex.toUpperCase()}
-      staticData={currentData.staticData}
+      staticData={mergedStaticData}
       staticMetaData={currentData.staticMetaData}
+      extractedMetadata={currentData.extractedMetadata}
       allPosts={allPosts}
       indices={indices}
       onIndexChange={handleIndexChange}

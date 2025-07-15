@@ -18,34 +18,49 @@ const indices = [
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 interface InitialData {
-  staticData: any
+  features: any[]
   staticMetaData: any
+  baseGeometry: any // Add base geometry to initial data
+  extractedMetadata?: any // Add extracted metadata from GeoJSON files
 }
 
-// Pre-fetch only the initial/default index at build time for instant first load
+// Pre-fetch initial data including base geometry server-side
 async function fetchInitialIndexData(index: string): Promise<InitialData | null> {
   const datatype = index.toUpperCase()
 
   try {
-    const [staticDataResponse, metadataResponse] = await Promise.all([
-      fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.min.geojson`, {
+    const [featuresResponse, metadataResponse, baseGeometryResponse] = await Promise.all([
+      fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest-features.json`, {
         next: { revalidate: false } // Cache until next build
       }),
       fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
         next: { revalidate: false } // Cache until next build
+      }),
+      fetch(`https://${ADO_DATA_URL}/json/impacts/nuts3_simple_4326.geojson`, {
+        next: { revalidate: false } // Cache until next build - this is the big win!
       })
     ])
 
-    if (!staticDataResponse.ok || !metadataResponse.ok) {
+    if (!featuresResponse.ok || !metadataResponse.ok || !baseGeometryResponse.ok) {
       return null
     }
 
-    const [staticData, staticMetaData] = await Promise.all([
-      staticDataResponse.json(),
-      metadataResponse.json()
+    const [features, staticMetaData, baseGeometry] = await Promise.all([
+      featuresResponse.json(),
+      metadataResponse.json(),
+      baseGeometryResponse.json()
     ])
 
-    return { staticData, staticMetaData }
+    // Handle the new structure where features are nested under a 'features' property
+    const actualFeatures = features.features || features
+    const extractedMetadata = features.metadata || null
+
+    return {
+      features: actualFeatures,
+      staticMetaData,
+      baseGeometry,
+      extractedMetadata
+    }
   } catch (error) {
     return null
   }

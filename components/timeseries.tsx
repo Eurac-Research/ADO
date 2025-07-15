@@ -150,8 +150,6 @@ function TimeSeries(props: TimeSeriesProps) {
 
   const { data, indices, index, firstDate, lastDate } = props
 
-  // console.log("index", index)
-
   const [showTooltip, setShowTooltip] = useState<boolean>(false)
 
   const series = indices?.map((indexName) => {

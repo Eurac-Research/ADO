@@ -34,6 +34,7 @@ interface IndexClientProps {
   datatype: string
   staticData: any
   staticMetaData: any
+  extractedMetadata?: any
   allPosts: PostData[]
   indices: string[]
   error?: string
@@ -56,6 +57,7 @@ export default function IndexClient({
   datatype,
   staticData,
   staticMetaData,
+  extractedMetadata,
   allPosts,
   indices,
   error,
@@ -66,7 +68,9 @@ export default function IndexClient({
   const [theme] = useThemeContext()
 
   // State
-  const [day, setDay] = useState(staticData?.metadata?.properties?.lastDate)
+  const [day, setDay] = useState(
+    extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
+  )
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
   const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null)
   const [nutsData, setNutsData] = useState(null)
@@ -87,21 +91,17 @@ export default function IndexClient({
   const timestamp = format(day, 'X')
   const dayFromTimestamp = parseInt(timestamp) / 60 / 60 / 24
   const firstDayTimestamp =
-    parseInt(format(staticData?.metadata?.properties?.firstDate, 'X')) / 60 / 60 / 24
+    parseInt(format(extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate, 'X')) / 60 / 60 / 24
   const lastDayTimestamp =
-    parseInt(format(staticData?.metadata?.properties?.lastDate, 'X')) / 60 / 60 / 24
+    parseInt(format(extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate, 'X')) / 60 / 60 / 24
 
   // Effect to update day when staticData changes (when index changes)
   useEffect(() => {
-    console.log('IndexClient: staticData changed', {
-      lastDate: staticData?.metadata?.properties?.lastDate,
-      firstDate: staticData?.metadata?.properties?.firstDate,
-      datatype
-    })
-    if (staticData?.metadata?.properties?.lastDate) {
-      setDay(staticData.metadata.properties.lastDate)
+    const lastDate = extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
+    if (lastDate) {
+      setDay(lastDate)
     }
-  }, [staticData?.metadata?.properties?.lastDate, staticData?.metadata?.properties?.firstDate, datatype])
+  }, [extractedMetadata?.properties?.lastDate, staticData?.metadata?.properties?.lastDate, staticData?.metadata?.properties?.firstDate, datatype])
 
   // Fix day if it's out of range
   const fixedDay =
@@ -346,8 +346,8 @@ export default function IndexClient({
         <ControlPanel
           metadata={metadata}
           day={day}
-          firstDay={staticData?.metadata?.properties?.firstDate}
-          lastDay={staticData?.metadata?.properties?.lastDate}
+          firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
+          lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
           onChange={(value: any) =>
             setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
           }

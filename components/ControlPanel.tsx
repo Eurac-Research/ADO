@@ -27,16 +27,8 @@ function ControlPanel(props: ControlPanelProps) {
 
   // Effect to handle timespan changes and prop changes (when index changes)
   useEffect(() => {
-    console.log('ControlPanel: Props changed', { firstDay, lastDay, timeSpan })
     const newOriginalFirstDayTimestamp = parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
     const newLastDayTimestamp = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
-
-    console.log('ControlPanel: Calculated timestamps', {
-      newOriginalFirstDayTimestamp,
-      newLastDayTimestamp,
-      firstDay,
-      lastDay
-    })
 
     // Update state with new values
     setCurrentOriginalFirstDayTimestamp(newOriginalFirstDayTimestamp)
