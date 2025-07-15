@@ -33,7 +33,7 @@ export default function Header({ headerModeWithBackground }: HeaderProps) {
         </>
       </Link>
       <div className="logos">
-        <a href="https://www.eurac.edu/en" className="eurac-logo">
+        <a href="https://www.eurac.edu/en" className="eurac-logo" title='Eurac Research'>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="178.793"
@@ -47,7 +47,7 @@ export default function Header({ headerModeWithBackground }: HeaderProps) {
           </svg>
         </a>
 
-        <a href="https://www.alpine-space.eu/project/ado/">
+        <a href="https://www.alpine-space.eu/project/ado/" title='Alpine Space Project'>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="718"
