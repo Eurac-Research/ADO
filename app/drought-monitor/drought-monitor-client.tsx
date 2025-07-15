@@ -54,7 +54,7 @@ function DroughtMonitorContent({
 
     try {
       const [staticDataResponse, metadataResponse] = await Promise.all([
-        fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`, {
+        fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.min.geojson`, {
           // Let browser handle caching - don't force reload
           cache: 'default'
         }),

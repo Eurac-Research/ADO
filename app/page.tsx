@@ -28,7 +28,7 @@ async function fetchInitialIndexData(index: string): Promise<InitialData | null>
 
   try {
     const [staticDataResponse, metadataResponse] = await Promise.all([
-      fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`, {
+      fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.min.geojson`, {
         next: { revalidate: false } // Cache until next build
       }),
       fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
