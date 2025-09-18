@@ -1,0 +1,61 @@
+/* Clean, minimal globals.scss with Tailwind-based slider */
+
+/* Get the original content up to line 1443 */
+@import './globals.scss.backup' up to line 1443;
+
+/* Bottom Control Panel Layout - Clean & Simple */
+.controlContainerBottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: var(--bg-8-light);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Simple slider thumb styles for Tailwind implementation */
+.slider-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: 3px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  border-color: #2563eb;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+
+.slider-thumb::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: 3px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Adjust main content to account for bottom panel */
+.reactMap {
+  height: calc(100vh - 80px) !important;
+
+  @media (min-width: 768px) {
+    height: calc(100vh - 100px) !important;
+  }
+
+  @media (min-width: 1024px) {
+    height: calc(100vh - 120px) !important;
+  }
+}

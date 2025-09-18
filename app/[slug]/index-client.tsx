@@ -77,6 +77,29 @@ export default function IndexClient({
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
+  // Forecast state - next 4 weeks with uncertainty levels
+  const [forecastWeeks, setForecastWeeks] = useState(() => {
+    const lastDate = extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
+    if (!lastDate) return []
+
+    const lastDateTime = new Date(lastDate)
+    const forecasts = []
+
+    for (let week = 1; week <= 4; week++) {
+      const forecastDate = new Date(lastDateTime)
+      forecastDate.setDate(forecastDate.getDate() + (week * 7))
+
+      forecasts.push({
+        date: format(forecastDate, 'YYYY-MM-DD'),
+        week: week,
+        uncertainty: (week === 1 ? 'low' : week === 2 ? 'medium' : 'high') as 'low' | 'medium' | 'high',
+        confidence: week === 1 ? 85 : week === 2 ? 70 : week <= 3 ? 55 : 40
+      })
+    }
+
+    return forecasts
+  })
+
   // Memoized values
   const dataLayer = useMemo(() => {
     return staticMetaData ? staticMetaData?.colormap : {}
@@ -326,9 +349,8 @@ export default function IndexClient({
         </Map>
       </div>
 
-      <div
-        className="controlContainer"
-      >
+      {/* Legend over the map */}
+      <div className="controlContainer">
         <div className="legend">
           {staticMetaData?.colormap?.legend.stops.map((item: any, index: number) => {
             return (
@@ -342,21 +364,13 @@ export default function IndexClient({
             )
           })}
         </div>
+      </div>
 
-        <ControlPanel
-          metadata={metadata}
-          day={day}
-          firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
-          lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
-          onChange={(value: any) =>
-            setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
-          }
-        />
 
-        <div className="navigation">
-          <p>Indices</p>
+      <div className="navigation">
+        <p>Indices</p>
+        <div className="navigationButtons">
           {indices?.map((index) => (
-
             onIndexChange ? (
               <button
                 key={index}
@@ -378,6 +392,27 @@ export default function IndexClient({
               </Link>
             )
           ))}
+        </div>
+      </div>
+
+
+      {/* Bottom Control Panel - Full Width */}
+      <div className="controlContainerBottom">
+        <div className="controlPanelWrapper">
+          {/* Index Navigation */}
+
+
+          {/* Control Panel */}
+          <ControlPanel
+            metadata={metadata}
+            day={day}
+            firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
+            lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
+            forecastWeeks={forecastWeeks}
+            onChange={(value: any) =>
+              setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
+            }
+          />
         </div>
       </div>
 

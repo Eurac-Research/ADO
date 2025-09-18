@@ -94,6 +94,14 @@ export interface Metadata {
   [key: string]: any
 }
 
+// Forecast types
+export interface ForecastWeek {
+  date: string
+  week: number
+  uncertainty: 'low' | 'medium' | 'high'
+  confidence: number
+}
+
 // Component prop types
 export interface ControlPanelProps {
   day: string
@@ -102,6 +110,7 @@ export interface ControlPanelProps {
   lastDay: string
   onChange: (value: string) => void
   hideDaySwitchTabs?: boolean
+  forecastWeeks?: ForecastWeek[]
 }
 
 export interface ControlPanelImpactsProps {

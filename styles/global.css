@@ -13,6 +13,18 @@
 }
 
 
+@keyframes pulse-forecast {
+
+  0%,
+  100% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(245, 158, 11, 0.4);
+  }
+}
+
 @keyframes bounce {
 
   0%,
