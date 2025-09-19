@@ -111,6 +111,7 @@ export interface ControlPanelProps {
   onChange: (value: string) => void
   hideDaySwitchTabs?: boolean
   forecastWeeks?: ForecastWeek[]
+  currentIndex?: string
 }
 
 export interface ControlPanelImpactsProps {

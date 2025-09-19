@@ -2,11 +2,16 @@ import * as React from 'react'
 import { format } from 'date-format-parse'
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { ControlPanelProps } from '@/types'
+import { getCategoryForIndex } from '@/lib/categories'
 
 function ControlPanel(props: ControlPanelProps) {
-  const { day, metadata, firstDay, lastDay, forecastWeeks = [] } = props
+  const { day, metadata, firstDay, lastDay, forecastWeeks = [], currentIndex } = props
   const timestamp = format(new Date(day), 'X')
   const dayFromTimestamp = parseInt(timestamp) / 60 / 60 / 24
+
+  // Get the category for the current index
+  const category = currentIndex ? getCategoryForIndex(currentIndex) : null
+  const CategoryIcon = category?.icon
 
   // Calculate extended timeline that includes forecasts
   const lastHistoricalDay = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
@@ -320,6 +325,9 @@ function ControlPanel(props: ControlPanelProps) {
     return { dayValue: targetItem.dayValue, sliderIndex: targetItem.sliderIndex }
   }, [discreteTimePoints, maxSliderIndex, dayFromTimestamp])
 
+  // Track current autoplay index internally
+  const autoPlayIndexRef = useRef<number>(0)
+
   const startAutoPlay = useCallback(() => {
     if (playIntervalRef.current) {
       clearInterval(playIntervalRef.current)
@@ -328,41 +336,45 @@ function ControlPanel(props: ControlPanelProps) {
     const firstSliderIndex = 0
     const lastSliderIndex = maxSliderIndex
 
-    // Initialize current day from props
-    let currentIndex = getCurrentSliderIndex(parseInt(format(new Date(props.day), 'X')) / 60 / 60 / 24)
+    // Initialize autoplay index from current slider position
+    autoPlayIndexRef.current = currentSliderIndex
 
     // If we're already at the last position, start from the beginning
-    if (currentIndex >= lastSliderIndex) {
-      currentIndex = firstSliderIndex
-      const { dayValue } = getNearestValidPosition(firstSliderIndex)
-      isAutoPlayChangeRef.current = true
-      props.onChange(dayValue.toString())
+    if (autoPlayIndexRef.current >= lastSliderIndex) {
+      autoPlayIndexRef.current = firstSliderIndex
+      const targetPoint = discreteTimePoints[firstSliderIndex]
+      if (targetPoint) {
+        isAutoPlayChangeRef.current = true
+        props.onChange(targetPoint.dayValue.toString())
+      }
     }
 
     setIsPlaying(true)
     playIntervalRef.current = setInterval(() => {
-      currentIndex = getCurrentSliderIndex(parseInt(format(new Date(props.day), 'X')) / 60 / 60 / 24)
+      // Use ref value for reliable state tracking in interval
+      const currentIndex = autoPlayIndexRef.current
 
       // If we've reached the end, loop back to beginning
       if (currentIndex >= lastSliderIndex) {
-        const { dayValue } = getNearestValidPosition(firstSliderIndex)
-        isAutoPlayChangeRef.current = true
-        props.onChange(dayValue.toString())
+        autoPlayIndexRef.current = firstSliderIndex
+        const targetPoint = discreteTimePoints[firstSliderIndex]
+        if (targetPoint) {
+          isAutoPlayChangeRef.current = true
+          props.onChange(targetPoint.dayValue.toString())
+        }
       } else {
         // Move to next position
-        let nextIndex: number
-        if (currentIndex >= discreteTimePoints.length - forecastWeeks.length) { // In forecast section
-          nextIndex = currentIndex + 1 // Move week by week
-        } else {
-          nextIndex = currentIndex + 1 // Daily in historical section
-        }
+        const nextIndex = currentIndex + 1
+        autoPlayIndexRef.current = nextIndex
+        const targetPoint = discreteTimePoints[nextIndex]
 
-        const { dayValue } = getNearestValidPosition(nextIndex)
-        isAutoPlayChangeRef.current = true
-        props.onChange(dayValue.toString())
+        if (targetPoint) {
+          isAutoPlayChangeRef.current = true
+          props.onChange(targetPoint.dayValue.toString())
+        }
       }
     }, playSpeed)
-  }, [playSpeed, props, maxSliderIndex, getCurrentSliderIndex, getNearestValidPosition, discreteTimePoints, forecastWeeks])
+  }, [playSpeed, props, maxSliderIndex, discreteTimePoints, currentSliderIndex])
 
   const toggleAutoPlay = useCallback(() => {
     if (isPlaying) {
@@ -401,61 +413,92 @@ function ControlPanel(props: ControlPanelProps) {
 
   return (
     <>
-      <div className="controlpanel">
-        <h2 onClick={() => setOverlay(true)}>
-          {metadata?.short_name} - {metadata?.long_name}{' '}
-          <span className="getMoreInfoIcon">i</span>
-        </h2>
+      <div className="controlpanelXX">
 
-        {!props.hideDaySwitchTabs && (
-          <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4" role="group" aria-label="Time range selection">
-            <button
-              onClick={() => handleTimeSpanChange(30)}
-              className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
-              aria-pressed={timeSpan === 30}
-              aria-label="Show last 30 days plus forecasts"
-            >
-              Last 30 days + forecasts
-            </button>
-            <button
-              onClick={() => handleTimeSpanChange(90)}
-              className={`px-3 py-1 rounded ${timeSpan === 90 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
-              aria-pressed={timeSpan === 90}
-              aria-label="Show last 90 days plus forecasts"
-            >
-              Last 90 days + forecasts
-            </button>
-            <button
-              onClick={resetTimeRange}
-              className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
-              aria-pressed={timeSpan === null}
-              aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days including forecasts`}
-            >
-              All data + forecasts
-            </button>
-          </div>
 
-        )}
 
-        <h1 id="selected-date" aria-live="polite">
-          {day}
-          {isSliderInForecastRange && (
-            <span className={`forecast-indicator forecast-${getSliderForecastUncertainty()}`}>
-              FORECAST {currentSliderTimelineItem?.week ? `WEEK ${currentSliderTimelineItem.week}` : ''}
-              {getSliderForecastUncertainty() && (
-                <span className="uncertainty-badge">
-                  {getSliderForecastUncertainty()?.toUpperCase()} UNCERTAINTY
+
+        <div className='flex items-end justify-center gap-4 mb-4'>
+
+
+          <div className=' w-fit max-w-[500px] px-4  relative bottom-0'>
+            <div className="flex items-center justify-start gap-4 mb-2">
+              {CategoryIcon && <CategoryIcon className="w-16 h-16 text-black" />}
+              <h2 onClick={() => setOverlay(true)} className="items-center gap-2 text-xl mb-4 max-w-[70%]">
+
+                <span className='block'>{metadata?.short_name}</span>
+
+                <span className='block text-sm'>{metadata?.long_name}{' '}</span>
+
+                <span className='block font-bold text-sm' id="selected-date" aria-live="polite">
+
+                  {format(new Date(day), 'ddd, MMM DD, YYYY')}
+
+                  {isSliderInForecastRange && (
+                    <span className={`forecast-indicator text-green-600  forecast-${getSliderForecastUncertainty()}`}>
+                      {" "}
+                      FORECAST {currentSliderTimelineItem?.week ? `WEEK ${currentSliderTimelineItem.week}` : ''}
+                      {getSliderForecastUncertainty() && (
+                        <span className="uncertainty-badge">
+                          {getSliderForecastUncertainty()?.toUpperCase()} UNCERTAINTY
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </span>
+              </h2>
+              <span onClick={() => setOverlay(true)} className="getMoreInfoIcon cursor-pointer absolute top-0 right-0 rounded-full bg-blue-600 h-6 w-6 shrink-0 flex items-center justify-center text-white ">i</span>
+            </div>
+
+            {!props.hideDaySwitchTabs && (
+              <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-[12px]" role="group" aria-label="Time range selection">
+                <button
+                  onClick={() => handleTimeSpanChange(30)}
+                  className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-medium' : 'bg-gray-200'}`}
+                  aria-pressed={timeSpan === 30}
+                  aria-label="Show last 30 days plus forecasts"
+                >
+                  Last 30 days
+                </button>
+                <button
+                  onClick={() => handleTimeSpanChange(90)}
+                  className={`px-3 py-1 rounded ${timeSpan === 90 ? 'bg-blue-500 text-white font-medium' : 'bg-gray-200'}`}
+                  aria-pressed={timeSpan === 90}
+                  aria-label="Show last 90 days plus forecasts"
+                >
+                  Last 90 days
+                </button>
+                <button
+                  onClick={resetTimeRange}
+                  className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-medium' : 'bg-gray-200'}`}
+                  aria-pressed={timeSpan === null}
+                  aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days including forecasts`}
+                >
+                  All data
+                </button>
+              </div>
+
+            )}
+
+            {/* <h1 id="selected-date" aria-live="polite">
+              {day}
+              {isSliderInForecastRange && (
+                <span className={`forecast-indicator forecast-${getSliderForecastUncertainty()}`}>
+                  FORECAST {currentSliderTimelineItem?.week ? `WEEK ${currentSliderTimelineItem.week}` : ''}
+                  {getSliderForecastUncertainty() && (
+                    <span className="uncertainty-badge">
+                      {getSliderForecastUncertainty()?.toUpperCase()} UNCERTAINTY
+                    </span>
+                  )}
                 </span>
               )}
-            </span>
-          )}
-        </h1>
+            </h1> */}
+          </div>
 
 
-        <div className='flex flex-col md:flex-row items-start justify-start gap-4 mb-4'>
-          {/* Auto-play controls */}
-          <div className="auto-play-controls flex items-center gap-2 mb-4">
 
+          {/* Auto-play controls - positioned left of slider */}
+          <div className="auto-play-controls flex items-center gap-2">
             <button
               onClick={toggleAutoPlay}
               className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors focus:outline-none ${isPlaying
@@ -473,40 +516,28 @@ function ControlPanel(props: ControlPanelProps) {
                 </div>
               ) : (
                 // Play icon (triangle)
-                // <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[15px] border-l-transparent border-r-transparent border-b-blue-500"></div>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className='fill-blue-500 w-8 h-8'>
                   <path d="M8 5v14l11-7z" />
                 </svg>
-
               )}
             </button>
 
-            <div className="flex  items-center gap-2 text-sm">
-
-              <select
-                value={playSpeed}
-                onChange={(e) => setPlaySpeed(Number(e.target.value))}
-                className="text-xs px-1 py-1 border rounded bg-white w-fit"
-                disabled={isPlaying}
-                title="Playback speed"
-              >
-                <option value={1000}>0.5x</option>
-                <option value={500}>1x</option>
-                <option value={250}>2x</option>
-                <option value={125}>4x</option>
-                {/* <option value={125}>Very Fast (4x)</option> */}
-              </select>
-            </div>
-
-            {/* {isPlaying && (
-              <span className="text-xs text-gray-600 animate-pulse">
-                Playing...
-              </span>
-            )} */}
+            <select
+              value={playSpeed}
+              onChange={(e) => setPlaySpeed(Number(e.target.value))}
+              className="text-xs px-1 py-1 border rounded bg-white w-fit"
+              disabled={isPlaying}
+              title="Playback speed"
+            >
+              <option value={1000}>0.5x</option>
+              <option value={500}>1x</option>
+              <option value={250}>2x</option>
+              <option value={125}>4x</option>
+            </select>
           </div>
 
           {/* Full-width timeline slider */}
-          <div key={'day'} className="timerangeSlider w-[80%] mb-5" role="group" aria-label="Timeline selection controls">
+          <div key={'day'} className="timerangeSlider flex-1 mb-4" role="group" aria-label="Timeline selection controls">
             <div className="timeline-container" style={{
               '--historical-end': `${historicalEndPercentage}%`,
               '--total-range': currentLastDayTimestamp - currentFirstDay
@@ -530,8 +561,8 @@ function ControlPanel(props: ControlPanelProps) {
                     type="button"
                     onClick={() => {
                       if (isInForecastRange && currentTimelineItem?.week && currentTimelineItem.week > 1) {
-                        // Navigate to previous forecast week (jump back 7 slider positions)
-                        const targetIndex = currentSliderIndex - 7
+                        // Navigate to previous forecast week (jump back 1 slider position)
+                        const targetIndex = currentSliderIndex - 1
                         const { dayValue } = getNearestValidPosition(targetIndex)
                         handleButtonClick(dayValue)
                       } else if (isInForecastRange && currentTimelineItem?.week === 1) {
@@ -560,7 +591,7 @@ function ControlPanel(props: ControlPanelProps) {
                 )}
 
                 {/* Main slider container */}
-                <div className="relative flex-1 mx-2 py-12 pb-16">
+                <div className="relative flex-1 mx-2 pt-12 pb-6">
                   {/* Date label that follows the thumb */}
                   <div
                     className="absolute -top-4 rounded-lg px-6 py-3 text-base font-semibold shadow-lg z-10 transform -translate-x-1/2 whitespace-nowrap cursor-grab active:cursor-grabbing"
@@ -636,8 +667,8 @@ function ControlPanel(props: ControlPanelProps) {
                     }}
                   >
                     {isSliderInForecastRange && currentSliderTimelineItem?.week
-                      ? `Week ${currentSliderTimelineItem.week} - ${format(new Date(currentSliderTimelineItem.date), 'dddd, YYYY')}`
-                      : format(new Date(day), 'dddd, MMM DD, YYYY')
+                      ? `Week ${currentSliderTimelineItem.week} - ${format(new Date(currentSliderTimelineItem.date), 'ddd, YYYY')}`
+                      : format(new Date(day), 'ddd, MMM DD, YYYY')
                     }
                     {/* Small arrow pointing down */}
                     <div
@@ -678,31 +709,32 @@ function ControlPanel(props: ControlPanelProps) {
                   />
 
                   {/* Tick marks overlay */}
-                  <div className="absolute top-full mt-1 w-full pointer-events-none">
+                  <div className="absolute top-full w-full pointer-events-none">
                     {discreteTimePoints.map((item, index) => {
                       const position = (index / Math.max(1, discreteTimePoints.length - 1)) * 100
 
-                      // Different spacing logic for forecast vs historical
+                      // Enhanced spacing logic for forecast vs historical
                       let isMajorTick = false
                       let shouldShowTick = false
+                      let tickHeight = 'h-3'
+                      let tickColor = 'bg-gray-400'
 
                       if (item.type === 'forecast') {
-                        // Only show tick at the first position of each forecast week
-                        const prevItem = discreteTimePoints[index - 1]
-                        const isFirstOfWeek = !prevItem ||
-                          prevItem.type !== 'forecast' ||
-                          prevItem.week !== item.week
-
-                        if (isFirstOfWeek) {
-                          isMajorTick = true
-                          shouldShowTick = true
-                        }
+                        // All forecast weeks are major ticks with enhanced styling
+                        isMajorTick = true
+                        shouldShowTick = true
+                        tickHeight = 'h-6' // Taller for forecast weeks
+                        tickColor = 'bg-green-600' // Green color for forecast
                       } else {
-                        // For historical data, show major ticks every 7 days, plus first and last
+                        // For historical data, show major ticks every 3 days for more detail
                         const isHistoricalEnd = index < discreteTimePoints.length - 1 &&
                           discreteTimePoints[index + 1]?.type === 'forecast'
-                        isMajorTick = index % 7 === 0 || index === 0 || isHistoricalEnd
+                        isMajorTick = index % 3 === 0 || index === 0 || isHistoricalEnd
                         shouldShowTick = isMajorTick
+                        if (isMajorTick) {
+                          tickHeight = 'h-4'
+                          tickColor = 'bg-blue-600' // Blue color for historical
+                        }
                       }
 
                       if (!shouldShowTick) return null
@@ -710,18 +742,30 @@ function ControlPanel(props: ControlPanelProps) {
                       return (
                         <div
                           key={`tick-${index}`}
-                          className={`absolute transform -translate-x-1/2 ${isMajorTick ? 'h-4 w-1 bg-gray-600' : 'h-3 w-0.5 bg-gray-400'
-                            }`}
+                          className={`absolute transform -translate-x-1/2`}
                           style={{ left: `${position}%` }}
                         >
+                          <div className={`w-[2px] ${item.type === 'forecast' ? 'hidden' : ''} ${tickHeight} ${tickColor}`} />
                           {isMajorTick && (
-                            <span className={`absolute top-full mt-1 text-xs font-medium whitespace-nowrap transform -translate-x-1/2 ${item.type === 'forecast' ? 'text-green-700' : 'text-blue-700'
-                              }`}>
-                              {item.type === 'forecast'
-                                ? `Week ${item.week}`
-                                : format(new Date(item.date), 'MMM DD')
-                              }
-                            </span>
+                            <div className="relative">
+                              <span className={`absolute top-full mt-1 text-xs font-medium whitespace-nowrap transform -translate-x-1/2 ${item.type === 'forecast' ? 'text-green-800' : 'text-blue-700'
+                                }`}>
+                                {/* {item.type === 'forecast'
+                                  ? `WEEK ${item.week}`
+                                  : format(new Date(item.date), 'MMM DD')
+                                } */}
+                                {item.type === 'forecast'
+                                  ? ``
+                                  : format(new Date(item.date), 'MMM DD')
+                                }
+                              </span>
+                              {/* Add a visual indicator for forecast weeks */}
+                              {/* {item.type === 'forecast' && (
+                                <div className="absolute top-full mt-6 transform -translate-x-1/2 text-xs text-green-600 font-medium">
+                                  Forecast
+                                </div>
+                              )} */}
+                            </div>
                           )}
                         </div>
                       )
@@ -747,8 +791,8 @@ function ControlPanel(props: ControlPanelProps) {
                     type="button"
                     onClick={() => {
                       if (isInForecastRange && currentTimelineItem?.week && currentTimelineItem.week < 4) {
-                        // Navigate to next forecast week (jump forward 7 slider positions)
-                        const targetIndex = currentSliderIndex + 7
+                        // Navigate to next forecast week (jump forward 1 slider position)
+                        const targetIndex = currentSliderIndex + 1
                         const { dayValue } = getNearestValidPosition(targetIndex)
                         handleButtonClick(dayValue)
                       } else if (!isInForecastRange && dayFromTimestamp === lastHistoricalDay && forecastWeeks.length > 0) {

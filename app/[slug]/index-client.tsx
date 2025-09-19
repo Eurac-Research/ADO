@@ -18,6 +18,18 @@ import { format } from 'date-format-parse'
 import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import type { PostData } from '@/types'
+import { CloudRain, Droplets, Leaf, Snowflake, ChevronDown } from 'lucide-react'
+import { DROUGHT_CATEGORIES, getCategoryForIndex } from '@/lib/categories'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
+import { cn } from "@/lib/utils"
+import React from 'react'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -52,6 +64,65 @@ interface HoverInfo {
 interface ClickInfo {
   feature: any
 }
+
+// ListItem component for NavigationMenu (from official Shadcn demo)
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & {
+    title: string
+    children?: React.ReactNode
+    href?: string
+    onClick?: () => void
+    isActive?: boolean
+  }
+>(({ className, title, children, href, onClick, isActive, onMouseEnter, ...props }, ref) => {
+  const content = (
+    <>
+      <div className="text-sm font-medium leading-none">{title}</div>
+      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+        {children}
+      </p>
+    </>
+  )
+
+  const baseClasses = cn(
+    "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-blue-50 hover:text-blue-900 dark:hover:bg-blue-900/20 dark:hover:text-blue-100 focus:bg-blue-50 focus:text-blue-900 dark:focus:bg-blue-900/20 dark:focus:text-blue-100",
+    isActive && "bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100 border border-blue-300 dark:border-blue-600",
+    className
+  )
+
+  if (onClick) {
+    return (
+      <li>
+        <button
+          type="button"
+          onClick={onClick}
+          onMouseEnter={onMouseEnter as any}
+          className={cn(baseClasses, "w-full text-left")}
+        >
+          {content}
+        </button>
+      </li>
+    )
+  }
+
+  return (
+    <li className='relative' data-name="nav-list-item">
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          href={href}
+          className={baseClasses}
+          onMouseEnter={onMouseEnter}
+          {...props}
+        >
+          {content}
+        </a>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = "ListItem"
 
 export default function IndexClient({
   datatype,
@@ -110,6 +181,12 @@ export default function IndexClient({
   const metadata = useMemo(() => {
     return staticMetaData
   }, [staticMetaData])
+
+  // Helper function to determine active category
+  const getActiveCategory = useMemo(() => {
+    const category = getCategoryForIndex(datatype)
+    return category?.id || null
+  }, [datatype])
 
   const timestamp = format(day, 'X')
   const dayFromTimestamp = parseInt(timestamp) / 60 / 60 / 24
@@ -351,7 +428,7 @@ export default function IndexClient({
 
       {/* Legend over the map */}
       <div className="controlContainer">
-        <div className="legend">
+        <div className="legend relative bottom-40">
           {staticMetaData?.colormap?.legend.stops.map((item: any, index: number) => {
             return (
               <div key={`legend${index}`} className="legendItem">
@@ -367,38 +444,264 @@ export default function IndexClient({
       </div>
 
 
-      <div className="navigation">
-        <p>Indices</p>
-        <div className="navigationButtons">
-          {indices?.map((index) => (
-            onIndexChange ? (
-              <button
-                key={index}
-                onClick={() => onIndexChange(index)}
-                onMouseEnter={() => onIndexHover?.(index)}
-                className={datatype.toLowerCase() === index ? 'active' : ''}
-              >
-                {index}
-              </button>
-            ) : (
-              <Link
-                prefetch={true}
-                href={`/${index}`}
-                key={index}
-                className={datatype.toLowerCase() === index ? 'active' : ''}
-                onMouseEnter={() => onIndexHover?.(index)}
-              >
-                {index}
-              </Link>
-            )
-          ))}
-        </div>
+      <div className="navigationXXX z-20 absolute top-10 flex items-center w-full justify-center">
+        <p className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200 hidden">Drought Indices</p>
+
+        <NavigationMenu className=''>
+          <NavigationMenuList>
+
+            {/* Precipitation and Evapotranspiration Category */}
+            <NavigationMenuItem className='relative'>
+              <NavigationMenuTrigger className="bg-white/90">
+                <div className="flex items-center space-x-2">
+                  <CloudRain className="w-4 h-4" />
+                  <span>Precipitation & Evapotranspiration</span>
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className='bg-white/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700'>
+                <ul className="grid gap-3 p-6 md:w-[500px] lg:w-[900px] lg:grid-cols-[.75fr_1fr_1fr] lg:grid-rows-[repeat(4,_minmax(0,_1fr))]">
+                  <li className="row-span-5 lg:row-span-5">
+                    <NavigationMenuLink asChild>
+                      <div className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-900 p-6 no-underline outline-none focus:shadow-md">
+                        <CloudRain className="h-20 w-20" />
+                        <div className="mb-2 mt-4 text-lg font-medium">
+                          Precipitation & Evapotranspiration Indices
+                        </div>
+                        <p className="text-sm leading-tight text-muted-foreground">
+                          Monitor drought through standardized precipitation and evapotranspiration measures.
+                        </p>
+                      </div>
+                    </NavigationMenuLink>
+                  </li>
+                  {indices?.filter(index =>
+                    index.toLowerCase().startsWith('spi') || index.toLowerCase().startsWith('spei') || ['precipitation'].includes(index.toLowerCase())
+                  )
+                    .sort((a, b) => {
+                      // Sort by type (SPEI first, then SPI) and then by time scale
+                      const aLower = a.toLowerCase()
+                      const bLower = b.toLowerCase()
+
+                      // Extract type and scale
+                      const getTypeAndScale = (index: string) => {
+                        if (index.startsWith('spei')) {
+                          return { type: 'spei', scale: parseInt(index.split('-')[1]) || 0 }
+                        }
+                        if (index.startsWith('spi')) {
+                          return { type: 'spi', scale: parseInt(index.split('-')[1]) || 0 }
+                        }
+                        return { type: 'other', scale: 0 }
+                      }
+
+                      const aInfo = getTypeAndScale(aLower)
+                      const bInfo = getTypeAndScale(bLower)
+
+                      // First sort by type (SPEI before SPI)
+                      if (aInfo.type !== bInfo.type) {
+                        if (aInfo.type === 'spei') return -1
+                        if (bInfo.type === 'spei') return 1
+                        if (aInfo.type === 'spi') return -1
+                        if (bInfo.type === 'spi') return 1
+                      }
+
+                      // Then sort by scale (1, 3, 6, 12)
+                      return aInfo.scale - bInfo.scale
+                    })
+                    .map((index) => {
+                      const indexLower = index.toLowerCase()
+                      const isSpei = indexLower.startsWith('spei')
+                      const isSpi = indexLower.startsWith('spi')
+
+                      const title = isSpei ? `SPEI-${index.split('-')[1]}` : isSpi ? `SPI-${index.split('-')[1]}` : index.toUpperCase()
+
+                      let description = "Precipitation data"
+                      if (isSpei) {
+                        const scale = index.split('-')[1]
+                        description = `Standardised Precipitation-Evapotranspiration Index (${scale}-month scale)`
+                      } else if (isSpi) {
+                        const scale = index.split('-')[1]
+                        description = `Standardised Precipitation Index (${scale}-month time scale)`
+                      }
+
+                      return (
+                        <ListItem
+                          key={index}
+                          title={title}
+                          href={onIndexChange ? undefined : `/${index}`}
+                          onClick={onIndexChange ? () => onIndexChange(index) : undefined}
+                          onMouseEnter={() => onIndexHover?.(index)}
+                          isActive={datatype.toLowerCase() === index}
+                        >
+                          {description}
+                        </ListItem>
+                      )
+                    })}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            {/* Soil Moisture Category */}
+            <NavigationMenuItem className='relative'>
+              <NavigationMenuTrigger className="bg-white/90">
+                <div className="flex items-center space-x-2">
+                  <Droplets className="w-4 h-4" />
+                  <span>Soil Moisture</span>
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className='bg-white/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700'>
+                <ul className="grid gap-3 p-6 md:w-[500px] lg:w-[600px] lg:grid-cols-[.75fr_1fr]">
+                  <li className="row-span-3">
+                    <NavigationMenuLink asChild>
+                      <div className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-900 p-6 no-underline outline-none focus:shadow-md">
+                        <Droplets className="h-20 w-20" />
+                        <div className="mb-2 mt-4 text-lg font-medium">
+                          Soil Moisture Indices
+                        </div>
+                        <p className="text-sm leading-tight text-muted-foreground">
+                          Monitor drought through soil water content and moisture anomalies.
+                        </p>
+                      </div>
+                    </NavigationMenuLink>
+                  </li>
+                  {indices?.filter(index =>
+                    ['smi', 'soil_moisture', 'swi', 'sma'].includes(index.toLowerCase())
+                  ).map((index) => {
+                    const indexLower = index.toLowerCase()
+                    const title = indexLower === 'sma' ? 'SMA' : index.toUpperCase()
+                    const description = indexLower === 'sma' ? "Soil Moisture Anomalies" : "Soil moisture data"
+
+                    return (
+                      <ListItem
+                        key={index}
+                        title={title}
+                        href={onIndexChange ? undefined : `/${index}`}
+                        onClick={onIndexChange ? () => onIndexChange(index) : undefined}
+                        onMouseEnter={() => onIndexHover?.(index)}
+                        isActive={datatype.toLowerCase() === index}
+                      >
+                        {description}
+                      </ListItem>
+                    )
+                  })}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            {/* Vegetation Category */}
+            <NavigationMenuItem className='relative'>
+              <NavigationMenuTrigger className="bg-white/90">
+                <div className="flex items-center space-x-2">
+                  <Leaf className="w-4 h-4" />
+                  <span>Vegetation</span>
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className='bg-white/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700'>
+                <ul className="grid gap-3 p-6 md:w-[500px] lg:w-[600px] lg:grid-cols-[.75fr_1fr]">
+                  <li className="row-span-4">
+                    <NavigationMenuLink asChild>
+                      <div className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-900 p-6 no-underline outline-none focus:shadow-md">
+                        <Leaf className="h-20 w-20" />
+                        <div className="mb-2 mt-4 text-lg font-medium">
+                          Vegetation Indices
+                        </div>
+                        <p className="text-sm leading-tight text-muted-foreground">
+                          Monitor vegetation health and condition through satellite-derived measurements.
+                        </p>
+                      </div>
+                    </NavigationMenuLink>
+                  </li>
+                  {indices?.filter(index =>
+                    ['vci', 'vhi', 'ndvi', 'evi', 'vegetation', 'fapar', 'lai'].includes(index.toLowerCase())
+                  ).map((index) => {
+                    const indexLower = index.toLowerCase()
+                    let title = index.toUpperCase()
+                    let description = "Vegetation data"
+
+                    if (indexLower === 'vhi') {
+                      title = 'VHI'
+                      description = "Vegetation Health Index"
+                    } else if (indexLower === 'vci') {
+                      title = 'VCI'
+                      description = "Vegetation Condition Index"
+                    }
+
+                    return (
+                      <ListItem
+                        key={index}
+                        title={title}
+                        href={onIndexChange ? undefined : `/${index}`}
+                        onClick={onIndexChange ? () => onIndexChange(index) : undefined}
+                        onMouseEnter={() => onIndexHover?.(index)}
+                        isActive={datatype.toLowerCase() === index}
+                      >
+                        {description}
+                      </ListItem>
+                    )
+                  })}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            {/* Snow Category */}
+            <NavigationMenuItem className='relative'>
+              <NavigationMenuTrigger className="bg-white/90">
+                <div className="flex items-center space-x-2">
+                  <Snowflake className="w-4 h-4" />
+                  <span>Snow</span>
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className='bg-white/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700'>
+                <ul className="grid gap-3 p-6 md:w-[500px] lg:w-[600px] lg:grid-cols-[.75fr_1fr]">
+                  <li className="row-span-3">
+                    <NavigationMenuLink asChild>
+                      <div className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-900 p-6 no-underline outline-none focus:shadow-md">
+                        <Snowflake className="h-20 w-20" />
+                        <div className="mb-2 mt-4 text-lg font-medium">
+                          Snow Indices
+                        </div>
+                        <p className="text-sm leading-tight text-muted-foreground">
+                          Monitor snow cover, depth, and water equivalent for drought assessment.
+                        </p>
+                      </div>
+                    </NavigationMenuLink>
+                  </li>
+                  {indices?.filter(index =>
+                    index.toLowerCase().startsWith('sspi') || ['snow', 'swe', 'snow_depth', 'snow_cover', 'snowpack'].includes(index.toLowerCase())
+                  ).map((index) => {
+                    const indexLower = index.toLowerCase()
+                    let title = index.toUpperCase()
+                    let description = "Snow data"
+
+                    if (indexLower.startsWith('sspi')) {
+                      title = `SSPI-${index.split('-')[1]}`
+                      description = "Standardised Snow Pack Index"
+                    }
+
+                    return (
+                      <ListItem
+                        key={index}
+                        title={title}
+                        href={onIndexChange ? undefined : `/${index}`}
+                        onClick={onIndexChange ? () => onIndexChange(index) : undefined}
+                        onMouseEnter={() => onIndexHover?.(index)}
+                        isActive={datatype.toLowerCase() === index}
+                      >
+                        {description}
+                      </ListItem>
+                    )
+                  })}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
 
 
       {/* Bottom Control Panel - Full Width */}
-      <div className="controlContainerBottom">
-        <div className="controlPanelWrapper">
+      <div className="controlContainerBottomXXX fixed bottom-0 w-full" >
+        <div className='bg-white/80 dark:bg-black/80 h-[170px] w-full fixed bottom-0 -z-10' />
+        <div className="controlPanelWrapperXX mx-auto pl-4 pr-20">
           {/* Index Navigation */}
 
 
@@ -409,6 +712,7 @@ export default function IndexClient({
             firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
             lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
             forecastWeeks={forecastWeeks}
+            currentIndex={datatype}
             onChange={(value: any) =>
               setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
             }
@@ -416,81 +720,83 @@ export default function IndexClient({
         </div>
       </div>
 
-      {clickInfo && (
-        <>
-          <div className="overlayContainer" onClick={onClose}></div>
-          <div className="dataOverlay">
-            <span className="closeOverlay" onClick={onClose}>
-              close X
-            </span>
-            <h3>
-              {datatype} - {staticMetaData?.long_name}
-            </h3>
-            {isError && (
-              <p>
-                file {ADO_DATA_URL}/json/timeseries/NUTS3_
-                {clickInfo.feature.properties.NUTS_ID}.json - errors in file
-              </p>
-            )}
-            <p>{clickInfo.feature.properties.NUTS_NAME}</p>
-            <TimeSeriesLegend />
-            <TimeSeries
-              data={nutsData}
-              indices={indices}
-              index={datatype}
-              metadata={staticMetaData}
-              firstDate={format(
-                new Date(new Date(day).getTime() - 5 * 365 * 24 * 60 * 60 * 1000),
-                'YYYY-MM-DD'
+      {
+        clickInfo && (
+          <>
+            <div className="overlayContainer" onClick={onClose}></div>
+            <div className="dataOverlay">
+              <span className="closeOverlay" onClick={onClose}>
+                close X
+              </span>
+              <h3>
+                {datatype} - {staticMetaData?.long_name}
+              </h3>
+              {isError && (
+                <p>
+                  file {ADO_DATA_URL}/json/timeseries/NUTS3_
+                  {clickInfo.feature.properties.NUTS_ID}.json - errors in file
+                </p>
               )}
-              lastDate={day}
-              style={{
-                width: '100%',
-                height: '100%',
-                position: 'relative',
-                zIndex: '102',
-                top: '0',
-                left: '0',
-              }}
-            />
-            {(staticMetaData?.doi || staticMetaData?.factsheet) && (
-              <p
+              <p>{clickInfo.feature.properties.NUTS_NAME}</p>
+              <TimeSeriesLegend />
+              <TimeSeries
+                data={nutsData}
+                indices={indices}
+                index={datatype}
+                metadata={staticMetaData}
+                firstDate={format(
+                  new Date(new Date(day).getTime() - 5 * 365 * 24 * 60 * 60 * 1000),
+                  'YYYY-MM-DD'
+                )}
+                lastDate={day}
                 style={{
-                  marginTop: '1rem',
-                  fontSize: '10px',
-                  lineHeight: '2',
+                  width: '100%',
+                  height: '100%',
+                  position: 'relative',
+                  zIndex: '102',
+                  top: '0',
+                  left: '0',
                 }}
-              >
-                More information about the data:
-                <br />
-                {staticMetaData?.factsheet && (
-                  <>
+              />
+              {(staticMetaData?.doi || staticMetaData?.factsheet) && (
+                <p
+                  style={{
+                    marginTop: '1rem',
+                    fontSize: '10px',
+                    lineHeight: '2',
+                  }}
+                >
+                  More information about the data:
+                  <br />
+                  {staticMetaData?.factsheet && (
+                    <>
+                      <a
+                        href={staticMetaData?.factsheet}
+                        target="_blank"
+                        rel="noreferrer"
+                        className='text-blue-600 underline'
+                      >
+                        Download {staticMetaData?.short_name} Factsheet
+                      </a>
+                      <br />
+                    </>
+                  )}
+                  {staticMetaData?.doi && (
                     <a
-                      href={staticMetaData?.factsheet}
+                      href={staticMetaData?.doi}
                       target="_blank"
                       rel="noreferrer"
                       className='text-blue-600 underline'
                     >
-                      Download {staticMetaData?.short_name} Factsheet
+                      {staticMetaData?.doi}
                     </a>
-                    <br />
-                  </>
-                )}
-                {staticMetaData?.doi && (
-                  <a
-                    href={staticMetaData?.doi}
-                    target="_blank"
-                    rel="noreferrer"
-                    className='text-blue-600 underline'
-                  >
-                    {staticMetaData?.doi}
-                  </a>
-                )}
-              </p>
-            )}
-          </div>
-        </>
-      )}
-    </Layout>
+                  )}
+                </p>
+              )}
+            </div>
+          </>
+        )
+      }
+    </Layout >
   )
 }
