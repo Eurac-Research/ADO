@@ -197,6 +197,8 @@ export interface TimeSeriesProps {
   lastDate: string
   metadata?: Metadata
   style?: React.CSSProperties
+  compareYears?: boolean
+  selectedYears?: number[]
 }
 
 

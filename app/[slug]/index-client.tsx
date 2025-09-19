@@ -13,13 +13,14 @@ import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { format } from 'date-format-parse'
 import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import type { PostData } from '@/types'
 import { CloudRain, Droplets, Leaf, Snowflake, ChevronDown } from 'lucide-react'
 import { DROUGHT_CATEGORIES, getCategoryForIndex } from '@/lib/categories'
+import RegionDetail from '@/components/RegionDetail'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -136,17 +137,17 @@ export default function IndexClient({
   onIndexHover
 }: IndexClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [theme] = useThemeContext()
+
+  // Get region from URL parameters
+  const selectedRegion = searchParams.get('region')
 
   // State
   const [day, setDay] = useState(
     extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
   )
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
-  const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null)
-  const [nutsData, setNutsData] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
 
   // Forecast state - next 4 weeks with uncertainty levels
   const [forecastWeeks, setForecastWeeks] = useState(() => {
@@ -249,41 +250,32 @@ export default function IndexClient({
   const onClick = useCallback(async (event: any) => {
     const { features } = event
     const hoveredFeature = features && features[0]
-    setClickInfo(
-      hoveredFeature
-        ? {
-          feature: hoveredFeature,
-        }
-        : null
-    )
     const nutsId = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
+
     if (nutsId) {
-      await getNutsData(nutsId)
+      // Update URL to include region parameter
+      const newSearchParams = new URLSearchParams(searchParams.toString())
+      newSearchParams.set('region', nutsId)
+      router.push(`?${newSearchParams.toString()}`, { scroll: false })
     }
-  }, [])
+  }, [router, searchParams])
+
+  // Get selected region feature from the data
+  const selectedRegionFeature = useMemo(() => {
+    if (!selectedRegion || !data?.features) return null
+
+    return data.features.find((feature: any) =>
+      feature.properties?.NUTS_ID === selectedRegion
+    )
+  }, [selectedRegion, data])
 
   const onClose = useCallback(() => {
-    setClickInfo(null)
-    setNutsData(null)
-  }, [])
-
-  // Data fetching function
-  async function getNutsData(overlayNutsId: string) {
-    const fetchData = async () => {
-      setIsError(false)
-      setIsLoading(true)
-      try {
-        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${overlayNutsId ? `${overlayNutsId}` : ''
-          }.json`
-        const result = await axios(url)
-        setNutsData(result.data)
-      } catch (error) {
-        setIsError(true)
-      }
-      setIsLoading(false)
-    }
-    fetchData()
-  }
+    // Remove region parameter from URL
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+    newSearchParams.delete('region')
+    const newPath = newSearchParams.toString() ? `?${newSearchParams.toString()}` : window.location.pathname
+    router.push(newPath, { scroll: false })
+  }, [router, searchParams])
 
   // Custom tooltip component
   function CustomTooltip({ payload, label, active }: any) {
@@ -720,83 +712,19 @@ export default function IndexClient({
         </div>
       </div>
 
-      {
-        clickInfo && (
-          <>
-            <div className="overlayContainer" onClick={onClose}></div>
-            <div className="dataOverlay">
-              <span className="closeOverlay" onClick={onClose}>
-                close X
-              </span>
-              <h3>
-                {datatype} - {staticMetaData?.long_name}
-              </h3>
-              {isError && (
-                <p>
-                  file {ADO_DATA_URL}/json/timeseries/NUTS3_
-                  {clickInfo.feature.properties.NUTS_ID}.json - errors in file
-                </p>
-              )}
-              <p>{clickInfo.feature.properties.NUTS_NAME}</p>
-              <TimeSeriesLegend />
-              <TimeSeries
-                data={nutsData}
-                indices={indices}
-                index={datatype}
-                metadata={staticMetaData}
-                firstDate={format(
-                  new Date(new Date(day).getTime() - 5 * 365 * 24 * 60 * 60 * 1000),
-                  'YYYY-MM-DD'
-                )}
-                lastDate={day}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'relative',
-                  zIndex: '102',
-                  top: '0',
-                  left: '0',
-                }}
-              />
-              {(staticMetaData?.doi || staticMetaData?.factsheet) && (
-                <p
-                  style={{
-                    marginTop: '1rem',
-                    fontSize: '10px',
-                    lineHeight: '2',
-                  }}
-                >
-                  More information about the data:
-                  <br />
-                  {staticMetaData?.factsheet && (
-                    <>
-                      <a
-                        href={staticMetaData?.factsheet}
-                        target="_blank"
-                        rel="noreferrer"
-                        className='text-blue-600 underline'
-                      >
-                        Download {staticMetaData?.short_name} Factsheet
-                      </a>
-                      <br />
-                    </>
-                  )}
-                  {staticMetaData?.doi && (
-                    <a
-                      href={staticMetaData?.doi}
-                      target="_blank"
-                      rel="noreferrer"
-                      className='text-blue-600 underline'
-                    >
-                      {staticMetaData?.doi}
-                    </a>
-                  )}
-                </p>
-              )}
-            </div>
-          </>
-        )
-      }
+      {/* Region Detail Modal/Overlay */}
+      {selectedRegion && selectedRegionFeature && (
+        <RegionDetail
+          nutsId={selectedRegion}
+          nutsName={selectedRegionFeature.properties?.NUTS_NAME || 'Unknown Region'}
+          datatype={datatype}
+          staticMetaData={staticMetaData}
+          indices={indices}
+          day={day}
+          mode="modal"
+          onClose={onClose}
+        />
+      )}
     </Layout >
   )
 }

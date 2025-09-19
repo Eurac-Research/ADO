@@ -148,11 +148,96 @@ function TimeSeries(props: TimeSeriesProps) {
     datazoomLabelColor: '#999999',
   })
 
-  const { data, indices, index, firstDate, lastDate } = props
+  const { data, indices, index, firstDate, lastDate, compareYears = false, selectedYears = [] } = props
 
   const [showTooltip, setShowTooltip] = useState<boolean>(false)
 
-  const series = indices?.map((indexName) => {
+  // Function to process data for year comparison
+  const processDataForYearComparison = (): {
+    processedData: any[] | null
+    processedSeries: any[]
+    processedDimensions: string[]
+  } => {
+    if (!data || !compareYears || selectedYears.length === 0) {
+      return {
+        processedData: data,
+        processedSeries: indices?.map((indexName) => ({
+          type: 'line',
+          showSymbol: false,
+          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+          connectNulls: false,
+        })) || [],
+        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+      }
+    }
+
+    // Group data by year and day-of-year
+    const yearData: Record<number, Record<string, any>> = {}
+
+    data.forEach((row) => {
+      const date = new Date(row.date)
+      const year = date.getFullYear()
+      const dayOfYear = Math.floor((date.getTime() - new Date(year, 0, 0).getTime()) / (1000 * 60 * 60 * 24))
+
+      if (selectedYears.includes(year)) {
+        if (!yearData[year]) {
+          yearData[year] = {}
+        }
+        yearData[year][dayOfYear] = row
+      }
+    })
+
+    // Create unified dataset with all days of the year (1-365)
+    const processedRows = Array.from({ length: 365 }, (_, i) => {
+      const dayOfYear = i + 1
+      const row: any = { date: `Day ${dayOfYear}` }
+
+      selectedYears.forEach(year => {
+        const yearRow = yearData[year]?.[dayOfYear]
+        if (yearRow) {
+          indices.forEach(idx => {
+            const yearColName = `${idx.toUpperCase()}_${year}`
+            row[yearColName] = yearRow[idx.toUpperCase()]
+          })
+        } else {
+          // Fill with null for missing days to maintain gaps
+          indices.forEach(idx => {
+            const yearColName = `${idx.toUpperCase()}_${year}`
+            row[yearColName] = null
+          })
+        }
+      })
+
+      return row
+    })
+
+    // Create series for each year-index combination
+    const processedSeriesArray = selectedYears.flatMap(year =>
+      indices.map(indexName => ({
+        type: 'line',
+        showSymbol: false,
+        yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+        connectNulls: false,
+        name: `${indexName.toUpperCase()} ${year}`,
+      }))
+    )
+
+    // Create dimensions for each year-index combination
+    const processedDimensionsArray = selectedYears.flatMap(year =>
+      indices.map(indexName => `${indexName.toUpperCase()}_${year}`)
+    )
+    const processedDimensions = ['date'].concat(processedDimensionsArray)
+
+    return {
+      processedData: processedRows,
+      processedSeries: processedSeriesArray,
+      processedDimensions
+    }
+  }
+
+  const { processedData, processedSeries, processedDimensions } = processDataForYearComparison()
+
+  const series = compareYears ? processedSeries : indices?.map((indexName) => {
     return {
       type: 'line',
       showSymbol: false,
@@ -161,17 +246,28 @@ function TimeSeries(props: TimeSeriesProps) {
     }
   })
 
-  const dimensionsArray = indices?.map((indexName) => {
+  const dimensionsArray = compareYears ? processedDimensions.slice(1) : indices?.map((indexName) => {
     return indexName.toUpperCase()
   })
-  const dimensions = ['date'].concat(dimensionsArray || [])
+  const dimensions = compareYears ? processedDimensions : ['date'].concat(dimensionsArray || [])
 
   const legendObject: Record<string, boolean> = {}
-  for (const item of indices) {
-    if (index === item.toUpperCase()) {
-      legendObject[item.toUpperCase()] = true
-    } else {
-      legendObject[item.toUpperCase()] = false
+  if (compareYears) {
+    // For year comparison, create legend for each year-index combination
+    selectedYears.forEach(year => {
+      indices.forEach(idx => {
+        const key = `${idx.toUpperCase()}_${year}`
+        legendObject[key] = index === idx.toUpperCase()
+      })
+    })
+  } else {
+    // Normal mode legend
+    for (const item of indices) {
+      if (index === item.toUpperCase()) {
+        legendObject[item.toUpperCase()] = true
+      } else {
+        legendObject[item.toUpperCase()] = false
+      }
     }
   }
 
@@ -221,7 +317,7 @@ function TimeSeries(props: TimeSeriesProps) {
     },
     dataset: {
       dimensions: dimensions,
-      source: data,
+      source: compareYears ? processedData : data,
     },
     xAxis: {
       type: 'category',
@@ -263,7 +359,16 @@ function TimeSeries(props: TimeSeriesProps) {
     tooltip: {
       trigger: 'axis',
     },
-    dataZoom: {
+    dataZoom: compareYears ? {
+      type: 'slider',
+      show: true,
+      startValue: 0,
+      endValue: 366,
+      showDetail: true,
+      handleLabel: {
+        show: true,
+      },
+    } : {
       type: 'slider',
       show: true,
       startValue: firstDate,
