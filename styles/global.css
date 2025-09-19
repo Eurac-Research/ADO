@@ -58,13 +58,13 @@
     --chart-5: 340 75% 55%;
   }
 
-  html {
+  /* html {
     @apply bg-white dark:bg-gray-900;
   }
 
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
-  }
+  } */
 }
 
 @layer components {
