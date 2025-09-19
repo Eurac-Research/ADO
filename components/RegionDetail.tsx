@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-format-parse'
 import { X, ExternalLink, Download, Maximize2 } from 'lucide-react'
 import Link from 'next/link'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
 import dynamic from 'next/dynamic'
 import axios from 'axios'
+import type { RegionInfo } from '@/types'
 
 // Dynamic import for TimeSeries to prevent SSR issues
 const TimeSeries = dynamic(() => import('@/components/timeseries'), {
@@ -58,6 +59,47 @@ export default function RegionDetail({
   const [selectedYears, setSelectedYears] = useState<number[]>([])
   const [availableYears, setAvailableYears] = useState<number[]>([])
 
+  // Region comparison state
+  const [compareRegions, setCompareRegions] = useState(false)
+  const [selectedComparisonRegion, setSelectedComparisonRegion] = useState<string | null>(null)
+  const [comparisonRegionData, setComparisonRegionData] = useState<TimeSeriesData[] | null>(null)
+  const [availableRegions, setAvailableRegions] = useState<RegionInfo[]>([])
+  const [isLoadingComparison, setIsLoadingComparison] = useState(false)
+
+  // Function to extract available regions from GeoJSON
+  const fetchAvailableRegions = useCallback(async () => {
+    try {
+      const response = await fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype.toUpperCase()}-latest.geojson`)
+      const geojson = await response.json()
+
+      const regions: RegionInfo[] = geojson.features
+        .map((feature: any) => ({
+          id: feature.properties.NUTS_ID,
+          name: feature.properties.NUTS_NAME || feature.properties.NAME_LATN
+        }))
+        .filter((region: RegionInfo) => region.id !== nutsId) // Exclude current region
+        .sort((a: RegionInfo, b: RegionInfo) => a.name.localeCompare(b.name))
+
+      setAvailableRegions(regions)
+    } catch (error) {
+      console.error('Error fetching available regions:', error)
+    }
+  }, [datatype, nutsId])
+
+  // Function to fetch comparison region data
+  const fetchComparisonRegionData = useCallback(async (regionId: string) => {
+    setIsLoadingComparison(true)
+    try {
+      const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${regionId}.json`
+      const result = await axios(url)
+      setComparisonRegionData(result.data)
+    } catch (error) {
+      console.error('Error fetching comparison region data:', error)
+      setComparisonRegionData(null)
+    }
+    setIsLoadingComparison(false)
+  }, [])
+
   // Fetch data for the region
   useEffect(() => {
     const fetchData = async () => {
@@ -69,15 +111,15 @@ export default function RegionDetail({
         const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${nutsId}.json`
         const result = await axios(url)
         setNutsData(result.data)
-        
+
         // Extract available years from the data
         if (result.data && Array.isArray(result.data)) {
           const years = [...new Set(result.data.map((item: TimeSeriesData) => {
             return new Date(item.date).getFullYear()
           }))].sort((a, b) => b - a) // Sort descending (newest first)
-          
+
           setAvailableYears(years)
-          
+
           // Set default selected years (last 3 years)
           const defaultYears = years.slice(0, 3)
           setSelectedYears(defaultYears)
@@ -92,13 +134,29 @@ export default function RegionDetail({
     fetchData()
   }, [nutsId])
 
+  // Load available regions when comparison mode is enabled
+  useEffect(() => {
+    if (compareRegions && availableRegions.length === 0) {
+      fetchAvailableRegions()
+    }
+  }, [compareRegions, availableRegions.length, fetchAvailableRegions])
+
+  // Fetch comparison data when a region is selected
+  useEffect(() => {
+    if (selectedComparisonRegion) {
+      fetchComparisonRegionData(selectedComparisonRegion)
+    } else {
+      setComparisonRegionData(null)
+    }
+  }, [selectedComparisonRegion, fetchComparisonRegionData])
+
   const containerClasses = mode === 'modal'
     ? "fixed inset-0 z-50 flex items-center justify-center"
     : "w-full min-h-screen"
 
   const contentClasses = mode === 'modal'
     ? "dataOverlay max-w-4xl max-h-[90vh] overflow-y-auto"
-    : "container mx-auto p-6 bg-white rounded-lg shadow-sm"
+    : "container mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
 
   return (
     <div className={`${containerClasses} ${className}`} data-name="region-detail">
@@ -110,13 +168,13 @@ export default function RegionDetail({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {nutsName}
             </h1>
-            <p className="text-lg text-gray-600 mb-1">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-1">
               {datatype} - {staticMetaData?.long_name}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Region ID: {nutsId}
             </p>
           </div>
@@ -136,7 +194,7 @@ export default function RegionDetail({
             {onClose && (
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 aria-label="Close region details"
               >
                 <X className="w-4 h-4" />
@@ -148,9 +206,9 @@ export default function RegionDetail({
 
         {/* Error State */}
         {isError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h3 className="text-red-800 font-medium mb-2">Data Loading Error</h3>
-            <p className="text-red-700 text-sm">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+            <h3 className="text-red-800 dark:text-red-300 font-medium mb-2">Data Loading Error</h3>
+            <p className="text-red-700 dark:text-red-400 text-sm">
               Failed to load data for region {nutsId}. The file {ADO_DATA_URL}/json/timeseries/NUTS3_{nutsId}.json may not be available.
             </p>
           </div>
@@ -160,7 +218,7 @@ export default function RegionDetail({
         {isLoading && (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">Loading region data...</span>
+            <span className="ml-3 text-gray-600 dark:text-gray-300">Loading region data...</span>
           </div>
         )}
 
@@ -168,27 +226,101 @@ export default function RegionDetail({
         {!isLoading && !isError && (
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Historical Data & Analysis
               </h2>
 
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2" title={compareRegions ? "Disabled: Region comparison is active" : ""}>
                   <input
                     type="checkbox"
                     checked={compareYears}
-                    onChange={(e) => setCompareYears(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    disabled={compareRegions}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        // Disable region comparison when enabling year comparison
+                        setCompareRegions(false)
+                        setSelectedComparisonRegion(null)
+                        setComparisonRegionData(null)
+                      } else {
+                        // Clear year selection when disabling year comparison
+                        setSelectedYears([])
+                      }
+                      setCompareYears(e.target.checked)
+                    }}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  <span className="text-sm text-gray-700">Compare by Year</span>
+                  <span className={`text-sm ${compareRegions ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}>
+                    Compare by Year
+                  </span>
+                </label>
+
+                <label className="flex items-center gap-2" title={compareYears ? "Disabled: Year comparison is active" : ""}>
+                  <input
+                    type="checkbox"
+                    checked={compareRegions}
+                    disabled={compareYears}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        // Disable year comparison when enabling region comparison
+                        setCompareYears(false)
+                        setSelectedYears([])
+                      } else {
+                        // Clear region comparison data when disabling region comparison
+                        setSelectedComparisonRegion(null)
+                        setComparisonRegionData(null)
+                      }
+                      setCompareRegions(e.target.checked)
+                    }}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <span className={`text-sm ${compareYears ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}>
+                    Compare with Region
+                  </span>
                 </label>
               </div>
             </div>
 
+            {/* Region Selection Controls (only show when compare mode is enabled) */}
+            {compareRegions && (
+              <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Select Region to Compare:</h3>
+                <div className="space-y-3">
+                  <select
+                    value={selectedComparisonRegion || ''}
+                    onChange={(e) => setSelectedComparisonRegion(e.target.value || null)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    disabled={isLoadingComparison}
+                  >
+                    <option value="">Select a region...</option>
+                    {availableRegions.map((region) => (
+                      <option key={region.id} value={region.id}>
+                        {region.name} ({region.id})
+                      </option>
+                    ))}
+                  </select>
+
+                  {isLoadingComparison && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Loading comparison data...</p>
+                  )}
+
+                  {selectedComparisonRegion && !isLoadingComparison && !comparisonRegionData && (
+                    <p className="text-sm text-red-500 dark:text-red-400">Failed to load data for selected region.</p>
+                  )}
+
+                  {selectedComparisonRegion && comparisonRegionData && (
+                    <p className="text-sm text-green-600 dark:text-green-400">
+                      ✓ Loaded data for {availableRegions.find(r => r.id === selectedComparisonRegion)?.name}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Year Selection Controls (only show when compare mode is enabled) */}
             {compareYears && (
-              <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Select Years to Compare:</h3>
+              <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Select Years to Compare:</h3>
                 <div className="flex flex-wrap gap-2">
                   {availableYears.map((year) => (
                     <label key={year} className="flex items-center gap-1 text-sm">
@@ -204,12 +336,12 @@ export default function RegionDetail({
                         }}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="text-gray-700">{year}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{year}</span>
                     </label>
                   ))}
                 </div>
                 {selectedYears.length === 0 && (
-                  <p className="text-sm text-gray-500 mt-2">Please select at least one year to compare.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Please select at least one year to compare.</p>
                 )}
               </div>
             )}
@@ -220,7 +352,7 @@ export default function RegionDetail({
 
         {/* Time Series Chart */}
         {!isLoading && !isError && nutsData && (
-          <div className="mb-8 bg-gray-50 rounded-lg p-4">
+          <div className="mb-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <TimeSeries
               data={nutsData}
               indices={indices}
@@ -233,6 +365,16 @@ export default function RegionDetail({
               lastDate={day}
               compareYears={compareYears}
               selectedYears={selectedYears}
+              compareRegions={compareRegions}
+              regionNames={[
+                nutsName,
+                ...(selectedComparisonRegion ? [availableRegions.find(r => r.id === selectedComparisonRegion)?.name || selectedComparisonRegion] : [])
+              ]}
+              comparisonData={
+                compareRegions && selectedComparisonRegion && comparisonRegionData
+                  ? { [selectedComparisonRegion]: comparisonRegionData }
+                  : {}
+              }
               style={{
                 width: '100%',
                 height: '400px',
@@ -297,15 +439,6 @@ export default function RegionDetail({
               </div>
             </div>
           )}
-        </div>
-
-        {/* Analysis Tools Section (Future Enhancement) */}
-        <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="font-semibold text-yellow-800 mb-2">Coming Soon</h3>
-          <p className="text-yellow-700 text-sm">
-            Enhanced analysis tools including drought trend analysis, comparison with neighboring regions,
-            and downloadable reports will be available in future updates.
-          </p>
         </div>
       </div>
     </div>

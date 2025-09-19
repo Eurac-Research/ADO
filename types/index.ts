@@ -28,6 +28,11 @@ export interface NutsRegion {
   name: string
 }
 
+export interface RegionInfo {
+  id: string
+  name: string
+}
+
 // Impact category types
 export interface ImpactCategory {
   id: number
@@ -199,6 +204,11 @@ export interface TimeSeriesProps {
   style?: React.CSSProperties
   compareYears?: boolean
   selectedYears?: number[]
+  compareRegions?: boolean
+  regionNames?: string[]
+  comparisonData?: {
+    [regionId: string]: TimeSeriesData[]
+  }
 }
 
 

@@ -28,6 +28,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  NavigationMenuViewport
 } from "@/components/ui/navigation-menu"
 import { cn } from "@/lib/utils"
 import React from 'react'
@@ -447,7 +448,7 @@ export default function IndexClient({
               <NavigationMenuTrigger className="bg-white/90">
                 <div className="flex items-center space-x-2">
                   <CloudRain className="w-4 h-4" />
-                  <span>Precipitation & Evapotranspiration</span>
+                  <span>Precipitation</span>
                 </div>
               </NavigationMenuTrigger>
               <NavigationMenuContent className='bg-white/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700'>
@@ -686,6 +687,7 @@ export default function IndexClient({
             </NavigationMenuItem>
 
           </NavigationMenuList>
+          <NavigationMenuViewport />
         </NavigationMenu>
       </div>
 
