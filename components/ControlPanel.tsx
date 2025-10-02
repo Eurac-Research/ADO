@@ -413,6 +413,52 @@ function ControlPanel(props: ControlPanelProps) {
 
   return (
     <>
+
+
+      <div className='bg-white/80 dark:bg-black/80 w-[30vw] min-w-[250px] rounded-md p-5 shrink-0 fixed left-0 bottom-[200px]' data-name="mainIndicatorInfo">
+        <div className="flex items-start justify-start  gap-4 mb-2 h-full">
+          {CategoryIcon && <CategoryIcon className="w-16 h-16 text-black shrink-0" />}
+          <h2 onClick={() => setOverlay(true)} className="items-center gap-2 text-xl mb-4 max-w-[70%]">
+
+            <span className='block'>{metadata?.short_name}</span>
+
+            <span className='block text-sm'>{metadata?.long_name}{' '}</span>
+
+            <span className='block font-bold text-sm' id="selected-date" aria-live="polite">
+
+              {format(new Date(day), 'ddd, MMM DD, YYYY')}
+
+              {isSliderInForecastRange && (
+                <span className={`forecast-indicator text-green-600  forecast-${getSliderForecastUncertainty()}`}>
+                  {" "}
+                  FORECAST {currentSliderTimelineItem?.week ? `WEEK ${currentSliderTimelineItem.week}` : ''}
+                  {getSliderForecastUncertainty() && (
+                    <span className="uncertainty-badge">
+                      {getSliderForecastUncertainty()?.toUpperCase()} UNCERTAINTY
+                    </span>
+                  )}
+                </span>
+              )}
+            </span>
+          </h2>
+          <span
+            onClick={() => setOverlay(true)}
+            className="cursor-pointer absolute top-4 right-4 rounded-full border border-black h-6 w-6 shrink-0 flex items-center justify-center text-black text-sm font-semibold hover:bg-gray-100 transition-colors bg-white"
+            style={{ border: '1px solid #000' }}
+          >
+            i
+          </span>
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
       <div className="controlpanelXX">
 
 
@@ -421,66 +467,10 @@ function ControlPanel(props: ControlPanelProps) {
         <div className='flex items-end justify-center gap-4 mb-4'>
 
 
-          <div className=' w-fit max-w-[500px] px-4  relative bottom-0'>
-            <div className="flex items-center justify-start gap-4 mb-2">
-              {CategoryIcon && <CategoryIcon className="w-16 h-16 text-black" />}
-              <h2 onClick={() => setOverlay(true)} className="items-center gap-2 text-xl mb-4 max-w-[70%]">
+          {/* <div className='h-full w-fit max-w-[500px] px-4 flex-col items-start justify-between relative bottom-0'>
 
-                <span className='block'>{metadata?.short_name}</span>
 
-                <span className='block text-sm'>{metadata?.long_name}{' '}</span>
-
-                <span className='block font-bold text-sm' id="selected-date" aria-live="polite">
-
-                  {format(new Date(day), 'ddd, MMM DD, YYYY')}
-
-                  {isSliderInForecastRange && (
-                    <span className={`forecast-indicator text-green-600  forecast-${getSliderForecastUncertainty()}`}>
-                      {" "}
-                      FORECAST {currentSliderTimelineItem?.week ? `WEEK ${currentSliderTimelineItem.week}` : ''}
-                      {getSliderForecastUncertainty() && (
-                        <span className="uncertainty-badge">
-                          {getSliderForecastUncertainty()?.toUpperCase()} UNCERTAINTY
-                        </span>
-                      )}
-                    </span>
-                  )}
-                </span>
-              </h2>
-              <span onClick={() => setOverlay(true)} className="getMoreInfoIcon cursor-pointer absolute top-0 right-0 rounded-full bg-blue-600 h-6 w-6 shrink-0 flex items-center justify-center text-white ">i</span>
-            </div>
-
-            {!props.hideDaySwitchTabs && (
-              <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-[12px]" role="group" aria-label="Time range selection">
-                <button
-                  onClick={() => handleTimeSpanChange(30)}
-                  className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-medium' : 'bg-gray-200'}`}
-                  aria-pressed={timeSpan === 30}
-                  aria-label="Show last 30 days plus forecasts"
-                >
-                  Last 30 days
-                </button>
-                <button
-                  onClick={() => handleTimeSpanChange(90)}
-                  className={`px-3 py-1 rounded ${timeSpan === 90 ? 'bg-blue-500 text-white font-medium' : 'bg-gray-200'}`}
-                  aria-pressed={timeSpan === 90}
-                  aria-label="Show last 90 days plus forecasts"
-                >
-                  Last 90 days
-                </button>
-                <button
-                  onClick={resetTimeRange}
-                  className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-medium' : 'bg-gray-200'}`}
-                  aria-pressed={timeSpan === null}
-                  aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days including forecasts`}
-                >
-                  All data
-                </button>
-              </div>
-
-            )}
-
-            {/* <h1 id="selected-date" aria-live="polite">
+            <h1 id="selected-date" aria-live="polite">
               {day}
               {isSliderInForecastRange && (
                 <span className={`forecast-indicator forecast-${getSliderForecastUncertainty()}`}>
@@ -492,50 +482,78 @@ function ControlPanel(props: ControlPanelProps) {
                   )}
                 </span>
               )}
-            </h1> */}
-          </div>
+            </h1>
+          </div> */}
 
 
+          <div className="flex items-center gap-8 mr-8 relative" data-name="controlElementsWrapper">
 
-          {/* Auto-play controls - positioned left of slider */}
-          <div className="auto-play-controls flex items-center gap-2">
-            <button
-              onClick={toggleAutoPlay}
-              className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors focus:outline-none ${isPlaying
-                ? 'bg-blue-500 border-blue-500 text-white hover:bg-blue-500'
-                : 'bg-transparent border-blue-500 hover:bg-blue-50'
-                }`}
-              aria-label={isPlaying ? 'Pause auto-play' : 'Start auto-play'}
-              title={isPlaying ? 'Pause auto-play' : 'Start auto-play'}
-            >
-              {isPlaying ? (
-                // Pause icon (two vertical bars)
-                <div className="flex gap-1">
-                  <div className="w-1 h-4 bg-white"></div>
-                  <div className="w-1 h-4 bg-white"></div>
-                </div>
-              ) : (
-                // Play icon (triangle)
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className='fill-blue-500 w-8 h-8'>
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+            {/* Auto-play controls - positioned left of slider */}
+            <div className="auto-play-controls flex flex-col justify-end items-center gap-2">
+              <button
+                onClick={toggleAutoPlay}
+                className={`flex items-center justify-center w-14 h-14 rounded-full border-2 transition-colors focus:outline-none ${isPlaying
+                  ? 'bg-blue-500 border-blue-500 text-white hover:bg-blue-500'
+                  : 'bg-transparent border-blue-500 hover:bg-blue-50'
+                  }`}
+                aria-label={isPlaying ? 'Pause auto-play' : 'Start auto-play'}
+                title={isPlaying ? 'Pause auto-play' : 'Start auto-play'}
+              >
+                {isPlaying ? (
+                  // Pause icon (two vertical bars)
+                  <div className="flex gap-1">
+                    <div className="w-1 h-4 bg-white"></div>
+                    <div className="w-1 h-4 bg-white"></div>
+                  </div>
+                ) : (
+                  // Play icon (triangle)
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className='fill-blue-500 w-10 h-10'>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                )}
+              </button>
+
+              <select
+                value={playSpeed}
+                onChange={(e) => setPlaySpeed(Number(e.target.value))}
+                className="text-xs px-1 py-1 border rounded bg-white w-fit"
+                disabled={isPlaying}
+                title="Playback speed"
+              >
+                <option value={1000}>0.5x</option>
+                <option value={500}>1x</option>
+                <option value={250}>2x</option>
+                <option value={125}>4x</option>
+              </select>
+            </div>
+
+
+            <div className='' data-name="rangeSelector">
+
+              {!props.hideDaySwitchTabs && (
+                <select
+                  value={timeSpan === null ? 'all' : timeSpan}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === 'all') {
+                      resetTimeRange();
+                    } else {
+                      handleTimeSpanChange(Number(value));
+                    }
+                  }}
+                  className="px-3 py-2 text-xs border border-gray-300 rounded bg-white hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  aria-label="Time range selection"
+                >
+                  <option value={30}>Last 30 days</option>
+                  <option value={90}>Last 90 days</option>
+                  <option value="all">
+                    All data ({Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days)
+                  </option>
+                </select>
               )}
-            </button>
 
-            <select
-              value={playSpeed}
-              onChange={(e) => setPlaySpeed(Number(e.target.value))}
-              className="text-xs px-1 py-1 border rounded bg-white w-fit"
-              disabled={isPlaying}
-              title="Playback speed"
-            >
-              <option value={1000}>0.5x</option>
-              <option value={500}>1x</option>
-              <option value={250}>2x</option>
-              <option value={125}>4x</option>
-            </select>
+            </div>
           </div>
-
           {/* Full-width timeline slider */}
           <div key={'day'} className="timerangeSlider flex-1 mb-4" role="group" aria-label="Timeline selection controls">
             <div className="timeline-container" style={{
@@ -544,9 +562,9 @@ function ControlPanel(props: ControlPanelProps) {
             } as React.CSSProperties}>
 
               {/* Timeline track with different styling for historical vs forecast */}
-              <div className="timeline-track">
+              {/* <div className="timeline-track">
                 <div className="historical-track" style={{ width: `${historicalEndPercentage}%` }}></div>
-              </div>
+              </div> */}
 
               {/* Navigation buttons */}
               <div className="timeline-controls">
@@ -591,10 +609,10 @@ function ControlPanel(props: ControlPanelProps) {
                 )}
 
                 {/* Main slider container */}
-                <div className="relative flex-1 mx-2 pt-12 pb-6">
+                <div className="relative flex-1 mx-2 pt-12 pb-0">
                   {/* Date label that follows the thumb */}
                   <div
-                    className="absolute -top-4 rounded-lg px-6 py-3 text-base font-semibold shadow-lg z-10 transform -translate-x-1/2 whitespace-nowrap cursor-grab active:cursor-grabbing"
+                    className="absolute -top-[16px] rounded-lg px-6 py-3 text-base font-semibold shadow-lg z-10 transform -translate-x-1/2 whitespace-nowrap cursor-grab active:cursor-grabbing"
                     style={{
                       left: `${(currentSliderIndex / Math.max(1, discreteTimePoints.length - 1)) * 100}%`,
                       color: 'white',
@@ -677,7 +695,8 @@ function ControlPanel(props: ControlPanelProps) {
                         borderTopColor: isSliderInForecastRange ? '#22c55e' : '#3b82f6'
                       }}
                     />
-                  </div>                  <input
+                  </div>
+                  <input
                     type="range"
                     list="timeline-tickmarks"
                     value={currentSliderIndex}
@@ -693,7 +712,7 @@ function ControlPanel(props: ControlPanelProps) {
                       console.log('Slider onInput triggered with value:', target.value)
                       handleSliderChange(target.value)
                     }}
-                    className="w-full h-3 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    className="w-full h-3 rounded-lg appearance-none cursor-pointer slider-thumb z-20 relative"
                     style={{
                       background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${historicalEndPercentage}%, #22c55e ${historicalEndPercentage}%, #22c55e 100%)`
                     }}
@@ -830,29 +849,50 @@ function ControlPanel(props: ControlPanelProps) {
 
       {overlay && (
         <>
-          <div className="overlayContainer" onClick={onClose}></div>
-          <div className="textOverlay">
-            <span className="closeOverlay" onClick={onClose}>
-              close X
-            </span>
-            <h3 className="overlayTitle">
-              {metadata?.short_name} - {metadata?.long_name}
-            </h3>
-            <p style={{ marginBottom: '1rem' }}>{metadata?.abstract}</p>
-            {metadata?.factsheet && (
-              <p style={{ marginBottom: '1rem' }}>
-                <a href={metadata?.factsheet} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                  Download {metadata?.short_name} Factsheet
-                </a>
-              </p>
-            )}
-            {metadata?.doi && (
-              <p>
-                <a href={metadata?.doi} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                  {metadata?.doi}
-                </a>
-              </p>
-            )}
+          {/* Overlay backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40 z-[100]"
+            onClick={onClose}
+          ></div>
+
+          {/* Centered overlay container */}
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4" onClick={onClose}>
+            <div
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-full max-w-2xl mx-auto rounded-lg shadow-lg relative max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Content */}
+              <div className="p-6 md:p-8 pb-20">
+                <button
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer text-lg font-medium"
+                  onClick={onClose}
+                >
+                  close ✕
+                </button>
+
+                <h3 className="text-xl font-semibold mb-5 pr-16">
+                  {metadata?.short_name} - {metadata?.long_name}
+                </h3>
+
+                <p className="mb-4 leading-relaxed">{metadata?.abstract}</p>
+
+                {metadata?.factsheet && (
+                  <p className="mb-4">
+                    <a href={metadata?.factsheet} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      Download {metadata?.short_name} Factsheet
+                    </a>
+                  </p>
+                )}
+
+                {metadata?.doi && (
+                  <p>
+                    <a href={metadata?.doi} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      {metadata?.doi}
+                    </a>
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </>
       )}

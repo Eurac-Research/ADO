@@ -421,7 +421,9 @@ export default function IndexClient({
 
       {/* Legend over the map */}
       <div className="controlContainer">
-        <div className="legend relative bottom-40">
+
+        <div className="legend relative bottom-[30vh]">
+
           {staticMetaData?.colormap?.legend.stops.map((item: any, index: number) => {
             return (
               <div key={`legend${index}`} className="legendItem">
@@ -694,7 +696,7 @@ export default function IndexClient({
 
       {/* Bottom Control Panel - Full Width */}
       <div className="controlContainerBottomXXX fixed bottom-0 w-full" >
-        <div className='bg-white/80 dark:bg-black/80 h-[170px] w-full fixed bottom-0 -z-10' />
+        <div className='bg-white/80 dark:bg-black/80 h-[80px] w-full fixed bottom-0 -z-10' />
         <div className="controlPanelWrapperXX mx-auto pl-4 pr-20">
           {/* Index Navigation */}
 

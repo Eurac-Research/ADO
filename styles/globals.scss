@@ -399,38 +399,7 @@ body {
   }
 }
 
-.textOverlay {
-  position: absolute;
-  z-index: 101;
 
-  top: 20px;
-  background: var(--bg-10-light);
-  color: var(--text-strong-light);
-  width: 100%;
-  height: auto;
-  padding: 30px;
-  padding-bottom: 80px;
-  line-height: 1.5;
-
-  @media (min-width: 768px) {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50vw;
-  }
-
-  .overlayTitle {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
-  }
-}
-
-.closeOverlay {
-  text-align: right;
-  display: block;
-  cursor: pointer;
-}
 
 .controlContainer {
   display: flex;
@@ -604,18 +573,18 @@ body {
 
     .getMoreInfoIcon {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.8);
-      background-color: var(--bg-9-dark);
-      color: var(--text-dark);
-      padding: 4px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      transition: all 300ms ease-in-out;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      // background: rgba(255, 255, 255, 0.8);
+      // background-color: var(--bg-9-dark);
+      // color: var(--text-dark);
+      // padding: 4px;
+      // width: 22px;
+      // height: 22px;
+      // border-radius: 50%;
+      // display: inline-flex;
+      // justify-content: center;
+      // align-items: center;
+      // transition: all 300ms ease-in-out;
+      // border: 1px solid rgba(0, 0, 0, 0.2);
       cursor: pointer;
       margin-left: 10px;
 
@@ -1467,6 +1436,7 @@ b {
   border: 4px solid #3b82f6;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  margin-top: -8px; /* Centers thumb on 12px track: (28px - 12px) / 2 = 8px */
 }
 
 .slider-thumb::-webkit-slider-thumb:hover {

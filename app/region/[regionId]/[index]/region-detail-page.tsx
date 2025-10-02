@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, MapPin } from 'lucide-react'
+import Link from 'next/link'
 import Layout from '@/components/layout'
 import RegionDetail from '@/components/RegionDetail'
 import type { PostData } from '@/types'
@@ -130,7 +131,12 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                 <span>/</span>
                 <MapPin className="w-4 h-4" />
-                <span className="font-medium">{regionName || regionId}</span>
+                <Link
+                  href={`/region/${regionId}`}
+                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {regionName || regionId}
+                </Link>
                 <span>/</span>
                 <span className="font-medium">{index.toUpperCase()}</span>
               </div>

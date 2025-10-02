@@ -243,8 +243,9 @@ export default function RegionDetail({
                         setSelectedComparisonRegion(null)
                         setComparisonRegionData(null)
                       } else {
-                        // Clear year selection when disabling year comparison
-                        setSelectedYears([])
+                        // Reset to default years when disabling year comparison
+                        const defaultYears = availableYears.slice(0, 3)
+                        setSelectedYears(defaultYears)
                       }
                       setCompareYears(e.target.checked)
                     }}
@@ -264,7 +265,9 @@ export default function RegionDetail({
                       if (e.target.checked) {
                         // Disable year comparison when enabling region comparison
                         setCompareYears(false)
-                        setSelectedYears([])
+                        // Reset to default years when switching modes
+                        const defaultYears = availableYears.slice(0, 3)
+                        setSelectedYears(defaultYears)
                       } else {
                         // Clear region comparison data when disabling region comparison
                         setSelectedComparisonRegion(null)
@@ -354,6 +357,7 @@ export default function RegionDetail({
         {!isLoading && !isError && nutsData && (
           <div className="mb-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <TimeSeries
+              key={`timeseries-${compareYears ? 'year' : ''}-${compareRegions ? 'region' : ''}-${selectedComparisonRegion || ''}-${selectedYears.join(',')}`}
               data={nutsData}
               indices={indices}
               index={datatype}
