@@ -167,14 +167,7 @@ function ControlPanel(props: ControlPanelProps) {
   // Additional debug for forecast detection
   useEffect(() => {
     if (currentTimelineItem) {
-      console.log('Current timeline item found:', currentTimelineItem)
-      if (currentTimelineItem.type === 'forecast') {
-        console.log('✅ IN FORECAST RANGE - Week', currentTimelineItem.week, 'Uncertainty:', currentTimelineItem.uncertainty)
-      } else {
-        console.log('📅 In historical range')
-      }
-    } else {
-      console.log('❌ No timeline item found for day value:', dayFromTimestamp)
+      // Timeline item found and processed
     }
   }, [currentTimelineItem, dayFromTimestamp])
 
@@ -192,23 +185,23 @@ function ControlPanel(props: ControlPanelProps) {
     return ((lastHistoricalItem.sliderIndex + 1) / (maxSliderIndex + 1)) * 100
   }, [discreteTimePoints, maxSliderIndex])
 
-  // Debug logging
-  useEffect(() => {
-    console.log('=== Slider Debug Info ===')
-    console.log('Total discrete points:', discreteTimePoints.length)
-    console.log('Historical points:', discreteTimePoints.filter(p => p.type === 'historical').length)
-    console.log('Forecast points:', discreteTimePoints.filter(p => p.type === 'forecast').length)
-    console.log('Max slider index:', maxSliderIndex)
-    console.log('Current slider index:', currentSliderIndex)
-    console.log('Current day value:', dayFromTimestamp)
-    console.log('Historical end percentage:', historicalEndPercentage)
-    console.log('Forecast weeks:', forecastWeeks.map(fw => `Week ${fw.week}: ${fw.date}`))
-    console.log('Last 5 discrete points:', discreteTimePoints.slice(-5))
-    if (discreteTimePoints.length > 0) {
-      console.log('Slider range: 0 to', discreteTimePoints.length - 1)
-      console.log('When at max index, position should be:', ((discreteTimePoints.length - 1) / Math.max(1, discreteTimePoints.length - 1)) * 100, '%')
+  // Calculate enhanced historical end percentage to ensure forecast section visibility
+  const enhancedHistoricalEndPercentage = useMemo(() => {
+    const forecastPoints = discreteTimePoints.filter(p => p.type === 'forecast').length
+    const totalPoints = discreteTimePoints.length
+
+    if (forecastPoints === 0 || totalPoints === 0) return historicalEndPercentage
+
+    // Ensure forecast section gets at least 15% of the slider for visibility
+    const forecastPercentage = (forecastPoints / totalPoints) * 100
+    const minForecastPercentage = 15
+
+    if (forecastPercentage < minForecastPercentage) {
+      return Math.max(0, 100 - minForecastPercentage)
     }
-  }, [discreteTimePoints, maxSliderIndex, currentSliderIndex, dayFromTimestamp, historicalEndPercentage, forecastWeeks])
+
+    return historicalEndPercentage
+  }, [historicalEndPercentage, discreteTimePoints])
 
   const onClose = useCallback(() => {
     setOverlay(false)
@@ -557,7 +550,7 @@ function ControlPanel(props: ControlPanelProps) {
           {/* Full-width timeline slider */}
           <div key={'day'} className="timerangeSlider flex-1 mb-4" role="group" aria-label="Timeline selection controls">
             <div className="timeline-container" style={{
-              '--historical-end': `${historicalEndPercentage}%`,
+              '--historical-end': `${enhancedHistoricalEndPercentage}%`,
               '--total-range': currentLastDayTimestamp - currentFirstDay
             } as React.CSSProperties}>
 
@@ -745,11 +738,21 @@ function ControlPanel(props: ControlPanelProps) {
                         tickHeight = 'h-6' // Taller for forecast weeks
                         tickColor = 'bg-green-600' // Green color for forecast
                       } else {
-                        // For historical data, show major ticks every 3 days for more detail
+                        // Intelligent tick spacing based on total historical data points
+                        const historicalPoints = discreteTimePoints.filter(p => p.type === 'historical')
+                        const totalHistoricalPoints = historicalPoints.length
+
+                        // Calculate optimal tick interval to show 8-12 ticks total
+                        const targetTicks = Math.min(Math.max(8, Math.ceil(totalHistoricalPoints / 10)), 12)
+                        const tickInterval = Math.max(1, Math.floor(totalHistoricalPoints / targetTicks))
+
                         const isHistoricalEnd = index < discreteTimePoints.length - 1 &&
                           discreteTimePoints[index + 1]?.type === 'forecast'
-                        isMajorTick = index % 3 === 0 || index === 0 || isHistoricalEnd
+
+                        // Show tick if it's at interval, first point, or end of historical data
+                        isMajorTick = index % tickInterval === 0 || index === 0 || isHistoricalEnd
                         shouldShowTick = isMajorTick
+
                         if (isMajorTick) {
                           tickHeight = 'h-4'
                           tickColor = 'bg-blue-600' // Blue color for historical
@@ -769,14 +772,19 @@ function ControlPanel(props: ControlPanelProps) {
                             <div className="relative">
                               <span className={`absolute top-full mt-1 text-xs font-medium whitespace-nowrap transform -translate-x-1/2 ${item.type === 'forecast' ? 'text-green-800' : 'text-blue-700'
                                 }`}>
-                                {/* {item.type === 'forecast'
-                                  ? `WEEK ${item.week}`
-                                  : format(new Date(item.date), 'MMM DD')
-                                } */}
-                                {item.type === 'forecast'
-                                  ? ``
-                                  : format(new Date(item.date), 'MMM DD')
-                                }
+                                {item.type === 'forecast' ? `` : (() => {
+                                  const historicalPoints = discreteTimePoints.filter(p => p.type === 'historical')
+                                  const totalHistoricalPoints = historicalPoints.length
+
+                                  // Use more compact format for large date ranges
+                                  if (totalHistoricalPoints > 60) {
+                                    return format(new Date(item.date), 'MMM')
+                                  } else if (totalHistoricalPoints > 30) {
+                                    return format(new Date(item.date), 'M/d')
+                                  } else {
+                                    return format(new Date(item.date), 'MMM dd')
+                                  }
+                                })()}
                               </span>
                               {/* Add a visual indicator for forecast weeks */}
                               {/* {item.type === 'forecast' && (

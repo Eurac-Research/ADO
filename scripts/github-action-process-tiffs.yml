@@ -1,0 +1,189 @@
+name: Process High-Resolution TIFFs
+
+on:
+  push:
+    paths:
+      - 'tiffs/raw/**/*.tif'
+      - 'json/nuts/metadata/*.json'
+  workflow_dispatch:
+    inputs:
+      index:
+        description: 'Index to process (e.g., VHI, SPI-1, etc.)'
+        required: false
+        default: 'all'
+
+jobs:
+  process-tiffs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up GDAL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin python3-gdal
+          gdalinfo --version
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Generate GDAL colormaps from metadata
+        run: |
+          echo "Generating GDAL colormap files from metadata..."
+          mkdir -p tiffs/colormaps
+          
+          # Process all metadata files
+          for metadata in json/nuts/metadata/*.json; do
+            index_name=$(basename "$metadata" .json)
+            echo "Processing $index_name..."
+            
+            node scripts/convert-metadata-to-gdal-colormap.js "$metadata"
+            
+            # Move generated colormap to tiffs/colormaps/
+            if [ -f "json/nuts/metadata/${index_name}-colormap.txt" ]; then
+              mv "json/nuts/metadata/${index_name}-colormap.txt" "tiffs/colormaps/"
+              echo "✓ Created tiffs/colormaps/${index_name}-colormap.txt"
+            fi
+          done
+          
+          ls -lh tiffs/colormaps/
+      
+      - name: Process TIFFs
+        run: |
+          echo "Processing TIFF files..."
+          
+          # Create output directory
+          mkdir -p tiffs/optimized
+          
+          # Process each raw TIFF
+          for raw_tiff in tiffs/raw/**/*.tif; do
+            if [ ! -f "$raw_tiff" ]; then
+              continue
+            fi
+            
+            echo ""
+            echo "Processing: $raw_tiff"
+            
+            # Extract index name from filename (e.g., vhi_8d_doy2025153_231m_laea.tif -> VHI)
+            filename=$(basename "$raw_tiff")
+            index=$(echo "$filename" | cut -d'_' -f1 | tr '[:lower:]' '[:upper:]')
+            
+            # Extract year and day of year
+            year=$(echo "$filename" | grep -oP 'doy\K\d{4}' || echo "2025")
+            doy=$(echo "$filename" | grep -oP 'doy\d{4}\K\d{3}' || echo "001")
+            
+            # Calculate week number (approximate: doy / 7)
+            week=$((10#$doy / 7 + 1))
+            
+            echo "  Index: $index, Year: $year, DOY: $doy, Week: $week"
+            
+            # Find corresponding colormap
+            colormap="tiffs/colormaps/${index}-colormap.txt"
+            
+            if [ ! -f "$colormap" ]; then
+              echo "  ⚠️  Warning: Colormap not found: $colormap"
+              echo "  Skipping colorization for $filename"
+              continue
+            fi
+            
+            # Output paths
+            output_dir="tiffs/optimized/${index}/${year}"
+            mkdir -p "$output_dir"
+            
+            colored_tiff="${output_dir}/week-${week}-colored.tif"
+            optimized_tiff="${output_dir}/week-${week}.tif"
+            optimized_png="${output_dir}/week-${week}.png"
+            
+            # Step 1: Apply color relief
+            echo "  1/3 Applying colorization..."
+            gdaldem color-relief \
+              "$raw_tiff" \
+              "$colormap" \
+              "$colored_tiff" \
+              -alpha \
+              -co COMPRESS=DEFLATE
+            
+            # Step 2: Convert to Cloud-Optimized GeoTIFF (COG)
+            echo "  2/3 Creating optimized COG..."
+            gdal_translate \
+              -of COG \
+              -co COMPRESS=DEFLATE \
+              -co PREDICTOR=2 \
+              -co NUM_THREADS=ALL_CPUS \
+              -co BLOCKSIZE=512 \
+              -co OVERVIEWS=AUTO \
+              "$colored_tiff" \
+              "$optimized_tiff"
+            
+            # Step 3: Generate PNG for web fallback
+            echo "  3/3 Generating PNG..."
+            gdal_translate \
+              -of PNG \
+              -co ZLEVEL=9 \
+              "$colored_tiff" \
+              "$optimized_png"
+            
+            # Clean up intermediate file
+            rm "$colored_tiff"
+            
+            # Show file sizes
+            original_size=$(du -h "$raw_tiff" | cut -f1)
+            optimized_size=$(du -h "$optimized_tiff" | cut -f1)
+            png_size=$(du -h "$optimized_png" | cut -f1)
+            
+            echo "  ✓ Original: $original_size → Optimized: $optimized_size, PNG: $png_size"
+          done
+          
+          echo ""
+          echo "Summary of processed files:"
+          find tiffs/optimized -type f -name "*.tif" -o -name "*.png" | sort
+      
+      - name: Commit and push processed TIFFs
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add tiffs/optimized/ tiffs/colormaps/
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🗺️ Process high-resolution TIFFs [skip ci]
+            
+            - Generated GDAL colormaps from metadata
+            - Applied colorization to raw TIFFs
+            - Created Cloud-Optimized GeoTIFFs (COG)
+            - Generated PNG fallbacks"
+            
+            git push
+          fi
+      
+      - name: Generate processing report
+        if: always()
+        run: |
+          echo "# TIFF Processing Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Processed Files" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "tiffs/optimized" ]; then
+            echo "### Optimized TIFFs" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            find tiffs/optimized -type f -name "*.tif" | sort >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### File Sizes" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            du -h tiffs/optimized/**/*.tif | sort -h >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi

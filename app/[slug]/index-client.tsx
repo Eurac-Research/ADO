@@ -18,9 +18,11 @@ import { format } from 'date-format-parse'
 import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import type { PostData } from '@/types'
-import { CloudRain, Droplets, Leaf, Snowflake, ChevronDown } from 'lucide-react'
+import { CloudRain, Droplets, Leaf, Snowflake, ChevronDown, Map as MapIcon } from 'lucide-react'
 import { DROUGHT_CATEGORIES, getCategoryForIndex } from '@/lib/categories'
 import RegionDetail from '@/components/RegionDetail'
+import HighResTiffLayer from '@/components/HighResTiffLayer'
+import { ColorStop } from '@/lib/tiff-renderer'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -149,6 +151,7 @@ export default function IndexClient({
     extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
   )
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
+  const [showHighResMap, setShowHighResMap] = useState(false)
 
   // Forecast state - next 4 weeks with uncertainty levels
   const [forecastWeeks, setForecastWeeks] = useState(() => {
@@ -348,6 +351,21 @@ export default function IndexClient({
           <Source type="geojson" data={data} generateId={true}>
             <Layer {...dataLayer} beforeId="waterway-shadow" />
           </Source>
+
+          {/* High-resolution TIFF layer */}
+          <HighResTiffLayer
+            index={datatype}
+            colorStops={(() => {
+              // Convert metadata colormap stops to ColorStop format
+              const stops = staticMetaData?.colormap?.paint?.['fill-color']?.stops || []
+              return stops.map((stop: any) => ({
+                value: stop[0],
+                color: stop[1]
+              })) as ColorStop[]
+            })()}
+            isActive={showHighResMap}
+          />
+
           <ScaleControl
             maxWidth={100}
             unit="metric"
@@ -424,6 +442,22 @@ export default function IndexClient({
 
         <div className="legend relative bottom-[30vh]">
 
+          {/* High Resolution Map Toggle Button */}
+          {datatype.toLowerCase() === 'vhi' && (
+            <button
+              onClick={() => setShowHighResMap(!showHighResMap)}
+              className={cn(
+                "w-full mb-3 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg",
+                showHighResMap
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-white/95 text-gray-800 hover:bg-white border-2 border-blue-500"
+              )}
+            >
+              <MapIcon className="w-5 h-5" />
+              {showHighResMap ? 'Standard Map' : 'High Resolution Map'}
+            </button>
+          )}
+
           {staticMetaData?.colormap?.legend.stops.map((item: any, index: number) => {
             return (
               <div key={`legend${index}`} className="legendItem">
@@ -439,7 +473,7 @@ export default function IndexClient({
       </div>
 
 
-      <div className="navigationXXX z-20 absolute top-10 flex items-center w-full justify-center">
+      <div className="navigationXXX z-20 absolute top-10 flex items-center w-full justify-center ">
         <p className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200 hidden">Drought Indices</p>
 
         <NavigationMenu className=''>
@@ -695,26 +729,28 @@ export default function IndexClient({
 
 
       {/* Bottom Control Panel - Full Width */}
-      <div className="controlContainerBottomXXX fixed bottom-0 w-full" >
-        <div className='bg-white/80 dark:bg-black/80 h-[80px] w-full fixed bottom-0 -z-10' />
-        <div className="controlPanelWrapperXX mx-auto pl-4 pr-20">
-          {/* Index Navigation */}
+      {!showHighResMap && (
+        <div className="controlContainerBottomXXX fixed bottom-0 w-full" >
+          <div className='bg-white/80 dark:bg-black/80 h-[80px] w-full fixed bottom-0 -z-10' />
+          <div className="controlPanelWrapperXX mx-auto pl-4 pr-20">
+            {/* Index Navigation */}
 
 
-          {/* Control Panel */}
-          <ControlPanel
-            metadata={metadata}
-            day={day}
-            firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
-            lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
-            forecastWeeks={forecastWeeks}
-            currentIndex={datatype}
-            onChange={(value: any) =>
-              setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
-            }
-          />
+            {/* Control Panel */}
+            <ControlPanel
+              metadata={metadata}
+              day={day}
+              firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
+              lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
+              forecastWeeks={forecastWeeks}
+              currentIndex={datatype}
+              onChange={(value: any) =>
+                setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
+              }
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Region Detail Modal/Overlay */}
       {selectedRegion && selectedRegionFeature && (
