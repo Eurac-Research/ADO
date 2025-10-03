@@ -66,6 +66,60 @@ export default function RegionDetail({
   const [availableRegions, setAvailableRegions] = useState<RegionInfo[]>([])
   const [isLoadingComparison, setIsLoadingComparison] = useState(false)
 
+  // Function to download data as CSV
+  const downloadCSV = useCallback(() => {
+    if (!nutsData) return
+
+    // Create CSV header
+    const headers = ['date', ...indices.map(idx => idx.toUpperCase())]
+    const csvContent = [
+      headers.join(','),
+      ...nutsData.map(row => {
+        return [
+          row.date,
+          ...indices.map(idx => row[idx] !== undefined && row[idx] !== null ? row[idx] : '')
+        ].join(',')
+      })
+    ].join('\n')
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `${nutsId}_${datatype}_timeseries.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }, [nutsData, nutsId, datatype, indices])
+
+  // Function to download data as JSON
+  const downloadJSON = useCallback(() => {
+    if (!nutsData) return
+
+    const jsonContent = JSON.stringify({
+      region: {
+        nutsId,
+        nutsName,
+        datatype
+      },
+      metadata: staticMetaData,
+      data: nutsData
+    }, null, 2)
+
+    // Create blob and download
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `${nutsId}_${datatype}_timeseries.json`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }, [nutsData, nutsId, nutsName, datatype, staticMetaData])
+
   // Function to extract available regions from GeoJSON
   const fetchAvailableRegions = useCallback(async () => {
     try {
@@ -391,58 +445,84 @@ export default function RegionDetail({
         {/* Region Information & Resources */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Region Stats */}
-          <div className="bg-blue-50 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-3">Region Information</h3>
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">Region Information</h3>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <dt className="text-blue-700">NUTS ID:</dt>
-                <dd className="font-mono text-blue-900">{nutsId}</dd>
+                <dt className="text-blue-700 dark:text-blue-300">NUTS ID:</dt>
+                <dd className="font-mono text-blue-900 dark:text-blue-100">{nutsId}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-blue-700">Region Name:</dt>
-                <dd className="text-blue-900">{nutsName}</dd>
+                <dt className="text-blue-700 dark:text-blue-300">Region Name:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">{nutsName}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-blue-700">Current Index:</dt>
-                <dd className="text-blue-900">{datatype}</dd>
+                <dt className="text-blue-700 dark:text-blue-300">Current Index:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">{datatype}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-blue-700">Current Date:</dt>
-                <dd className="text-blue-900">{day}</dd>
+                <dt className="text-blue-700 dark:text-blue-300">Current Date:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">{day}</dd>
               </div>
             </dl>
           </div>
 
           {/* Data Resources */}
-          {(staticMetaData?.doi || staticMetaData?.factsheet) && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Data Resources</h3>
-              <div className="space-y-3">
-                {staticMetaData?.factsheet && (
-                  <a
-                    href={staticMetaData.factsheet}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download {staticMetaData?.short_name} Factsheet
-                  </a>
-                )}
-                {staticMetaData?.doi && (
-                  <a
-                    href={staticMetaData.doi}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    View DOI Reference
-                  </a>
-                )}
-              </div>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Data Resources</h3>
+            <div className="space-y-3">
+              {/* Download Dataset */}
+              {nutsData && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Download Dataset:</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={downloadCSV}
+                      className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
+                    >
+                      <Download className="w-4 h-4" />
+                      CSV
+                    </button>
+                    <button
+                      onClick={downloadJSON}
+                      className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+                    >
+                      <Download className="w-4 h-4" />
+                      JSON
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Divider if both downloads and external resources exist */}
+              {nutsData && (staticMetaData?.factsheet || staticMetaData?.doi) && (
+                <div className="border-t border-gray-200 dark:border-gray-600 my-3"></div>
+              )}
+
+              {staticMetaData?.factsheet && (
+                <a
+                  href={staticMetaData.factsheet}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Download {staticMetaData?.short_name} Factsheet
+                </a>
+              )}
+              {staticMetaData?.doi && (
+                <a
+                  href={staticMetaData.doi}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View DOI Reference
+                </a>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

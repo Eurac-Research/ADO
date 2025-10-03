@@ -55,6 +55,16 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
   const loadedWeek = useRef<number | null>(null)
   const year = 2025
 
+  // Track the current active index/year to cancel stale preloads
+  const activeIndexRef = useRef<string>(index)
+  const activeYearRef = useRef<number>(year)
+
+  // Update refs when index or year changes
+  useEffect(() => {
+    activeIndexRef.current = index
+    activeYearRef.current = year
+  }, [index, year])
+
   // Get available weeks for the current index
   useEffect(() => {
     getAvailableWeeks(index, year).then(weeks => {
@@ -163,6 +173,8 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
   // Load TIFF when active or week changes
   useEffect(() => {
     let isMounted = true // Track if component is still mounted
+    const currentIndexSnapshot = index // Capture current index for this effect
+    const currentYearSnapshot = year // Capture current year for this effect
 
     if (isActive && availableWeeks.length > 0) {
       loadTiff(currentWeek)
@@ -180,16 +192,16 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
 
       // Preload in background without blocking
       weeksToPreload.forEach(week => {
-        const cacheKey = `${index}-${year}-${week}`
+        const cacheKey = `${currentIndexSnapshot}-${currentYearSnapshot}-${week}`
         const cached = tiffCache.get(cacheKey)
 
         if (!cached || !cached.isPreloaded) {
-          console.log('Background preloading week:', week)
-          renderOptimizedGeoTIFF(week, year, index)
+          console.log('Background preloading week:', week, 'for index:', currentIndexSnapshot)
+          renderOptimizedGeoTIFF(week, currentYearSnapshot, currentIndexSnapshot)
             .then(async (result) => {
-              // Only update state if component is still mounted
-              if (!isMounted) {
-                console.log('Component unmounted, skipping preload for week:', week)
+              // Check if component is unmounted OR if index/year has changed
+              if (!isMounted || activeIndexRef.current !== currentIndexSnapshot || activeYearRef.current !== currentYearSnapshot) {
+                console.log('Skipping preload - component unmounted or index/year changed. Week:', week, 'Index:', currentIndexSnapshot)
                 return
               }
               const imageUrl = await preloadImage(result.imageUrl)
@@ -198,12 +210,14 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
                 bounds: result.bounds,
                 isPreloaded: true
               })
-              console.log('Background preload complete for week:', week)
+              console.log('Background preload complete for week:', week, 'index:', currentIndexSnapshot)
             })
             .catch(err => {
-              // Only log error if component is still mounted (ignore 404s after unmount)
-              if (isMounted) {
-                console.warn('Background preload failed for week:', week, err)
+              // Only log error if component is still mounted AND index/year hasn't changed
+              if (isMounted && activeIndexRef.current === currentIndexSnapshot && activeYearRef.current === currentYearSnapshot) {
+                console.warn('Background preload failed for week:', week, 'index:', currentIndexSnapshot, err)
+              } else {
+                console.log('Ignoring preload error (stale request) for week:', week, 'index:', currentIndexSnapshot)
               }
             })
         }
