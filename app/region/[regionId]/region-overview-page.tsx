@@ -4,16 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, MapPin, Activity } from 'lucide-react'
 import Layout from '@/components/layout'
-import Link from 'next/link'
+import RegionDetail from '@/components/RegionDetail'
 import type { PostData } from '@/types'
 import axios from 'axios'
-import dynamic from 'next/dynamic'
-
-// Dynamic import for TimeSeries to prevent SSR issues
-const TimeSeries = dynamic(() => import('@/components/timeseries'), {
-  loading: () => <div className="flex items-center justify-center h-96"><p>Loading chart...</p></div>,
-  ssr: false,
-})
 
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
@@ -24,11 +17,6 @@ const availableIndices = [
   'sspi-10', 'sma', 'vci', 'vhi'
 ]
 
-interface TimeSeriesData {
-  date: string
-  [key: string]: string | number
-}
-
 interface RegionOverviewPageProps {
   regionId: string
   allPosts: PostData[]
@@ -37,9 +25,16 @@ interface RegionOverviewPageProps {
 export default function RegionOverviewPage({ regionId, allPosts }: RegionOverviewPageProps) {
   const router = useRouter()
   const [regionName, setRegionName] = useState<string>('')
-  const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[] | null>(null)
+  const [staticMetaData, setStaticMetaData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeIndex, setActiveIndex] = useState<string>('spei-1') // Default active index
+
+  // Mock day - in a real app, this might come from URL params or be current date
+  const [day] = useState(() => {
+    const today = new Date()
+    return today.toISOString().split('T')[0]
+  })
 
   useEffect(() => {
     const fetchRegionData = async () => {
@@ -53,17 +48,18 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
         const region = geojsonResponse.data.features.find((feature: any) =>
           feature.properties.NUTS_ID === regionId
         )
-        
+
         if (region) {
           setRegionName(region.properties.NUTS_NAME || region.properties.NAME_LATN || regionId)
         } else {
           setRegionName(regionId)
         }
 
-        // Fetch timeseries data for the region
-        const timeseriesUrl = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${regionId}.json`
-        const timeseriesResponse = await axios.get(timeseriesUrl)
-        setTimeSeriesData(timeseriesResponse.data)
+        // Fetch metadata for the default active index
+        const datatype = activeIndex.toUpperCase()
+        const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
+        const metadataResponse = await axios.get(metadataUrl)
+        setStaticMetaData(metadataResponse.data)
 
       } catch (fetchError) {
         console.error('Error fetching region data:', fetchError)
@@ -75,7 +71,7 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
     }
 
     fetchRegionData()
-  }, [regionId])
+  }, [regionId, activeIndex])
 
   const handleBackToMap = () => {
     router.push('/')
@@ -139,63 +135,26 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
                 {regionName}
               </h1>
             </div>
-            
+
             <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <Activity className="w-4 h-4" />
               <span>Region ID: {regionId}</span>
             </div>
           </div>
 
-          {/* Drought Indices Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Drought Indices Overview
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Interactive chart showing all available drought indices for this region. 
-                Use the legend to toggle between different indices and explore the data over time.
-              </p>
-            </div>
-
-            {timeSeriesData ? (
-              <div className="h-96">
-                <TimeSeries
-                  data={timeSeriesData}
-                  indices={availableIndices}
-                  index="spei-3" // Default selected index
-                  firstDate="2018-01-01"
-                  lastDate="2024-12-31"
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-96">
-                <p className="text-gray-500 dark:text-gray-400">No timeseries data available for this region</p>
-              </div>
-            )}
-          </div>
-
-          {/* Quick Links to Individual Index Pages */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Individual Index Details
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Click on any index below to view detailed analysis and comparisons.
-            </p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {availableIndices.map((index) => (
-                <Link
-                  key={index}
-                  href={`/region/${regionId}/${index}`}
-                  className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-center font-medium"
-                >
-                  {index.toUpperCase()}
-                </Link>
-              ))}
-            </div>
-          </div>
+          {/* Region Detail Component */}
+          {staticMetaData && (
+            <RegionDetail
+              nutsId={regionId}
+              nutsName={regionName}
+              datatype={activeIndex}
+              staticMetaData={staticMetaData}
+              indices={availableIndices}
+              day={day}
+              mode="page"
+              className="max-w-6xl mx-auto"
+            />
+          )}
         </div>
       </div>
     </Layout>

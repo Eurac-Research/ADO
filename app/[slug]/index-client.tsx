@@ -208,6 +208,11 @@ export default function IndexClient({
     }
   }, [extractedMetadata?.properties?.lastDate, staticData?.metadata?.properties?.lastDate, staticData?.metadata?.properties?.firstDate, datatype])
 
+  // Reset high-res map when navigating to different index
+  useEffect(() => {
+    setShowHighResMap(false)
+  }, [datatype])
+
   // Fix day if it's out of range
   const fixedDay =
     dayFromTimestamp > lastDayTimestamp

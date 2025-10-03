@@ -162,6 +162,8 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
 
   // Load TIFF when active or week changes
   useEffect(() => {
+    let isMounted = true // Track if component is still mounted
+
     if (isActive && availableWeeks.length > 0) {
       loadTiff(currentWeek)
 
@@ -185,6 +187,11 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
           console.log('Background preloading week:', week)
           renderOptimizedGeoTIFF(week, year, index)
             .then(async (result) => {
+              // Only update state if component is still mounted
+              if (!isMounted) {
+                console.log('Component unmounted, skipping preload for week:', week)
+                return
+              }
               const imageUrl = await preloadImage(result.imageUrl)
               tiffCache.set(cacheKey, {
                 imageUrl,
@@ -193,7 +200,12 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
               })
               console.log('Background preload complete for week:', week)
             })
-            .catch(err => console.warn('Background preload failed for week:', week, err))
+            .catch(err => {
+              // Only log error if component is still mounted (ignore 404s after unmount)
+              if (isMounted) {
+                console.warn('Background preload failed for week:', week, err)
+              }
+            })
         }
       })
     } else if (!isActive && map) {
@@ -207,7 +219,30 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
       }
       loadedWeek.current = null
     }
+
+    // Cleanup function to mark component as unmounted
+    return () => {
+      isMounted = false
+    }
   }, [isActive, currentWeek, availableWeeks, loadTiff, map, index, year])
+
+  // Cleanup on unmount - remove layer when component is destroyed
+  useEffect(() => {
+    return () => {
+      if (map) {
+        const mapInstance = map.getMap()
+        if (mapInstance) {
+          if (mapInstance.getLayer('high-res-tiff-layer')) {
+            mapInstance.removeLayer('high-res-tiff-layer')
+          }
+          if (mapInstance.getSource('high-res-tiff-source')) {
+            mapInstance.removeSource('high-res-tiff-source')
+          }
+        }
+      }
+      console.log('HighResTiffLayer unmounted - layer cleaned up')
+    }
+  }, [map])
 
   // Handle week change
   const handleWeekChange = (week: number) => {

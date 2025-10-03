@@ -357,9 +357,9 @@ function TimeSeries(props: TimeSeriesProps) {
       legendObject[key] = true
     })
   } else {
-    // Normal mode legend
+    // Normal mode legend - compare case-insensitively
     for (const item of indices) {
-      if (index === item.toUpperCase()) {
+      if (index.toUpperCase() === item.toUpperCase()) {
         legendObject[item.toUpperCase()] = true
       } else {
         legendObject[item.toUpperCase()] = false
