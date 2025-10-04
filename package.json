@@ -5,7 +5,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "clean": "rm -rf .next node_modules pnpm-lock.yaml && pnpm install"
   },
   "dependencies": {
@@ -50,6 +50,7 @@
     "uniqolor": "^1.0.2"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^24.0.10",
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
