@@ -277,7 +277,7 @@ function ControlPanel(props: ControlPanelProps) {
     setTimeSpan(null)
   }, [currentOriginalFirstDayTimestamp, isPlaying, stopAutoPlay])
 
-  let rows: React.ReactElement[] = []
+  let rows: React.ReactElement<any>[] = []
   for (let i = currentFirstDay; i <= currentLastDayTimestamp; i++) {
     rows.push(<option key={i} value={i}></option>)
   }
@@ -406,8 +406,6 @@ function ControlPanel(props: ControlPanelProps) {
 
   return (
     <>
-
-
       <div className='bg-white/80 dark:bg-black/80 w-[30vw] min-w-[250px] rounded-md p-5 shrink-0 fixed left-0 bottom-[200px]' data-name="mainIndicatorInfo">
         <div className="flex items-start justify-start  gap-4 mb-2 h-full">
           {CategoryIcon && <CategoryIcon className="w-16 h-16 text-black shrink-0" />}
@@ -446,12 +444,6 @@ function ControlPanel(props: ControlPanelProps) {
 
 
       </div>
-
-
-
-
-
-
       <div className="controlpanelXX">
 
 
@@ -494,15 +486,15 @@ function ControlPanel(props: ControlPanelProps) {
               >
                 {isPlaying ? (
                   // Pause icon (two vertical bars)
-                  <div className="flex gap-1">
+                  (<div className="flex gap-1">
                     <div className="w-1 h-4 bg-white"></div>
                     <div className="w-1 h-4 bg-white"></div>
-                  </div>
+                  </div>)
                 ) : (
                   // Play icon (triangle)
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className='fill-blue-500 w-10 h-10'>
+                  (<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className='fill-blue-500 w-10 h-10'>
                     <path d="M8 5v14l11-7z" />
-                  </svg>
+                  </svg>)
                 )}
               </button>
 
@@ -854,7 +846,6 @@ function ControlPanel(props: ControlPanelProps) {
 
         </div>
       </div>
-
       {overlay && (
         <>
           {/* Overlay backdrop */}
@@ -905,7 +896,7 @@ function ControlPanel(props: ControlPanelProps) {
         </>
       )}
     </>
-  )
+  );
 }
 
 export default ControlPanel

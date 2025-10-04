@@ -27,12 +27,12 @@
     "json5": "2.2.2",
     "lucide-react": "^0.544.0",
     "mapbox-gl": "^2.7.0",
-    "next": "15.4.1",
+    "next": "15.5.4",
     "next-plausible": "^3.2.0",
     "postcss": "^8.5.3",
-    "react": "18.3.1",
+    "react": "19.2.0",
     "react-cookie-consent": "^8.0.1",
-    "react-dom": "18.3.1",
+    "react-dom": "19.2.0",
     "react-map-gl": "^7.1.9",
     "rehype-accessible-emojis": "^0.3.2",
     "rehype-sanitize": "^5.0.1",
@@ -51,12 +51,18 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
     "eslint": "^8.57.1",
-    "eslint-config-next": "15.3.5",
+    "eslint-config-next": "15.5.4",
     "prettier": "^2.8.8",
     "sass": "^1.62.1",
     "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.0",
+      "@types/react-dom": "19.2.0"
+    }
   }
 }
