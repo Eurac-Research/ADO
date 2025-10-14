@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-format-parse'
-import { X, ExternalLink, Download, Maximize2 } from 'lucide-react'
+import { X, ExternalLink, Download, Maximize2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import Layout from '@/components/layout'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
 import dynamic from 'next/dynamic'
 import axios from 'axios'
-import type { RegionInfo } from '@/types'
+import type { RegionInfo, PostData } from '@/types'
 
 // Dynamic import for TimeSeries to prevent SSR issues
 const TimeSeries = dynamic(() => import('@/components/timeseries'), {
@@ -20,11 +22,14 @@ const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercont
 interface RegionDetailProps {
   // Required props
   nutsId: string
-  nutsName: string
   datatype: string
-  staticMetaData: any
   indices: string[]
   day: string
+
+  // Optional props (will be fetched if not provided)
+  nutsName?: string
+  staticMetaData?: any
+  allPosts?: PostData[]
 
   // Display mode
   mode?: 'modal' | 'page'
@@ -43,15 +48,24 @@ interface TimeSeriesData {
 
 export default function RegionDetail({
   nutsId,
-  nutsName,
+  nutsName: initialNutsName,
   datatype,
-  staticMetaData,
+  staticMetaData: initialStaticMetaData,
   indices,
   day,
   mode = 'modal',
   onClose,
+  allPosts = [],
   className = ''
 }: RegionDetailProps) {
+  const router = useRouter()
+
+  // State for fetched data
+  const [nutsName, setNutsName] = useState<string>(initialNutsName || nutsId)
+  const [staticMetaData, setStaticMetaData] = useState<any>(initialStaticMetaData || null)
+  const [isLoadingMeta, setIsLoadingMeta] = useState(!initialStaticMetaData || !initialNutsName)
+  const [metaError, setMetaError] = useState<string | null>(null)
+
   const [nutsData, setNutsData] = useState<TimeSeriesData[] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
@@ -65,6 +79,70 @@ export default function RegionDetail({
   const [comparisonRegionData, setComparisonRegionData] = useState<TimeSeriesData[] | null>(null)
   const [availableRegions, setAvailableRegions] = useState<RegionInfo[]>([])
   const [isLoadingComparison, setIsLoadingComparison] = useState(false)
+
+  // Handle index change from TimeSeries component
+  const handleIndexChange = useCallback((newIndex: string) => {
+    if (mode === 'page') {
+      // Update URL for page mode
+      router.push(`/region/${nutsId}/${newIndex}`, { scroll: false })
+    }
+    // Modal mode doesn't need URL updates
+  }, [mode, nutsId, router])
+
+  // Fetch metadata and region name if not provided
+  useEffect(() => {
+    if (initialStaticMetaData && initialNutsName) {
+      // Already have all data, no need to fetch
+      return
+    }
+
+    const fetchMetadata = async () => {
+      setIsLoadingMeta(true)
+      setMetaError(null)
+
+      try {
+        const datatypeUpper = datatype.toUpperCase()
+
+        // Fetch metadata if not provided
+        if (!initialStaticMetaData) {
+          const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatypeUpper}.json`
+          const metadataResponse = await axios.get(metadataUrl)
+          setStaticMetaData(metadataResponse.data)
+        }
+
+        // Fetch region name if not provided
+        if (!initialNutsName) {
+          try {
+            const geojsonUrl = `https://${ADO_DATA_URL}/json/nuts/${datatypeUpper}-latest.geojson`
+            const geojsonResponse = await axios.get(geojsonUrl)
+            const region = geojsonResponse.data.features.find((feature: any) =>
+              feature.properties.NUTS_ID === nutsId
+            )
+            if (region) {
+              setNutsName(region.properties.NUTS_NAME || region.properties.NAME_LATN || nutsId)
+            }
+          } catch (geoError) {
+            console.warn('Could not fetch region name from GeoJSON:', geoError)
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching metadata:', err)
+        setMetaError('Failed to load region metadata')
+      } finally {
+        setIsLoadingMeta(false)
+      }
+    }
+
+    fetchMetadata()
+  }, [nutsId, datatype, initialStaticMetaData, initialNutsName])
+
+  const handleBackToMap = useCallback(() => {
+    if (onClose) {
+      onClose()
+    } else {
+      router.push(`/?region=${nutsId}`)
+    }
+  }, [onClose, router, nutsId])
 
   // Function to download data as CSV
   const downloadCSV = useCallback(() => {
@@ -212,7 +290,60 @@ export default function RegionDetail({
     ? "dataOverlay max-w-4xl max-h-[90vh] overflow-y-auto"
     : "container mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
 
-  return (
+  // Loading state
+  if (isLoadingMeta) {
+    const loadingContent = (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading region details...</p>
+        </div>
+      </div>
+    )
+
+    if (mode === 'page') {
+      return (
+        <Layout posts={allPosts}>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
+            {loadingContent}
+          </div>
+        </Layout>
+      )
+    }
+    return loadingContent
+  }
+
+  // Error state
+  if (metaError) {
+    const errorContent = (
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">Error Loading Data</h2>
+        <p className="text-red-600 dark:text-red-300">{metaError}</p>
+        <button
+          onClick={handleBackToMap}
+          className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Map
+        </button>
+      </div>
+    )
+
+    if (mode === 'page') {
+      return (
+        <Layout posts={allPosts}>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
+            <div className="container mx-auto px-4 py-8">
+              {errorContent}
+            </div>
+          </div>
+        </Layout>
+      )
+    }
+    return errorContent
+  }
+
+  const mainContent = (
     <div className={`${containerClasses} ${className}`} data-name="region-detail">
       {mode === 'modal' && (
         <div className="overlayContainer fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
@@ -407,8 +538,18 @@ export default function RegionDetail({
           </div>
         )}
 
+        {/* Loading indicator when data is ready but metadata is still loading */}
+        {!isLoading && !isError && nutsData && !staticMetaData && (
+          <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+              <span className="text-gray-600 dark:text-gray-300">Loading metadata...</span>
+            </div>
+          </div>
+        )}
+
         {/* Time Series Chart */}
-        {!isLoading && !isError && nutsData && (
+        {!isLoading && !isError && nutsData && staticMetaData && (
           <div className="mb-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <TimeSeries
               key={`timeseries-${compareYears ? 'year' : ''}-${compareRegions ? 'region' : ''}-${selectedComparisonRegion || ''}-${selectedYears.join(',')}`}
@@ -433,6 +574,7 @@ export default function RegionDetail({
                   ? { [selectedComparisonRegion]: comparisonRegionData }
                   : {}
               }
+              onIndexChange={handleIndexChange}
               style={{
                 width: '100%',
                 height: '400px',
@@ -527,4 +669,47 @@ export default function RegionDetail({
       </div>
     </div>
   )
+
+  // Wrap in Layout for page mode, return directly for modal mode
+  if (mode === 'page') {
+    return (
+      <Layout posts={allPosts}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
+          {/* Header with breadcrumb */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleBackToMap}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Map
+                </button>
+
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                  <span>/</span>
+                  <Link
+                    href={`/region/${nutsId}`}
+                    className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {nutsName}
+                  </Link>
+                  <span>/</span>
+                  <span className="font-medium">{datatype.toUpperCase()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main content */}
+          <div className="container mx-auto px-4 py-8">
+            {mainContent}
+          </div>
+        </div>
+      </Layout>
+    )
+  }
+
+  return mainContent
 }

@@ -87,7 +87,16 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
 
     // Get the underlying Mapbox GL map instance
     const mapInstance = map.getMap()
-    if (!mapInstance) return
+    if (!mapInstance) {
+      console.warn('Map instance not available, skipping TIFF load')
+      return
+    }
+
+    // Additional safety check - ensure map is fully loaded
+    if (!mapInstance.isStyleLoaded()) {
+      console.warn('Map style not loaded yet, skipping TIFF load')
+      return
+    }
 
     setIsLoading(true)
     setError(null)
@@ -120,11 +129,20 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
       }
 
       // Remove existing layer and source if they exist
-      if (mapInstance.getLayer('high-res-tiff-layer')) {
-        mapInstance.removeLayer('high-res-tiff-layer')
+      try {
+        if (mapInstance.getLayer && mapInstance.getLayer('high-res-tiff-layer')) {
+          mapInstance.removeLayer('high-res-tiff-layer')
+        }
+      } catch (e) {
+        console.warn('Error checking/removing layer:', e)
       }
-      if (mapInstance.getSource('high-res-tiff-source')) {
-        mapInstance.removeSource('high-res-tiff-source')
+
+      try {
+        if (mapInstance.getSource && mapInstance.getSource('high-res-tiff-source')) {
+          mapInstance.removeSource('high-res-tiff-source')
+        }
+      } catch (e) {
+        console.warn('Error checking/removing source:', e)
       }
 
       console.log('Adding Mapbox image source')
@@ -225,11 +243,17 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
     } else if (!isActive && map) {
       // Remove layer when inactive
       const mapInstance = map.getMap()
-      if (mapInstance && mapInstance.getLayer('high-res-tiff-layer')) {
-        mapInstance.removeLayer('high-res-tiff-layer')
-      }
-      if (mapInstance && mapInstance.getSource('high-res-tiff-source')) {
-        mapInstance.removeSource('high-res-tiff-source')
+      if (mapInstance && mapInstance.isStyleLoaded()) {
+        try {
+          if (mapInstance.getLayer && mapInstance.getLayer('high-res-tiff-layer')) {
+            mapInstance.removeLayer('high-res-tiff-layer')
+          }
+          if (mapInstance.getSource && mapInstance.getSource('high-res-tiff-source')) {
+            mapInstance.removeSource('high-res-tiff-source')
+          }
+        } catch (e) {
+          console.warn('Error cleaning up TIFF layer on deactivation:', e)
+        }
       }
       loadedWeek.current = null
     }
@@ -245,12 +269,16 @@ export default function HighResTiffLayer({ index, colorStops, isActive, onWeekCh
     return () => {
       if (map) {
         const mapInstance = map.getMap()
-        if (mapInstance) {
-          if (mapInstance.getLayer('high-res-tiff-layer')) {
-            mapInstance.removeLayer('high-res-tiff-layer')
-          }
-          if (mapInstance.getSource('high-res-tiff-source')) {
-            mapInstance.removeSource('high-res-tiff-source')
+        if (mapInstance && mapInstance.isStyleLoaded()) {
+          try {
+            if (mapInstance.getLayer && mapInstance.getLayer('high-res-tiff-layer')) {
+              mapInstance.removeLayer('high-res-tiff-layer')
+            }
+            if (mapInstance.getSource && mapInstance.getSource('high-res-tiff-source')) {
+              mapInstance.removeSource('high-res-tiff-source')
+            }
+          } catch (e) {
+            console.warn('Error cleaning up TIFF layer on unmount:', e)
           }
         }
       }

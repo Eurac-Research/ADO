@@ -11,6 +11,13 @@ import axios from 'axios'
 
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
+// Available drought indices that can be shown in the chart
+const availableIndices = [
+  'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12',
+  'spi-1', 'spi-2', 'spi-3', 'spi-6', 'spi-12',
+  'sspi-10', 'sma', 'vci', 'vhi'
+]
+
 interface RegionDetailPageProps {
   regionId: string
   index: string
@@ -20,7 +27,6 @@ interface RegionDetailPageProps {
 export default function RegionDetailPage({ regionId, index, allPosts }: RegionDetailPageProps) {
   const router = useRouter()
   const [staticMetaData, setStaticMetaData] = useState<any>(null)
-  const [indices, setIndices] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [regionName, setRegionName] = useState<string>('')
@@ -44,10 +50,6 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
         const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
         const metadataResponse = await axios.get(metadataUrl)
         setStaticMetaData(metadataResponse.data)
-
-        // For now, we'll set indices as just the current index
-        // In a real app, you might want to fetch all available indices
-        setIndices([index])
 
         // Fetch region name from GeoJSON data
         try {
@@ -152,7 +154,7 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
               nutsName={regionName}
               datatype={index}
               staticMetaData={staticMetaData}
-              indices={indices}
+              indices={availableIndices}
               day={day}
               mode="page"
               className="max-w-6xl mx-auto"

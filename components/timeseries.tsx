@@ -197,7 +197,7 @@ function TimeSeries(props: TimeSeriesProps) {
         if (yearRow) {
           // Only include the selected index in comparison mode
           const yearColName = `${index}_${year}`
-          row[yearColName] = yearRow[index]
+          row[yearColName] = yearRow[index.toUpperCase()]
         } else {
           // Fill with null for missing days to maintain gaps
           const yearColName = `${index}_${year}`
@@ -483,6 +483,19 @@ function TimeSeries(props: TimeSeriesProps) {
     },
   }
 
+  // Handle legend selection change
+  const onChartEvents = {
+    legendselectchanged: (params: any) => {
+      // In normal (non-comparison) mode, when a legend item is selected, notify parent
+      if (!compareYears && !compareRegions && props.onIndexChange) {
+        const selectedIndex = Object.keys(params.selected).find(key => params.selected[key])
+        if (selectedIndex && selectedIndex.toLowerCase() !== index.toLowerCase()) {
+          props.onIndexChange(selectedIndex.toLowerCase())
+        }
+      }
+    }
+  }
+
   return (
     <div className="relative">
       {data ? (
@@ -491,6 +504,7 @@ function TimeSeries(props: TimeSeriesProps) {
             option={options}
             style={{ height: '400px', marginTop: '10px' }}
             theme={'mytheme'}
+            onEvents={onChartEvents}
           />
 
           {showTooltip && (

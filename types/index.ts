@@ -209,6 +209,7 @@ export interface TimeSeriesProps {
   comparisonData?: {
     [regionId: string]: TimeSeriesData[]
   }
+  onIndexChange?: (newIndex: string) => void
 }
 
 
