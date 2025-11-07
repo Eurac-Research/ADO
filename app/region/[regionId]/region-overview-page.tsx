@@ -147,7 +147,7 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
             <RegionDetail
               nutsId={regionId}
               nutsName={regionName}
-              datatype={activeIndex}
+              datatype={activeIndex.toUpperCase()}
               staticMetaData={staticMetaData}
               indices={availableIndices}
               day={day}
