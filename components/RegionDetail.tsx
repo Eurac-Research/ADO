@@ -415,57 +415,64 @@ export default function RegionDetail({
                 Historical Data & Analysis
               </h2>
 
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2" title={compareRegions ? "Disabled: Region comparison is active" : ""}>
-                  <input
-                    type="checkbox"
-                    checked={compareYears}
-                    disabled={compareRegions}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        // Disable region comparison when enabling year comparison
-                        setCompareRegions(false)
-                        setSelectedComparisonRegion(null)
-                        setComparisonRegionData(null)
-                      } else {
-                        // Reset to default years when disabling year comparison
-                        const defaultYears = availableYears.slice(0, 3)
-                        setSelectedYears(defaultYears)
-                      }
-                      setCompareYears(e.target.checked)
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                  <span className={`text-sm ${compareRegions ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}>
-                    Compare by Year
-                  </span>
-                </label>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    if (!compareYears) {
+                      // Enable year comparison, disable region comparison
+                      setCompareRegions(false)
+                      setSelectedComparisonRegion(null)
+                      setComparisonRegionData(null)
+                      setCompareYears(true)
+                    } else {
+                      // Disable year comparison and reset to default years
+                      const defaultYears = availableYears.slice(0, 3)
+                      setSelectedYears(defaultYears)
+                      setCompareYears(false)
+                    }
+                  }}
+                  disabled={compareRegions}
+                  className={`
+                    px-4 py-2 rounded-lg font-medium text-sm transition-all
+                    ${compareYears
+                      ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    }
+                    ${compareRegions ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                  `}
+                  title={compareRegions ? "Disabled: Region comparison is active" : "Compare data across different years"}
+                >
+                  Compare by Year
+                </button>
 
-                <label className="flex items-center gap-2" title={compareYears ? "Disabled: Year comparison is active" : ""}>
-                  <input
-                    type="checkbox"
-                    checked={compareRegions}
-                    disabled={compareYears}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        // Disable year comparison when enabling region comparison
-                        setCompareYears(false)
-                        // Reset to default years when switching modes
-                        const defaultYears = availableYears.slice(0, 3)
-                        setSelectedYears(defaultYears)
-                      } else {
-                        // Clear region comparison data when disabling region comparison
-                        setSelectedComparisonRegion(null)
-                        setComparisonRegionData(null)
-                      }
-                      setCompareRegions(e.target.checked)
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                  <span className={`text-sm ${compareYears ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}>
-                    Compare with Region
-                  </span>
-                </label>
+                <button
+                  onClick={() => {
+                    if (!compareRegions) {
+                      // Enable region comparison, disable year comparison
+                      setCompareYears(false)
+                      const defaultYears = availableYears.slice(0, 3)
+                      setSelectedYears(defaultYears)
+                      setCompareRegions(true)
+                    } else {
+                      // Disable region comparison
+                      setSelectedComparisonRegion(null)
+                      setComparisonRegionData(null)
+                      setCompareRegions(false)
+                    }
+                  }}
+                  disabled={compareYears}
+                  className={`
+                    px-4 py-2 rounded-lg font-medium text-sm transition-all
+                    ${compareRegions
+                      ? 'bg-green-600 text-white shadow-md hover:bg-green-700'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    }
+                    ${compareYears ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                  `}
+                  title={compareYears ? "Disabled: Year comparison is active" : "Compare with another region"}
+                >
+                  Compare with Region
+                </button>
               </div>
             </div>
 
