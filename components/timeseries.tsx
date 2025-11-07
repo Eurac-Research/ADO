@@ -148,30 +148,222 @@ function TimeSeries(props: TimeSeriesProps) {
     datazoomLabelColor: '#999999',
   })
 
-  const { data, indices, index, firstDate, lastDate } = props
+  const { data, indices, index, firstDate, lastDate, compareYears = false, selectedYears = [], compareRegions = false, regionNames = [], comparisonData = {} } = props
 
   const [showTooltip, setShowTooltip] = useState<boolean>(false)
 
-  const series = indices?.map((indexName) => {
-    return {
+  // Function to process data for year comparison
+  const processDataForYearComparison = (): {
+    processedData: any[] | null
+    processedSeries: any[]
+    processedDimensions: string[]
+  } => {
+    if (!data || !compareYears || selectedYears.length === 0) {
+      return {
+        processedData: data,
+        processedSeries: indices?.map((indexName) => ({
+          type: 'line',
+          showSymbol: false,
+          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+          connectNulls: false,
+        })) || [],
+        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+      }
+    }
+
+    // Group data by year and day-of-year
+    const yearData: Record<number, Record<string, any>> = {}
+
+    data.forEach((row) => {
+      const date = new Date(row.date)
+      const year = date.getFullYear()
+      const dayOfYear = Math.floor((date.getTime() - new Date(year, 0, 0).getTime()) / (1000 * 60 * 60 * 24))
+
+      if (selectedYears.includes(year)) {
+        if (!yearData[year]) {
+          yearData[year] = {}
+        }
+        yearData[year][dayOfYear] = row
+      }
+    })
+
+    // Create unified dataset with all days of the year (1-365)
+    const processedRows = Array.from({ length: 365 }, (_, i) => {
+      const dayOfYear = i + 1
+      const row: any = { date: `Day ${dayOfYear}` }
+
+      selectedYears.forEach(year => {
+        const yearRow = yearData[year]?.[dayOfYear]
+        if (yearRow) {
+          // Only include the selected index in comparison mode
+          const yearColName = `${index}_${year}`
+          row[yearColName] = yearRow[index.toUpperCase()]
+        } else {
+          // Fill with null for missing days to maintain gaps
+          const yearColName = `${index}_${year}`
+          row[yearColName] = null
+        }
+      })
+
+      return row
+    })
+
+    // Create series for each year of the selected index only
+    const processedSeriesArray = selectedYears.map(year => ({
       type: 'line',
       showSymbol: false,
-      yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
-      connectNulls: false, // This ensures gaps are shown for null/undefined values
-    }
-  })
+      yAxisIndex: index.toLowerCase() === 'vci' ? 1 : index.toLowerCase() === 'vhi' ? 1 : 0,
+      connectNulls: false,
+      name: `${index} ${year}`,
+    }))
 
-  const dimensionsArray = indices?.map((indexName) => {
-    return indexName.toUpperCase()
-  })
-  const dimensions = ['date'].concat(dimensionsArray || [])
+    // Create dimensions for each year of the selected index only
+    const processedDimensionsArray = selectedYears.map(year => `${index}_${year}`)
+    const processedDimensions = ['date'].concat(processedDimensionsArray)
+
+    return {
+      processedData: processedRows,
+      processedSeries: processedSeriesArray,
+      processedDimensions
+    }
+  }
+
+  // Function to process data for multi-region comparison
+  const processDataForRegionComparison = (): {
+    processedData: any[] | null
+    processedSeries: any[]
+    processedDimensions: string[]
+  } => {
+    if (!data || !compareRegions || Object.keys(comparisonData).length === 0) {
+      return {
+        processedData: data,
+        processedSeries: indices?.map((indexName) => ({
+          type: 'line',
+          showSymbol: false,
+          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+          connectNulls: false,
+        })) || [],
+        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+      }
+    }
+
+    // Get all unique dates from primary and comparison data
+    const allDates = new Set<string>()
+    data.forEach(row => allDates.add(row.date))
+    Object.values(comparisonData).forEach(regionData => {
+      regionData.forEach(row => allDates.add(row.date))
+    })
+
+    const sortedDates = Array.from(allDates).sort()
+
+    // Create unified dataset with columns for each region-index combination
+    const processedRows = sortedDates.map(date => {
+      const row: any = { date }
+
+      // Add primary region data (current region)
+      const primaryRow = data.find(d => d.date === date)
+      if (primaryRow) {
+        const primaryColName = `${index}_${regionNames[0] || 'Primary'}`
+        row[primaryColName] = primaryRow[index]
+      }
+
+      // Add comparison region data
+      Object.entries(comparisonData).forEach(([regionId, regionData], i) => {
+        const comparisonRow = regionData.find(d => d.date === date)
+        if (comparisonRow) {
+          const comparisonColName = `${index}_${regionNames[i + 1] || regionId}`
+          row[comparisonColName] = comparisonRow[index]
+        }
+      })
+
+      return row
+    })
+
+    // Create series for each region (only for the selected index)
+    const processedSeriesArray = [
+      // Primary region series
+      {
+        type: 'line',
+        showSymbol: false,
+        yAxisIndex: index.toLowerCase() === 'vci' ? 1 : index.toLowerCase() === 'vhi' ? 1 : 0,
+        connectNulls: false,
+        name: `${index} ${regionNames[0] || 'Primary'}`,
+        lineStyle: { type: 'solid' },
+        itemStyle: { color: '#607cba' }
+      },
+      // Comparison region series
+      ...Object.keys(comparisonData).map((regionId, i) => ({
+        type: 'line',
+        showSymbol: false,
+        yAxisIndex: index.toLowerCase() === 'vci' ? 1 : index.toLowerCase() === 'vhi' ? 1 : 0,
+        connectNulls: false,
+        name: `${index} ${regionNames[i + 1] || regionId}`,
+        lineStyle: { type: 'dashed' },
+        itemStyle: { color: i === 0 ? '#b34190' : '#5bcbc1' }
+      }))
+    ]
+
+    // Create dimensions for each region-index combination
+    const processedDimensionsArray = [
+      `${index}_${regionNames[0] || 'Primary'}`,
+      ...Object.keys(comparisonData).map((regionId, i) => `${index}_${regionNames[i + 1] || regionId}`)
+    ]
+    const processedDimensions = ['date'].concat(processedDimensionsArray)
+
+    return {
+      processedData: processedRows,
+      processedSeries: processedSeriesArray,
+      processedDimensions
+    }
+  }
+
+  // Determine which processing function to use
+  const getProcessedData = () => {
+    if (compareRegions && Object.keys(comparisonData).length > 0) {
+      return processDataForRegionComparison()
+    } else if (compareYears && selectedYears.length > 0) {
+      return processDataForYearComparison()
+    } else {
+      return {
+        processedData: data,
+        processedSeries: indices?.map((indexName) => ({
+          type: 'line',
+          showSymbol: false,
+          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+          connectNulls: false,
+        })) || [],
+        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+      }
+    }
+  }
+
+  const { processedData, processedSeries, processedDimensions } = getProcessedData()
+
+  const series = processedSeries
+
+  const dimensionsArray = processedDimensions.slice(1)
+  const dimensions = processedDimensions
 
   const legendObject: Record<string, boolean> = {}
-  for (const item of indices) {
-    if (index === item.toUpperCase()) {
-      legendObject[item.toUpperCase()] = true
-    } else {
-      legendObject[item.toUpperCase()] = false
+  if (compareRegions && Object.keys(comparisonData).length > 0) {
+    // For region comparison, show all region-index combinations
+    dimensionsArray.forEach(dim => {
+      legendObject[dim] = true
+    })
+  } else if (compareYears && selectedYears.length > 0) {
+    // For year comparison, show all year-index combinations for selected index
+    selectedYears.forEach(year => {
+      const key = `${index}_${year}`
+      legendObject[key] = true
+    })
+  } else {
+    // Normal mode legend - compare case-insensitively
+    for (const item of indices) {
+      if (index.toUpperCase() === item.toUpperCase()) {
+        legendObject[item.toUpperCase()] = true
+      } else {
+        legendObject[item.toUpperCase()] = false
+      }
     }
   }
 
@@ -221,7 +413,7 @@ function TimeSeries(props: TimeSeriesProps) {
     },
     dataset: {
       dimensions: dimensions,
-      source: data,
+      source: processedData,
     },
     xAxis: {
       type: 'category',
@@ -263,7 +455,16 @@ function TimeSeries(props: TimeSeriesProps) {
     tooltip: {
       trigger: 'axis',
     },
-    dataZoom: {
+    dataZoom: compareYears ? {
+      type: 'slider',
+      show: true,
+      startValue: 0,
+      endValue: 366,
+      showDetail: true,
+      handleLabel: {
+        show: true,
+      },
+    } : {
       type: 'slider',
       show: true,
       startValue: firstDate,
@@ -282,6 +483,19 @@ function TimeSeries(props: TimeSeriesProps) {
     },
   }
 
+  // Handle legend selection change
+  const onChartEvents = {
+    legendselectchanged: (params: any) => {
+      // In normal (non-comparison) mode, when a legend item is selected, notify parent
+      if (!compareYears && !compareRegions && props.onIndexChange) {
+        const selectedIndex = Object.keys(params.selected).find(key => params.selected[key])
+        if (selectedIndex && selectedIndex.toLowerCase() !== index.toLowerCase()) {
+          props.onIndexChange(selectedIndex.toLowerCase())
+        }
+      }
+    }
+  }
+
   return (
     <div className="relative">
       {data ? (
@@ -290,6 +504,7 @@ function TimeSeries(props: TimeSeriesProps) {
             option={options}
             style={{ height: '400px', marginTop: '10px' }}
             theme={'mytheme'}
+            onEvents={onChartEvents}
           />
 
           {showTooltip && (
