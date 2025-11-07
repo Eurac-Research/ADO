@@ -264,7 +264,7 @@ function TimeSeries(props: TimeSeriesProps) {
       const primaryRow = data.find(d => d.date === date)
       if (primaryRow) {
         const primaryColName = `${index}_${regionNames[0] || 'Primary'}`
-        row[primaryColName] = primaryRow[index]
+        row[primaryColName] = primaryRow[index.toUpperCase()]
       }
 
       // Add comparison region data
@@ -272,7 +272,7 @@ function TimeSeries(props: TimeSeriesProps) {
         const comparisonRow = regionData.find(d => d.date === date)
         if (comparisonRow) {
           const comparisonColName = `${index}_${regionNames[i + 1] || regionId}`
-          row[comparisonColName] = comparisonRow[index]
+          row[comparisonColName] = comparisonRow[index.toUpperCase()]
         }
       })
 
