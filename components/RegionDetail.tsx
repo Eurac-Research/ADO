@@ -155,7 +155,7 @@ export default function RegionDetail({
       ...nutsData.map(row => {
         return [
           row.date,
-          ...indices.map(idx => row[idx] !== undefined && row[idx] !== null ? row[idx] : '')
+          ...indices.map(idx => row[idx.toUpperCase()] !== undefined && row[idx.toUpperCase()] !== null ? row[idx.toUpperCase()] : '')
         ].join(',')
       })
     ].join('\n')
