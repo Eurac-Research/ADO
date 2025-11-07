@@ -152,7 +152,7 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
             <RegionDetail
               nutsId={regionId}
               nutsName={regionName}
-              datatype={index}
+              datatype={index.toUpperCase()}
               staticMetaData={staticMetaData}
               indices={availableIndices}
               day={day}
