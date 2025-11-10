@@ -195,7 +195,7 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 40;
   padding: 15px;
   width: 100%;
   display: flex;
@@ -288,11 +288,11 @@ body {
   }
 
   .alpinespace {
-    width: 160px;
+    width: 120px;
     height: auto;
 
     @media (min-width: 768px) {
-      width: 220px;
+      width: 180px;
     }
   }
 }
@@ -439,21 +439,21 @@ body {
   align-items: flex-start;
   justify-content: flex-end;
   width: 100%;
-  height: 80vh;
+  height: 90vh;
   max-height: 100%;
   z-index: 3;
   user-select: none;
 
   @media (min-width: 768px) {
     height: 100vh;
-    padding-bottom: 80px;
+    padding-bottom: 40px;
   }
 
   &.impacts {
     height: 90vh;
     @media (min-width: 768px) {
       height: 100vh;
-      padding-bottom: 80px;
+      padding-bottom: 40px;
     }
   }
 
@@ -520,7 +520,7 @@ body {
     z-index: 2;
     background-color: var(--bg-8-light);
     padding: 15px;
-    width: 75vw;
+    width: 86vw;
     box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
     backdrop-filter: blur(10px);
 
@@ -1349,5 +1349,4 @@ b {
 .mapboxgl-map {
   will-change: transform;
 }
-
 

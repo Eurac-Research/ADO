@@ -10,12 +10,12 @@ import Map, {
 import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-format-parse'
 import { useThemeContext } from '@/context/theme'
 import type { PostData } from '@/types'
 import RegionDetail from '@/components/RegionDetail'
+import IndicesNavigation from '@/components/IndicesNavigation'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -300,33 +300,14 @@ export default function IndexClient({
           }
         />
 
-        <div className="navigation">
-          <p>Indices</p>
-          {indices?.map((index) => (
-
-            onIndexChange ? (
-              <button
-                key={index}
-                onClick={() => onIndexChange(index)}
-                onMouseEnter={() => onIndexHover?.(index)}
-                className={datatype.toLowerCase() === index ? 'active' : ''}
-              >
-                {index}
-              </button>
-            ) : (
-              <Link
-                prefetch={true}
-                href={`/${index}`}
-                key={index}
-                className={datatype.toLowerCase() === index ? 'active' : ''}
-                onMouseEnter={() => onIndexHover?.(index)}
-              >
-                {index}
-              </Link>
-            )
-          ))}
-        </div>
       </div>
+
+      <IndicesNavigation
+        indices={indices}
+        activeIndex={datatype}
+        onIndexChange={onIndexChange}
+        onIndexHover={onIndexHover}
+      />
 
       {clickInfo && (
         <RegionDetail
