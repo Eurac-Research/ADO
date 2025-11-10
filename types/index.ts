@@ -28,6 +28,11 @@ export interface NutsRegion {
   name: string
 }
 
+export interface RegionInfo {
+  id: string
+  name: string
+}
+
 // Impact category types
 export interface ImpactCategory {
   id: number
@@ -94,6 +99,14 @@ export interface Metadata {
   [key: string]: any
 }
 
+// Forecast types
+export interface ForecastWeek {
+  date: string
+  week: number
+  uncertainty: 'low' | 'medium' | 'high'
+  confidence: number
+}
+
 // Component prop types
 export interface ControlPanelProps {
   day: string
@@ -102,6 +115,8 @@ export interface ControlPanelProps {
   lastDay: string
   onChange: (value: string) => void
   hideDaySwitchTabs?: boolean
+  forecastWeeks?: ForecastWeek[]
+  currentIndex?: string
 }
 
 export interface ControlPanelImpactsProps {
@@ -187,6 +202,14 @@ export interface TimeSeriesProps {
   lastDate: string
   metadata?: Metadata
   style?: React.CSSProperties
+  compareYears?: boolean
+  selectedYears?: number[]
+  compareRegions?: boolean
+  regionNames?: string[]
+  comparisonData?: {
+    [regionId: string]: TimeSeriesData[]
+  }
+  onIndexChange?: (newIndex: string) => void
 }
 
 

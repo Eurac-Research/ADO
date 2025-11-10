@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
-import dynamic from 'next/dynamic'
 import Map, {
   Source,
   Layer,
@@ -11,21 +10,14 @@ import Map, {
 import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
-import TimeSeriesLegend from '@/components/timeSeriesLegend'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-format-parse'
-import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import type { PostData } from '@/types'
+import RegionDetail from '@/components/RegionDetail'
+import IndicesNavigation from '@/components/IndicesNavigation'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
-
-// Dynamic import for TimeSeries to prevent SSR issues
-const TimeSeries = dynamic(() => import('@/components/timeseries'), {
-  loading: () => <p>Loading...</p>,
-  ssr: false,
-})
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
@@ -73,9 +65,6 @@ export default function IndexClient({
   )
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
   const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null)
-  const [nutsData, setNutsData] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
 
   // Memoized values
   const dataLayer = useMemo(() => {
@@ -156,53 +145,11 @@ export default function IndexClient({
         }
         : null
     )
-    const nutsId = hoveredFeature ? hoveredFeature?.properties?.NUTS_ID : null
-    if (nutsId) {
-      await getNutsData(nutsId)
-    }
   }, [])
 
   const onClose = useCallback(() => {
     setClickInfo(null)
-    setNutsData(null)
   }, [])
-
-  // Data fetching function
-  async function getNutsData(overlayNutsId: string) {
-    const fetchData = async () => {
-      setIsError(false)
-      setIsLoading(true)
-      try {
-        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${overlayNutsId ? `${overlayNutsId}` : ''
-          }.json`
-        const result = await axios(url)
-        setNutsData(result.data)
-      } catch (error) {
-        setIsError(true)
-      }
-      setIsLoading(false)
-    }
-    fetchData()
-  }
-
-  // Custom tooltip component
-  function CustomTooltip({ payload, label, active }: any) {
-    if (active && payload && payload.length) {
-      const valueStyle = {
-        color: payload[0].value > 0 ? `#000` : `#d73232`,
-      }
-      return (
-        <div className="custom-tooltip">
-          <p className="label">{`${label}`}</p>
-          <p>
-            {payload[0].name}:{' '}
-            <span style={valueStyle}>{payload[0].value}</span>
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
 
   // Loading state
   if (metadata === undefined) {
@@ -353,108 +300,27 @@ export default function IndexClient({
           }
         />
 
-        <div className="navigation">
-          <p>Indices</p>
-          {indices?.map((index) => (
-
-            onIndexChange ? (
-              <button
-                key={index}
-                onClick={() => onIndexChange(index)}
-                onMouseEnter={() => onIndexHover?.(index)}
-                className={datatype.toLowerCase() === index ? 'active' : ''}
-              >
-                {index}
-              </button>
-            ) : (
-              <Link
-                prefetch={true}
-                href={`/${index}`}
-                key={index}
-                className={datatype.toLowerCase() === index ? 'active' : ''}
-                onMouseEnter={() => onIndexHover?.(index)}
-              >
-                {index}
-              </Link>
-            )
-          ))}
-        </div>
       </div>
 
+      <IndicesNavigation
+        indices={indices}
+        activeIndex={datatype}
+        onIndexChange={onIndexChange}
+        onIndexHover={onIndexHover}
+      />
+
       {clickInfo && (
-        <>
-          <div className="overlayContainer" onClick={onClose}></div>
-          <div className="dataOverlay">
-            <span className="closeOverlay" onClick={onClose}>
-              close X
-            </span>
-            <h3>
-              {datatype} - {staticMetaData?.long_name}
-            </h3>
-            {isError && (
-              <p>
-                file {ADO_DATA_URL}/json/timeseries/NUTS3_
-                {clickInfo.feature.properties.NUTS_ID}.json - errors in file
-              </p>
-            )}
-            <p>{clickInfo.feature.properties.NUTS_NAME}</p>
-            <TimeSeriesLegend />
-            <TimeSeries
-              data={nutsData}
-              indices={indices}
-              index={datatype}
-              metadata={staticMetaData}
-              firstDate={format(
-                new Date(new Date(day).getTime() - 5 * 365 * 24 * 60 * 60 * 1000),
-                'YYYY-MM-DD'
-              )}
-              lastDate={day}
-              style={{
-                width: '100%',
-                height: '100%',
-                position: 'relative',
-                zIndex: '102',
-                top: '0',
-                left: '0',
-              }}
-            />
-            {(staticMetaData?.doi || staticMetaData?.factsheet) && (
-              <p
-                style={{
-                  marginTop: '1rem',
-                  fontSize: '10px',
-                  lineHeight: '2',
-                }}
-              >
-                More information about the data:
-                <br />
-                {staticMetaData?.factsheet && (
-                  <>
-                    <a
-                      href={staticMetaData?.factsheet}
-                      target="_blank"
-                      rel="noreferrer"
-                      className='text-blue-600 underline'
-                    >
-                      Download {staticMetaData?.short_name} Factsheet
-                    </a>
-                    <br />
-                  </>
-                )}
-                {staticMetaData?.doi && (
-                  <a
-                    href={staticMetaData?.doi}
-                    target="_blank"
-                    rel="noreferrer"
-                    className='text-blue-600 underline'
-                  >
-                    {staticMetaData?.doi}
-                  </a>
-                )}
-              </p>
-            )}
-          </div>
-        </>
+        <RegionDetail
+          nutsId={clickInfo.feature.properties.NUTS_ID}
+          nutsName={clickInfo.feature.properties.NUTS_NAME}
+          datatype={datatype}
+          indices={indices}
+          day={day}
+          staticMetaData={staticMetaData}
+          allPosts={allPosts}
+          mode="modal"
+          onClose={onClose}
+        />
       )}
     </Layout>
   )

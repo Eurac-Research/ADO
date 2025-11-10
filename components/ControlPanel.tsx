@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { format } from 'date-format-parse'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
+import { DROUGHT_CATEGORIES, getCategoryForIndex } from '@/lib/categories'
 import type { ControlPanelProps } from '@/types'
 
 function ControlPanel(props: ControlPanelProps) {
@@ -205,6 +206,13 @@ function ControlPanel(props: ControlPanelProps) {
     props.onChange(value)
   }
 
+  const currentIndexId = props.currentIndex || metadata?.short_name || ''
+  const indexCategory = useMemo(() => {
+    if (!currentIndexId) return null
+    return getCategoryForIndex(currentIndexId) ?? DROUGHT_CATEGORIES.other
+  }, [currentIndexId])
+  const CategoryIcon = indexCategory?.icon
+
   return (
     <>
       <div className="controlpanel">
@@ -213,37 +221,53 @@ function ControlPanel(props: ControlPanelProps) {
           <span className="getMoreInfoIcon">i</span>
         </h2>
 
-        {!props.hideDaySwitchTabs && (
-          <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4" role="group" aria-label="Time range selection">
-            <button
-              onClick={() => handleTimeSpanChange(30)}
-              className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
-              aria-pressed={timeSpan === 30}
-              aria-label="Show last 30 days"
-            >
-              Last 30 days
-            </button>
-            <button
-              onClick={() => handleTimeSpanChange(90)}
-              className={`px-3 py-1 rounded ${timeSpan === 90 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
-              aria-pressed={timeSpan === 90}
-              aria-label="Show last 90 days"
-            >
-              Last 90 days
-            </button>
-            <button
-              onClick={resetTimeRange}
-              className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
-              aria-pressed={timeSpan === null}
-              aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days`}
-            >
-              Last {Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days
-            </button>
+
+        <div className='flex flex-wrap gap-6'>
+
+
+          {CategoryIcon && (
+            <>
+              <CategoryIcon aria-hidden="true" className="h-8 w-8 md:h-14 md:w-14 mt-4" />
+              {indexCategory?.shortName && (
+                <span className="sr-only">{indexCategory.shortName} index icon</span>
+              )}
+            </>
+
+          )}
+          <div>
+            {!props.hideDaySwitchTabs && (
+              <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4" role="group" aria-label="Time range selection">
+                <button
+                  onClick={() => handleTimeSpanChange(30)}
+                  className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
+                  aria-pressed={timeSpan === 30}
+                  aria-label="Show last 30 days"
+                >
+                  Last 30 days
+                </button>
+                <button
+                  onClick={() => handleTimeSpanChange(90)}
+                  className={`px-3 py-1 rounded ${timeSpan === 90 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
+                  aria-pressed={timeSpan === 90}
+                  aria-label="Show last 90 days"
+                >
+                  Last 90 days
+                </button>
+                <button
+                  onClick={resetTimeRange}
+                  className={`px-3 py-1 rounded ${timeSpan === null ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
+                  aria-pressed={timeSpan === null}
+                  aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days`}
+                >
+                  Last {Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days
+                </button>
+              </div>
+
+            )}
+
+            <h1 id="selected-date" aria-live="polite">{day}</h1>
           </div>
-
-        )}
-
-        <h1 id="selected-date" aria-live="polite">{day}</h1>
+        </div>
 
 
         <div className='flex flex-col md:flex-row items-start justify-start gap-4 mb-4'>
@@ -365,7 +389,7 @@ function ControlPanel(props: ControlPanelProps) {
           </div>
 
         </div>
-      </div>
+      </div >
 
       {overlay && (
         <>
@@ -394,7 +418,8 @@ function ControlPanel(props: ControlPanelProps) {
             )}
           </div>
         </>
-      )}
+      )
+      }
     </>
   )
 }
