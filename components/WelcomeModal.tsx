@@ -111,7 +111,7 @@ export default function WelcomeModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
-        className="bg-gradient-to-br from-neutral-900 to-neutral-950 backdrop-blur-xl border border-neutral-800/50 text-neutral-100 rounded-3xl shadow-2xl max-w-3xl max-h-[90vh] overflow-y-auto p-0 transition-all duration-300 ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 [&>button]:hidden"
+        className="bg-gradient-to-br from-neutral-900 to-neutral-950 backdrop-blur-xl border border-neutral-800/50 text-neutral-100 rounded-3xl shadow-2xl max-w-4xl max-h-[90vh] overflow-y-auto p-0 transition-all duration-300 ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 [&>button]:hidden"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="space-y-8 p-8 md:p-12">
@@ -159,7 +159,7 @@ export default function WelcomeModal() {
 
           {/* Hero Title */}
           <DialogHeader>
-            <DialogTitle className="text-3xl md:text-4xl font-light leading-tight text-neutral-50 tracking-tight">
+            <DialogTitle className="text-3xl md:text-4xl font-light leading-tight text-neutral-50 tracking-tight md:max-w-[85%]">
               {t.title}
             </DialogTitle>
           </DialogHeader>
@@ -170,39 +170,33 @@ export default function WelcomeModal() {
           </p>
 
           {/* Institute Card */}
-          <Card className="bg-gradient-to-br from-neutral-800/60 to-neutral-900/60 border-neutral-700/50 p-6 space-y-3 backdrop-blur-sm">
-            <h3 className="font-semibold text-neutral-50 text-lg">
-              {t.instituteTitle}
-            </h3>
-            <p className="text-neutral-400 text-base leading-relaxed">
-              {t.instituteDescription}
-            </p>
-            <Button
-              onClick={handleLearnMore}
-              variant="outline"
-              size="sm"
-              className="border-neutral-600 text-neutral-300 hover:bg-neutral-800 hover:border-neutral-500 hover:text-neutral-100 transition-all mt-2"
-            >
-              {t.buttonLearnMore}
-            </Button>
-          </Card>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button
-              onClick={handleExplore}
-              className="bg-blue-600 hover:bg-blue-700 text-white flex-1 transition-all shadow-lg shadow-blue-900/20 h-12 text-base font-medium"
-            >
-              {t.buttonExplore}
-            </Button>
-          </div>
-
-          <Button
-            onClick={handleClose}
-            variant="ghost"
-            className="w-full text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/50 transition-colors h-11"
+          <a
+            href="https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
           >
-            {t.buttonContinue}
+            <Card className="bg-gradient-to-br from-neutral-800/60 to-neutral-900/60 border-neutral-700/50 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-neutral-800/80 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-900/10 cursor-pointer">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-neutral-50 text-lg">
+                  {t.instituteTitle}
+                </h3>
+                <p className="text-neutral-400 text-base leading-relaxed max-w-[80%]">
+                  {t.instituteDescription}
+                </p>
+                <span className="inline-flex items-center text-sm text-blue-400 transition-colors underline underline-offset-2">
+                  {t.buttonLearnMore}
+                </span>
+              </div>
+            </Card>
+          </a>
+
+          {/* Action Button */}
+          <Button
+            onClick={handleExplore}
+            className="bg-blue-600 hover:bg-blue-700 text-white w-fit transition-all shadow-lg shadow-blue-900/20 h-12 text-base font-medium"
+          >
+            {t.buttonExplore}
           </Button>
 
           {/* Don't Show Again Checkbox */}
