@@ -1316,11 +1316,12 @@ b {
 .CookieConsent {
   max-width: 400px;
   width: 100%;
-  font-size: 14px;
-  line-height: 1.4;
-  padding: 20px;
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 12px 16px;
   left: auto;
   right: 0;
+  z-index: 40 !important;
   a {
     color: #0969da;
   }
