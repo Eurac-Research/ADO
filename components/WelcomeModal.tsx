@@ -140,17 +140,17 @@ const translations: Record<Language, Translation> = {
     institutes: [
       {
         title: "Inštitut za opazovanje Zemlje",
-        description: "Spremljamo okoljske spremembe v gorskih regijah, da bi razumeli, kako se naš planet razvija in kako ga zaščititi.",
+        description: "Spremljanje okoljskih sprememb v gorskih regijah za razumevanje evolucije našega planeta in njegove zaščite.",
         url: "https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
       },
       {
         title: "Inštitut za alpsko okolje",
-        description: "Preučujemo alpske ekosisteme in razvijamo rešitve za trajnostno upravljanje naravnih virov v gorskih regijah.",
+        description: "Preučevanje alpskih ekosistemov in razvoj rešitev za trajnostno upravljanje naravnih virov v gorskih regijah.",
         url: "https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment"
       },
       {
         title: "Center za podnebne spremembe in preobrazbo",
-        description: "Raziskujemo vplive podnebnih sprememb in podpiramo skupnosti pri prilagajanju okoljskim izzivom.",
+        description: "Raziskave vplivov podnebnih sprememb in podpora skupnostim pri prilagajanju okoljskim izzivom.",
         url: "https://www.eurac.edu/en/institutes-centers/center-for-climate-change-and-transformation"
       }
     ],
