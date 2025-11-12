@@ -33,7 +33,7 @@ const translations: Record<Language, Translation> = {
     instituteTitle: "Eurac Research – Institute for Earth Observation",
     instituteDescription:
       "We monitor environmental changes in mountain regions to understand how our planet is evolving — and how to protect it.",
-    buttonExplore: "Explore the Observatory",
+    buttonExplore: "Start Exploring",
     buttonLearnMore: "Learn more about the Institute",
     buttonContinue: "Continue to Data",
     checkboxLabel: "Don't show again",
@@ -45,7 +45,7 @@ const translations: Record<Language, Translation> = {
     instituteTitle: "Eurac Research – Institut für Erdbeobachtung",
     instituteDescription:
       "Wir beobachten Umweltveränderungen in Gebirgsregionen, um besser zu verstehen, wie sich unser Planet verändert – und wie wir ihn schützen können.",
-    buttonExplore: "Zum Observatorium",
+    buttonExplore: "Jetzt erkunden",
     buttonLearnMore: "Mehr über das Institut",
     buttonContinue: "Weiter zu den Daten",
     checkboxLabel: "Nicht mehr anzeigen",
@@ -57,7 +57,7 @@ const translations: Record<Language, Translation> = {
     instituteTitle: "Eurac Research – Istituto per l'Osservazione della Terra",
     instituteDescription:
       "Monitoriamo i cambiamenti ambientali nelle regioni montane per comprendere meglio come si evolve il nostro pianeta e come possiamo proteggerlo.",
-    buttonExplore: "Esplora l'Osservatorio",
+    buttonExplore: "Inizia l'esplorazione",
     buttonLearnMore: "Scopri di più sull'Istituto",
     buttonContinue: "Continua ai dati",
     checkboxLabel: "Non mostrare più",
@@ -77,16 +77,18 @@ const detectLanguage = (): Language => {
 export default function WelcomeModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
-  const [language, setLanguage] = useState<Language>(detectLanguage);
+  const [language, setLanguage] = useState<Language>("en");
   const [mounted, setMounted] = useState(false);
 
   const t = translations[language];
 
   useEffect(() => {
     setMounted(true);
+    setLanguage(detectLanguage());
     const dismissed = localStorage.getItem("adoModalDismissed");
     if (!dismissed) {
-      setIsOpen(true);
+      // Delay opening until after hydration is complete to avoid aria-hidden mismatch
+      setTimeout(() => setIsOpen(true), 100);
     }
   }, []);
 
@@ -111,7 +113,7 @@ export default function WelcomeModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
-        className="bg-gradient-to-br from-neutral-900 to-neutral-950 backdrop-blur-xl border border-neutral-800/50 text-neutral-100 rounded-3xl shadow-2xl max-w-4xl max-h-[90vh] overflow-y-auto p-0 transition-all duration-300 ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 [&>button]:hidden"
+        className="bg-gradient-to-br from-neutral-900 to-neutral-950 backdrop-blur-xl border border-neutral-800/50 text-neutral-100 rounded-3xl shadow-2xl max-w-4xl max-h-[90vh] overflow-y-auto p-0 transition-all duration-300 ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 [&>button]:hidden z-50"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="space-y-8 p-8 md:p-12">

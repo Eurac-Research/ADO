@@ -56,12 +56,13 @@ export default function Layout({
         location="bottom"
         buttonText="OK"
         cookieName="cookieConsentAccepted"
-        style={{ background: '#222', left: 'auto', right: '0' }}
+        style={{ background: '#222', left: 'auto', right: '0', zIndex: 40 }}
         buttonStyle={{
           background: '#36a036',
           color: '#fff',
-          padding: '8px 14px',
+          padding: '6px 12px',
           fontWeight: 'bold',
+          fontSize: '14px',
         }}
         expires={150}
       >
