@@ -12,13 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 
-type Language = "en" | "de" | "it";
+type Language = "en" | "de" | "it" | "fr" | "sl";
 
 interface Translation {
   title: string;
   body: string;
-  instituteTitle: string;
-  instituteDescription: string;
+  institutes: {
+    title: string;
+    description: string;
+    url: string;
+  }[];
   buttonExplore: string;
   buttonLearnMore: string;
   buttonContinue: string;
@@ -30,11 +33,25 @@ const translations: Record<Language, Translation> = {
     title:
       "Understanding droughts in the Alps — to protect our mountain ecosystems and communities.",
     body: "The Alpine Drought Observatory helps us track and understand droughts in the Alpine region — a growing threat to biodiversity, water resources and livelihoods. Using satellite observations, ground-station and hydrological data, our scientists turn complex information into actionable insights for mountain communities and decision-makers.",
-    instituteTitle: "Eurac Research – Institute for Earth Observation",
-    instituteDescription:
-      "We monitor environmental changes in mountain regions to understand how our planet is evolving — and how to protect it.",
+    institutes: [
+      {
+        title: "Institute for Earth Observation",
+        description: "Monitoring environmental changes in mountain regions to understand how our planet is evolving — and how to protect it.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
+      },
+      {
+        title: "Institute for Alpine Environment",
+        description: "Studying Alpine ecosystems and developing solutions for sustainable management of natural resources in mountain regions.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment"
+      },
+      {
+        title: "Center for Climate Change and Transformation",
+        description: "Researching climate change impacts and supporting communities in adapting to environmental challenges.",
+        url: "https://www.eurac.edu/en/institutes-centers/center-for-climate-change-and-transformation"
+      }
+    ],
     buttonExplore: "Start Exploring",
-    buttonLearnMore: "Learn more about the Institute",
+    buttonLearnMore: "Learn more",
     buttonContinue: "Continue to Data",
     checkboxLabel: "Don't show again",
   },
@@ -42,11 +59,25 @@ const translations: Record<Language, Translation> = {
     title:
       "Dürre verstehen, um alpine Ökosysteme und Gemeinschaften zu schützen.",
     body: "Das Alpine Drought Observatory hilft uns, Dürre im Alpenraum zu erfassen und zu verstehen – eine wachsende Bedrohung für Biodiversität, Wasserressourcen und Lebensgrundlagen. Mithilfe von Satellitendaten, Messstationen und hydrologischen Daten übersetzen unsere Forschenden komplexe Informationen in konkrete Erkenntnisse für Bergregionen und Entscheidungsträger.",
-    instituteTitle: "Eurac Research – Institut für Erdbeobachtung",
-    instituteDescription:
-      "Wir beobachten Umweltveränderungen in Gebirgsregionen, um besser zu verstehen, wie sich unser Planet verändert – und wie wir ihn schützen können.",
+    institutes: [
+      {
+        title: "Institut für Erdbeobachtung",
+        description: "Beobachtung von Umweltveränderungen in Gebirgsregionen, um besser zu verstehen, wie sich unser Planet verändert — und wie wir ihn schützen können.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
+      },
+      {
+        title: "Institut für Alpine Umwelt",
+        description: "Erforschung alpiner Ökosysteme und Entwicklung von Lösungen für ein nachhaltiges Management natürlicher Ressourcen in Bergregionen.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment"
+      },
+      {
+        title: "Center for Climate Change and Transformation",
+        description: "Untersuchung der Auswirkungen des Klimawandels und Unterstützung von Gemeinschaften bei der Anpassung an Umweltherausforderungen.",
+        url: "https://www.eurac.edu/en/institutes-centers/center-for-climate-change-and-transformation"
+      }
+    ],
     buttonExplore: "Jetzt erkunden",
-    buttonLearnMore: "Mehr über das Institut",
+    buttonLearnMore: "Mehr erfahren",
     buttonContinue: "Weiter zu den Daten",
     checkboxLabel: "Nicht mehr anzeigen",
   },
@@ -54,13 +85,79 @@ const translations: Record<Language, Translation> = {
     title:
       "Capire la siccità per proteggere ecosistemi e comunità alpine.",
     body: "L'Osservatorio sulla Siccità Alpina ci aiuta a monitorare e comprendere la siccità nelle Alpi — una minaccia crescente per la biodiversità, le risorse idriche e le comunità. Utilizzando dati satellitari, stazioni di misura e dati idrologici, i nostri ricercatori trasformano informazioni complesse in conoscenze concrete per le regioni montane e i decisori.",
-    instituteTitle: "Eurac Research – Istituto per l'Osservazione della Terra",
-    instituteDescription:
-      "Monitoriamo i cambiamenti ambientali nelle regioni montane per comprendere meglio come si evolve il nostro pianeta e come possiamo proteggerlo.",
+    institutes: [
+      {
+        title: "Istituto per l'Osservazione della Terra",
+        description: "Monitoraggio dei cambiamenti ambientali nelle regioni montane per comprendere meglio come si evolve il nostro pianeta e come possiamo proteggerlo.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
+      },
+      {
+        title: "Istituto per l'Ambiente Alpino",
+        description: "Studio degli ecosistemi alpini e sviluppo di soluzioni per una gestione sostenibile delle risorse naturali nelle regioni montane.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment"
+      },
+      {
+        title: "Center for Climate Change and Transformation",
+        description: "Ricerca sugli impatti dei cambiamenti climatici e supporto alle comunità nell'adattamento alle sfide ambientali.",
+        url: "https://www.eurac.edu/en/institutes-centers/center-for-climate-change-and-transformation"
+      }
+    ],
     buttonExplore: "Inizia l'esplorazione",
-    buttonLearnMore: "Scopri di più sull'Istituto",
+    buttonLearnMore: "Scopri di più",
     buttonContinue: "Continua ai dati",
     checkboxLabel: "Non mostrare più",
+  },
+  fr: {
+    title:
+      "Comprendre les sécheresses dans les Alpes — pour protéger nos écosystèmes et communautés de montagne.",
+    body: "L'Observatoire Alpin de la Sécheresse nous aide à suivre et comprendre les sécheresses dans la région alpine — une menace croissante pour la biodiversité, les ressources en eau et les moyens de subsistance. En utilisant des observations satellitaires, des données de stations au sol et hydrologiques, nos scientifiques transforment des informations complexes en perspectives concrètes pour les communautés de montagne et les décideurs.",
+    institutes: [
+      {
+        title: "Institut d'Observation de la Terre",
+        description: "Surveillance des changements environnementaux dans les régions montagneuses pour comprendre l'évolution de notre planète et comment la protéger.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
+      },
+      {
+        title: "Institut pour l'Environnement Alpin",
+        description: "Étude des écosystèmes alpins et développement de solutions pour une gestion durable des ressources naturelles dans les régions montagneuses.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment"
+      },
+      {
+        title: "Centre pour le Changement Climatique et la Transformation",
+        description: "Recherche sur les impacts du changement climatique et soutien aux communautés dans leur adaptation aux défis environnementaux.",
+        url: "https://www.eurac.edu/en/institutes-centers/center-for-climate-change-and-transformation"
+      }
+    ],
+    buttonExplore: "Commencer l'exploration",
+    buttonLearnMore: "En savoir plus",
+    buttonContinue: "Continuer vers les données",
+    checkboxLabel: "Ne plus afficher",
+  },
+  sl: {
+    title:
+      "Razumevanje suš v Alpah — za zaščito gorskih ekosistemov in skupnosti.",
+    body: "Alpski observatorij za sušo nam pomaga spremljati in razumeti suše v alpski regiji — naraščajočo grožnjo biotski raznovrstnosti, vodnim virom in preživetju. Z uporabo satelitskih opazovanj, podatkovземeljskih postaj in hidroloških podatkov naši znanstveniki pretvarjajo kompleksne informacije v uporabne vpoglede za gorske skupnosti in odločevalce.",
+    institutes: [
+      {
+        title: "Inštitut za opazovanje Zemlje",
+        description: "Spremljamo okoljske spremembe v gorskih regijah, da bi razumeli, kako se naš planet razvija in kako ga zaščititi.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
+      },
+      {
+        title: "Inštitut za alpsko okolje",
+        description: "Preučujemo alpske ekosisteme in razvijamo rešitve za trajnostno upravljanje naravnih virov v gorskih regijah.",
+        url: "https://www.eurac.edu/en/institutes-centers/institute-for-alpine-environment"
+      },
+      {
+        title: "Center za podnebne spremembe in preobrazbo",
+        description: "Raziskujemo vplive podnebnih sprememb in podpiramo skupnosti pri prilagajanju okoljskim izzivom.",
+        url: "https://www.eurac.edu/en/institutes-centers/center-for-climate-change-and-transformation"
+      }
+    ],
+    buttonExplore: "Začni raziskovati",
+    buttonLearnMore: "Več informacij",
+    buttonContinue: "Nadaljuj na podatke",
+    checkboxLabel: "Ne prikaži več",
   },
 };
 
@@ -71,6 +168,8 @@ const detectLanguage = (): Language => {
 
   if (browserLang.startsWith("de")) return "de";
   if (browserLang.startsWith("it")) return "it";
+  if (browserLang.startsWith("fr")) return "fr";
+  if (browserLang.startsWith("sl")) return "sl";
   return "en";
 };
 
@@ -134,7 +233,7 @@ export default function WelcomeModal() {
             <div className="flex items-center gap-4">
               {/* Language Selector */}
               <div className="flex items-center gap-1.5 bg-neutral-800/50 rounded-lg p-1">
-                {(["en", "de", "it"] as Language[]).map((lang) => (
+                {(["en", "de", "it", "fr", "sl"] as Language[]).map((lang) => (
                   <button
                     key={lang}
                     onClick={() => setLanguage(lang)}
@@ -171,27 +270,37 @@ export default function WelcomeModal() {
             {t.body}
           </p>
 
-          {/* Institute Card */}
-          <a
-            href="https://www.eurac.edu/en/institutes-centers/institute-for-earth-observation"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <Card className="bg-gradient-to-br from-neutral-800/60 to-neutral-900/60 border-neutral-700/50 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-neutral-800/80 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-900/10 cursor-pointer">
-              <div className="space-y-3">
-                <h3 className="font-semibold text-neutral-50 text-lg">
-                  {t.instituteTitle}
-                </h3>
-                <p className="text-neutral-400 text-base leading-relaxed max-w-[80%]">
-                  {t.instituteDescription}
-                </p>
-                <span className="inline-flex items-center text-sm text-blue-400 transition-colors underline underline-offset-2">
-                  {t.buttonLearnMore}
-                </span>
-              </div>
-            </Card>
-          </a>
+          {/* Institute Cards */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-neutral-400 uppercase tracking-wide">
+              Eurac Research Institutes
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {t.institutes.map((institute, index) => (
+                <a
+                  key={index}
+                  href={institute.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Card className="bg-gradient-to-br from-neutral-800/60 to-neutral-900/60 border-neutral-700/50 p-4 backdrop-blur-sm transition-all duration-300 hover:bg-neutral-800/80 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-900/10 cursor-pointer h-full">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-neutral-50 text-sm leading-tight">
+                        {institute.title}
+                      </h4>
+                      <p className="text-neutral-400 text-xs leading-relaxed">
+                        {institute.description}
+                      </p>
+                      <span className="inline-flex items-center text-xs text-blue-400 transition-colors underline underline-offset-2">
+                        {t.buttonLearnMore}
+                      </span>
+                    </div>
+                  </Card>
+                </a>
+              ))}
+            </div>
+          </div>
 
           {/* Action Button */}
           <Button
