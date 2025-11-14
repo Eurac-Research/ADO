@@ -77,7 +77,7 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
               <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2 mt-16 mb-6">
                 Partner
               </h2>
-              <div className="flex flex-wrap justify-center items-center gap-6 pb-20">
+              <div className="flex flex-wrap justify-center items-center gap-8 pb-20 [&_a]:p-2">
                 <a
                   href="https://www.eurac.edu/en"
                   target="_blank"
@@ -101,19 +101,19 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
                 </a>
 
                 <a href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="KGZM-B" src="https://webassets.eurac.edu/31538/1763118611-kgzmb-logo.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                  <Image unoptimized alt="KGZM-B" src="https://webassets.eurac.edu/31538/1763118611-kgzmb-logo.svg" width={200} height={150} className="h-24 w-auto " />
                 </a>
 
                 <a href="https://www.dia4s.fr/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="DIA4S" src="https://webassets.eurac.edu/31538/1763118900-dia4s-fr.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                  <Image unoptimized alt="DIA4S" src="https://webassets.eurac.edu/31538/1763118900-dia4s-fr.svg" width={200} height={150} className="h-24 w-auto" />
                 </a>
 
                 <a href="https://www.geosphere.at/de" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="GeoSphere Austria" src="https://webassets.eurac.edu/31538/1727259358-geosphere-logo.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                  <Image unoptimized alt="GeoSphere Austria" src="https://webassets.eurac.edu/31538/1727259358-geosphere-logo.svg" width={200} height={150} className="h-20 w-auto" />
                 </a>
 
                 <a href="https://www.lmu.de/en/index.html" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="LMU Munich" src="https://webassets.eurac.edu/31538/1662112761-logo_lmu.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                  <Image unoptimized alt="LMU Munich" src="https://webassets.eurac.edu/31538/1662112761-logo_lmu.svg" width={200} height={150} className="h-24 w-auto" />
                 </a>
 
                 <a href="https://cf.regione.vda.it/it/" target="_blank" rel="noreferrer" className="">
@@ -159,9 +159,6 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
                   <Image unoptimized alt="Land Oberösterreich" src="https://webassets.eurac.edu/31538/1624968920-landoberosterreichlogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={199} height={140} className="max-h-24 w-auto object-contain" />
                 </a>
 
-                <a href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="KGZM-B" src="https://webassets.eurac.edu/31538/1624964716-kgzmblogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={193} height={150} className="max-h-24 w-auto object-contain" />
-                </a>
 
                 <a href="https://www.unr.uni-freiburg.de/en" target="_blank" rel="noreferrer" className="">
                   <Image unoptimized alt="University of Freiburg" src="https://webassets.eurac.edu/31538/1624964892-unifreiburglogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={161} height={150} className="max-h-24 w-auto object-contain" />
