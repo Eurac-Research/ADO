@@ -28,7 +28,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
-        <PlausibleProvider domain="ado.eurac.edu, rollup.eurac.edu">
+        <PlausibleProvider domain="ado.eurac.edu">
           <ThemeProvider>
             <WelcomeModal />
             {children}

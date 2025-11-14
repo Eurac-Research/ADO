@@ -227,7 +227,7 @@ function ControlPanel(props: ControlPanelProps) {
 
           {CategoryIcon && (
             <>
-              <CategoryIcon aria-hidden="true" className="h-8 w-8 md:h-14 md:w-14 mt-4" />
+              <CategoryIcon aria-hidden="true" className="h-8 w-8 md:h-14 md:w-14 mt-4 dark:stroke-white" />
               {indexCategory?.shortName && (
                 <span className="sr-only">{indexCategory.shortName} index icon</span>
               )}
