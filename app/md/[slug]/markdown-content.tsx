@@ -100,6 +100,49 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
                   </div>
                 </a>
 
+                <a href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="KGZM-B" src="https://webassets.eurac.edu/31538/1763118611-kgzmb-logo.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.dia4s.fr/" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="DIA4S" src="https://webassets.eurac.edu/31538/1763118900-dia4s-fr.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.geosphere.at/de" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="GeoSphere Austria" src="https://webassets.eurac.edu/31538/1727259358-geosphere-logo.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.lmu.de/en/index.html" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="LMU Munich" src="https://webassets.eurac.edu/31538/1662112761-logo_lmu.svg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://cf.regione.vda.it/it/" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="Centro Funzionale Valle d'Aosta" src="https://webassets.eurac.edu/31538/1732792788-centro-funzionale-aosta_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.cimafoundation.org/en/" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="CIMA Research Foundation" src="https://webassets.eurac.edu/31538/1727259515-cima_research_foundation_logo.jpeg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://lessem.lyon-grenoble.hub.inrae.fr/" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="LESSEM" src="https://webassets.eurac.edu/31538/1763119542-4e8cc0fc3d94-lessem_couleur-1.png?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.cee.ed.tum.de/cee/startseite/" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="TU Munich" src="https://webassets.eurac.edu/31538/1636727308-tumtechnische-universitaet-muenchen-munic-logo.gif?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.tuwien.at/mg/geo" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="TU Wien" src="https://webassets.eurac.edu/31538/1697190437-tu-wien_logo.png?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+                <a href="https://www.uni-lj.si/" target="_blank" rel="noreferrer" className="">
+                  <Image unoptimized alt="University of Ljubljana" src="https://webassets.eurac.edu/31538/1697190577-ljubljana-university_logo.png?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                </a>
+
+
+
+
                 <a href="https://www.regione.piemonte.it/web/" target="_blank" rel="noreferrer" className="">
                   <Image unoptimized alt="Regione Piemonte" src="https://webassets.eurac.edu/31538/1624965085-regionepiemontelogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={79} className="max-h-24 w-auto object-contain" />
                 </a>
@@ -132,9 +175,9 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
                   <Image unoptimized alt="INRAE" src="https://webassets.eurac.edu/31538/1624963435-inrae.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={107} className="max-h-24 w-auto object-contain" />
                 </a>
 
-                <a href="https://www.zamg.ac.at/" target="_blank" rel="noreferrer" className="">
+                {/* <a href="https://www.zamg.ac.at/" target="_blank" rel="noreferrer" className="">
                   <Image unoptimized alt="ZAMG" src="https://webassets.eurac.edu/31538/1625049129-zamg-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={125} className="max-h-24 w-auto object-contain" />
-                </a>
+                </a> */}
 
                 <a href="https://www.iskriva.net/" target="_blank" rel="noreferrer" className="">
                   <Image unoptimized alt="Iskriva" src="https://webassets.eurac.edu/31538/1630484236-iskriva-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={122} className="max-h-24 w-auto object-contain" />
