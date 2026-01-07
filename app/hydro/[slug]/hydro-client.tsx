@@ -12,12 +12,12 @@ import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
-import Link from 'next/link'
 import { format } from 'date-format-parse'
 import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import { stationCache } from '@/lib/station-cache'
 import type { PostData } from '@/types'
+import IndicesNavigation from '@/components/IndicesNavigation'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -635,20 +635,11 @@ export default function HydroClient({
           }}
         />
 
-        <div className="navigation">
-
-          <p>Hydro Indices</p>
-          {indices?.map((index) => (
-            <Link
-              prefetch={true}
-              href={`/hydro/${index}`}
-              key={index}
-              className={datatype.toLowerCase() === index ? 'active' : ''}
-            >
-              {index.toUpperCase()}
-            </Link>
-          ))}
-        </div>
+        <IndicesNavigation
+          indices={indices}
+          activeIndex={datatype}
+          basePath="/hydro"
+        />
       </div>
 
       {clickInfo && (

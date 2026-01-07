@@ -1,5 +1,5 @@
-import { CloudRain, Droplets, Leaf, Snowflake } from 'lucide-react'
-import { LucideIcon } from 'lucide-react'
+import { CloudRain, Droplets, Leaf, Map as MapIcon, Snowflake } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 export interface DroughtCategory {
   id: string
@@ -72,6 +72,20 @@ export const DROUGHT_CATEGORIES: Record<string, DroughtCategory> = {
       darkTo: 'dark:to-blue-900'
     },
     indices: ['sspi-1', 'sspi-3', 'sspi-6', 'sspi-12', 'snow', 'swe', 'snow_depth', 'snow_cover', 'snowpack']
+  },
+  other: {
+    id: 'other',
+    name: 'Other Indices',
+    shortName: 'Other',
+    description: 'Additional drought indicators and experimental layers.',
+    icon: MapIcon,
+    gradient: {
+      from: 'from-slate-50',
+      to: 'to-slate-200',
+      darkFrom: 'dark:from-slate-900/50',
+      darkTo: 'dark:to-slate-900'
+    },
+    indices: []
   }
 }
 
