@@ -4,7 +4,7 @@ const nextConfig = {
   //   typedRoutes: true,
   // },
   images: {
-    domains: ['webassets.eurac.edu'],
+    domains: ['webassets.eurac.edu', 'www.datocms-assets.com'],
   },
   reactStrictMode: true,
 
