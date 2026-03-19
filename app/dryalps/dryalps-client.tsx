@@ -233,9 +233,7 @@ export default function DryAlpsClient({
   )
   const [regionFilters, setRegionFilters] = useState<string[]>([])
   const [showMappedOnly, setShowMappedOnly] = useState(false)
-  const [selectedImpactId, setSelectedImpactId] = useState<number | null>(
-    dataset.impacts[0]?.id ?? null
-  )
+  const [selectedImpactId, setSelectedImpactId] = useState<number | null>(null)
   const [hoveredRegion, setHoveredRegion] = useState<{
     x: number
     y: number
@@ -452,14 +450,12 @@ export default function DryAlpsClient({
     )
 
     if (!hasSelectedImpact) {
-      setSelectedImpactId(filteredImpacts[0].id)
+      setSelectedImpactId(null)
     }
   }, [filteredImpacts, selectedImpactId])
 
   const selectedImpact =
-    filteredImpacts.find((impact) => impact.id === selectedImpactId) ||
-    filteredImpacts[0] ||
-    null
+    filteredImpacts.find((impact) => impact.id === selectedImpactId) || null
 
   const countsByNutsId = useMemo(() => {
     const counts: Record<string, number> = {}
