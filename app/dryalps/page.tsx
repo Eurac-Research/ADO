@@ -6,7 +6,7 @@ import {
 } from '@/lib/dryalps'
 import DryAlpsClient from './dryalps-client'
 
-export const revalidate = 24 * 60 * 60
+export const revalidate = 86400
 
 export const metadata = {
   title: 'DryAlps - Alpine Drought Observatory | Eurac Research',

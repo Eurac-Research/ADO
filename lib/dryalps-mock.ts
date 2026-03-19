@@ -383,20 +383,22 @@ export async function fetchMockDryAlpsDataset(
   const nuts3GeoJson = await fetchNutsGeoJSON('nuts3', mockFetchOptions)
 
   const eligibleFeatures = nuts3GeoJson.features
-    .filter((feature) => {
+    .filter((feature: NutsFeature) => {
       const nutsId = feature.properties?.NUTS_ID || ''
 
       return italianAlpineNuts3Prefixes.some((prefix) =>
         nutsId.startsWith(prefix)
       )
     })
-    .sort((firstFeature, secondFeature) =>
+    .sort((firstFeature: NutsFeature, secondFeature: NutsFeature) =>
       firstFeature.properties.NUTS_ID.localeCompare(secondFeature.properties.NUTS_ID)
     )
 
   const mockLocations = eligibleFeatures
     .slice(0, 36)
-    .map((feature, index) => buildMockLocation(feature, index))
+    .map((feature: NutsFeature, index: number) =>
+      buildMockLocation(feature, index)
+    )
 
   if (!mockLocations.length) {
     return {

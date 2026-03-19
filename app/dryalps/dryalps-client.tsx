@@ -483,8 +483,6 @@ export default function DryAlpsClient({
     [filteredImpacts]
   )
 
-  const selectedImpactNutsIds = selectedImpact?.mappedNutsIds || []
-
   const groupedImpacts = useMemo(() => {
     const groups = new Map<string, DryAlpsImpact[]>()
 
@@ -680,11 +678,14 @@ export default function DryAlpsClient({
   )
 
   const selectedFilter = useMemo<any>(
-    () =>
-      selectedImpactNutsIds.length
+    () => {
+      const selectedImpactNutsIds = selectedImpact?.mappedNutsIds ?? []
+
+      return selectedImpactNutsIds.length
         ? ['in', ['get', 'NUTS_ID'], ['literal', selectedImpactNutsIds]]
-        : ['==', ['get', 'NUTS_ID'], ''],
-    [selectedImpactNutsIds]
+        : ['==', ['get', 'NUTS_ID'], '']
+    },
+    [selectedImpact]
   )
 
   const regionSelectionFilter = useMemo<any>(
