@@ -124,6 +124,13 @@ const sharedMockNews: DryAlpsNewsItem = {
     'Mock source reused for interface stress testing. The purpose is to simulate repeated supporting evidence while evaluating the behavior of the chronology, filters, and map interactions under a denser impact volume.',
 }
 
+const mockRegionalHotspots = [
+  { center: [7.35, 45.85] as [number, number], radius: 1.25, weight: 10 },
+  { center: [10.9, 46.55] as [number, number], radius: 1.1, weight: 14 },
+  { center: [12.45, 46.35] as [number, number], radius: 0.95, weight: 9 },
+  { center: [9.55, 46.1] as [number, number], radius: 0.9, weight: 6 },
+] as const
+
 function collectCoordinates(value: unknown): [number, number][] {
   if (!Array.isArray(value)) {
     return []
@@ -179,6 +186,55 @@ function averageCoordinates(
   )
 
   return [sumLng / validCoordinates.length, sumLat / validCoordinates.length]
+}
+
+function getRegionalHotspotWeight(location: DryAlpsLocation) {
+  if (!location.coordinate) {
+    return 1
+  }
+
+  const [lng, lat] = location.coordinate
+
+  return mockRegionalHotspots.reduce((currentWeight, hotspot) => {
+    const distance = Math.hypot(lng - hotspot.center[0], lat - hotspot.center[1])
+
+    if (distance >= hotspot.radius) {
+      return currentWeight
+    }
+
+    const influence = 1 - distance / hotspot.radius
+    return currentWeight + Math.max(1, Math.round(influence * hotspot.weight))
+  }, 1)
+}
+
+function findNearbyLocation(
+  primaryLocation: DryAlpsLocation,
+  locations: DryAlpsLocation[],
+  index: number
+) {
+  const siblingLocations = locations.filter((location) => {
+    if (location.id === primaryLocation.id) {
+      return false
+    }
+
+    return (
+      location.nuts2[0] &&
+      primaryLocation.nuts2[0] &&
+      location.nuts2[0] === primaryLocation.nuts2[0]
+    )
+  })
+
+  if (siblingLocations.length) {
+    return siblingLocations[index % siblingLocations.length]
+  }
+
+  const primaryIndex = locations.findIndex(
+    (location) => location.id === primaryLocation.id
+  )
+  const fallbackLocation =
+    locations[(primaryIndex + index + 5) % locations.length] || null
+
+  return fallbackLocation?.id === primaryLocation.id ? null : fallbackLocation
 }
 
 function formatMonthLabel(date: Date) {
@@ -262,15 +318,16 @@ function buildMockLocation(feature: NutsFeature, index: number): DryAlpsLocation
 function buildMockImpact(
   index: number,
   locations: DryAlpsLocation[],
-  impactCount: number
+  impactCount: number,
+  weightedLocations: DryAlpsLocation[]
 ): DryAlpsImpact {
   const baseDate = getMockBaseDate(index, impactCount)
 
   const sector = mockSectors[index % mockSectors.length]
   const period = mockPeriods[index % mockPeriods.length]
-  const primaryLocation = locations[index % locations.length]
+  const primaryLocation = weightedLocations[index % weightedLocations.length]
   const secondaryLocation =
-    index % 5 === 0 ? locations[(index + 7) % locations.length] : null
+    index % 6 === 0 ? findNearbyLocation(primaryLocation, locations, index) : null
   const relatedLocations = secondaryLocation
     ? [primaryLocation, secondaryLocation]
     : [primaryLocation]
@@ -400,6 +457,10 @@ export async function fetchMockDryAlpsDataset(
       buildMockLocation(feature, index)
     )
 
+  const weightedLocations = mockLocations.flatMap((location) =>
+    Array.from({ length: getRegionalHotspotWeight(location) }, () => location)
+  )
+
   if (!mockLocations.length) {
     return {
       impacts: [],
@@ -408,7 +469,7 @@ export async function fetchMockDryAlpsDataset(
   }
 
   const impacts = Array.from({ length: impactCount }, (_, index) =>
-    buildMockImpact(index, mockLocations, impactCount)
+    buildMockImpact(index, mockLocations, impactCount, weightedLocations)
   ).sort((firstImpact, secondImpact) => {
     const firstTimestamp = firstImpact.displayDate
       ? Date.parse(firstImpact.displayDate)
