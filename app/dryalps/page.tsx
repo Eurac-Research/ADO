@@ -6,6 +6,7 @@ import {
 } from '@/lib/dryalps'
 import DryAlpsClient from './dryalps-client'
 
+export const dynamic = 'force-dynamic'
 export const revalidate = 86400
 
 export const metadata = {

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   startTransition,
   useDeferredValue,
@@ -32,6 +33,58 @@ const sectorColors: Record<string, string> = {
   'Public water supply': '#536c79',
   'Tourism and recreation': '#7a5f66',
   Others: '#6a675f',
+}
+
+const impactDensityLegend = [
+  { label: '1', color: '#d6d3d1' },
+  { label: '2', color: '#a8a29e' },
+  { label: '3-4', color: '#78716c' },
+  { label: '5+', color: '#57534e' },
+] as const
+
+function parseQueryList(value: string | null) {
+  if (!value) {
+    return []
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)
+    )
+  )
+}
+
+function parseQueryNumber(value: string | null) {
+  if (!value) {
+    return null
+  }
+
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function areEqualLists(firstList: string[], secondList: string[]) {
+  if (firstList.length !== secondList.length) {
+    return false
+  }
+
+  return firstList.every((value, index) => value === secondList[index])
+}
+
+function setListParam(
+  params: URLSearchParams,
+  key: string,
+  values: string[]
+) {
+  if (values.length) {
+    params.set(key, values.join(','))
+    return
+  }
+
+  params.delete(key)
 }
 
 function formatCalendarDate(value: string | null) {
@@ -114,6 +167,10 @@ function getImpactHeading(impact: DryAlpsImpact) {
   }
 
   return impact.impactedSector
+}
+
+function getPrimaryLocationLabel(impact: DryAlpsImpact) {
+  return impact.locations[0]?.naturalLocation || impact.locations[0]?.name || 'Location not specified'
 }
 
 function getImpactSubline(impact: DryAlpsImpact) {
@@ -221,19 +278,41 @@ export default function DryAlpsClient({
   error,
 }: DryAlpsClientProps) {
   const mapRef = useRef<MapRef>(null)
-  const [theme] = useThemeContext()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [regionSearchQuery, setRegionSearchQuery] = useState('')
-  const [sectorFilter, setSectorFilter] = useState('all')
-  const [periodFilter, setPeriodFilter] = useState('all')
-  const [yearFilters, setYearFilters] = useState<string[]>([])
-  const [speiFilters, setSpeiFilters] = useState<string[]>([])
-  const [counterMeasureFilters, setCounterMeasureFilters] = useState<string[]>(
-    []
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const currentQueryString = searchParams.toString()
+  const initialSearchQuery = searchParams.get('q') ?? ''
+  const initialSectorFilter = searchParams.get('sector') ?? 'all'
+  const initialPeriodFilter = searchParams.get('period') ?? 'all'
+  const initialYearFilters = parseQueryList(searchParams.get('years'))
+  const initialSpeiFilters = parseQueryList(searchParams.get('spei'))
+  const initialCounterMeasureFilters = parseQueryList(
+    searchParams.get('measures')
   )
-  const [regionFilters, setRegionFilters] = useState<string[]>([])
-  const [showMappedOnly, setShowMappedOnly] = useState(false)
-  const [selectedImpactId, setSelectedImpactId] = useState<number | null>(null)
+  const initialRegionFilters = parseQueryList(searchParams.get('regions'))
+  const initialSelectedImpactId = parseQueryNumber(searchParams.get('impact'))
+  const initialShowMappedOnly = searchParams.get('mapped') === '1'
+  const [theme] = useThemeContext()
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+  const [regionSearchQuery, setRegionSearchQuery] = useState('')
+  const [sectorFilter, setSectorFilter] = useState(initialSectorFilter)
+  const [periodFilter, setPeriodFilter] = useState(initialPeriodFilter)
+  const [yearFilters, setYearFilters] = useState<string[]>(initialYearFilters)
+  const [speiFilters, setSpeiFilters] = useState<string[]>(initialSpeiFilters)
+  const [counterMeasureFilters, setCounterMeasureFilters] = useState<string[]>(
+    initialCounterMeasureFilters
+  )
+  const [regionFilters, setRegionFilters] = useState<string[]>(
+    initialRegionFilters
+  )
+  const [showMappedOnly, setShowMappedOnly] = useState(initialShowMappedOnly)
+  const [mobileViewMode, setMobileViewMode] = useState<'timeline' | 'map'>(
+    'timeline'
+  )
+  const [selectedImpactId, setSelectedImpactId] = useState<number | null>(
+    initialSelectedImpactId
+  )
   const [hoveredRegion, setHoveredRegion] = useState<{
     x: number
     y: number
@@ -242,6 +321,58 @@ export default function DryAlpsClient({
   } | null>(null)
   const deferredSearchQuery = useDeferredValue(searchQuery)
   const deferredRegionSearchQuery = useDeferredValue(regionSearchQuery)
+
+  useEffect(() => {
+    const nextSearchQuery = searchParams.get('q') ?? ''
+    const nextSectorFilter = searchParams.get('sector') ?? 'all'
+    const nextPeriodFilter = searchParams.get('period') ?? 'all'
+    const nextYearFilters = parseQueryList(searchParams.get('years'))
+    const nextSpeiFilters = parseQueryList(searchParams.get('spei'))
+    const nextCounterMeasureFilters = parseQueryList(
+      searchParams.get('measures')
+    )
+    const nextRegionFilters = parseQueryList(searchParams.get('regions'))
+    const nextSelectedImpactId = parseQueryNumber(searchParams.get('impact'))
+    const nextShowMappedOnly = searchParams.get('mapped') === '1'
+
+    setSearchQuery((currentValue) =>
+      currentValue === nextSearchQuery ? currentValue : nextSearchQuery
+    )
+    setSectorFilter((currentValue) =>
+      currentValue === nextSectorFilter ? currentValue : nextSectorFilter
+    )
+    setPeriodFilter((currentValue) =>
+      currentValue === nextPeriodFilter ? currentValue : nextPeriodFilter
+    )
+    setYearFilters((currentValue) =>
+      areEqualLists(currentValue, nextYearFilters)
+        ? currentValue
+        : nextYearFilters
+    )
+    setSpeiFilters((currentValue) =>
+      areEqualLists(currentValue, nextSpeiFilters)
+        ? currentValue
+        : nextSpeiFilters
+    )
+    setCounterMeasureFilters((currentValue) =>
+      areEqualLists(currentValue, nextCounterMeasureFilters)
+        ? currentValue
+        : nextCounterMeasureFilters
+    )
+    setRegionFilters((currentValue) =>
+      areEqualLists(currentValue, nextRegionFilters)
+        ? currentValue
+        : nextRegionFilters
+    )
+    setSelectedImpactId((currentValue) =>
+      currentValue === nextSelectedImpactId
+        ? currentValue
+        : nextSelectedImpactId
+    )
+    setShowMappedOnly((currentValue) =>
+      currentValue === nextShowMappedOnly ? currentValue : nextShowMappedOnly
+    )
+  }, [currentQueryString])
 
   const sectors = useMemo(
     () =>
@@ -668,6 +799,72 @@ export default function DryAlpsClient({
     })
   }, [selectedImpact])
 
+  useEffect(() => {
+    const nextParams = new URLSearchParams(currentQueryString)
+    const normalizedSearchQuery = searchQuery.trim()
+
+    if (normalizedSearchQuery) {
+      nextParams.set('q', normalizedSearchQuery)
+    } else {
+      nextParams.delete('q')
+    }
+
+    if (sectorFilter !== 'all') {
+      nextParams.set('sector', sectorFilter)
+    } else {
+      nextParams.delete('sector')
+    }
+
+    if (periodFilter !== 'all') {
+      nextParams.set('period', periodFilter)
+    } else {
+      nextParams.delete('period')
+    }
+
+    setListParam(nextParams, 'years', yearFilters)
+    setListParam(nextParams, 'spei', speiFilters)
+    setListParam(nextParams, 'measures', counterMeasureFilters)
+    setListParam(nextParams, 'regions', regionFilters)
+
+    if (showMappedOnly) {
+      nextParams.set('mapped', '1')
+    } else {
+      nextParams.delete('mapped')
+    }
+
+    if (selectedImpactId !== null) {
+      nextParams.set('impact', String(selectedImpactId))
+    } else {
+      nextParams.delete('impact')
+    }
+
+    const nextQueryString = nextParams.toString()
+
+    if (nextQueryString === currentQueryString) {
+      return
+    }
+
+    startTransition(() => {
+      router.replace(
+        nextQueryString ? `${pathname}?${nextQueryString}` : pathname,
+        { scroll: false }
+      )
+    })
+  }, [
+    counterMeasureFilters,
+    currentQueryString,
+    pathname,
+    periodFilter,
+    regionFilters,
+    router,
+    searchQuery,
+    sectorFilter,
+    selectedImpactId,
+    showMappedOnly,
+    speiFilters,
+    yearFilters,
+  ])
+
   const fillExpression = useMemo(
     () => buildImpactCountExpression(countsByNutsId),
     [countsByNutsId]
@@ -794,8 +991,37 @@ export default function DryAlpsClient({
             </div>
           </div>
 
+          <div className="xl:hidden">
+            <div className="inline-flex items-center gap-1 border border-stone-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900/80">
+              <button
+                type="button"
+                onClick={() => setMobileViewMode('timeline')}
+                className={`px-3 py-2 text-sm font-medium transition ${
+                  mobileViewMode === 'timeline'
+                    ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-950'
+                    : 'text-zinc-600 hover:bg-stone-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
+                }`}
+              >
+                Timeline
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileViewMode('map')}
+                className={`px-3 py-2 text-sm font-medium transition ${
+                  mobileViewMode === 'map'
+                    ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-950'
+                    : 'text-zinc-600 hover:bg-stone-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
+                }`}
+              >
+                Map
+              </button>
+            </div>
+          </div>
+
           <div className="grid gap-6 xl:grid-cols-[minmax(620px,1.28fr)_minmax(420px,0.72fr)]">
-            <aside className="overflow-visible border border-stone-200/80 bg-white/92 shadow-[0_20px_70px_-45px_rgba(41,37,36,0.34)] backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/88">
+            <aside
+              className={`${mobileViewMode === 'timeline' ? 'block' : 'hidden'} overflow-x-hidden overflow-y-visible border border-stone-200/80 bg-white/92 shadow-[0_20px_70px_-45px_rgba(41,37,36,0.34)] backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/88 xl:block`}
+            >
               <div className="border-b border-stone-200/80 px-6 py-5 dark:border-zinc-800/80">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
@@ -827,14 +1053,14 @@ export default function DryAlpsClient({
                   ) : null}
                 </div>
 
-                <section className="z-20 mt-5 border border-stone-200 bg-stone-50/95 p-5 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
+                <section className="z-20 mt-5 overflow-hidden border border-stone-200 bg-stone-50/95 p-5 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
                   <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                       <div className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 dark:text-zinc-400">
                         Temporal pulse
                       </div>
                       <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                        Click one or more years to filter the timeline and the map.
+                        Filter the timeline and the map by one or more years.
                       </p>
                     </div>
 
@@ -845,13 +1071,13 @@ export default function DryAlpsClient({
                     </div>
                   </div>
 
-                  <div className="mt-5 overflow-x-auto pb-1">
-                    <div className="flex min-w-max items-end gap-3">
+                  <div className="mt-5 sm:overflow-x-auto sm:pb-1">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:min-w-max sm:items-end sm:gap-3">
                       {pulseYears.map(([year, impacts]) => {
                         const isSelectedYear = yearFilters.includes(year)
                         const barHeight = Math.max(
-                          18,
-                          Math.round((impacts.length / maxGroupedYearCount) * 84)
+                          14,
+                          Math.round((impacts.length / maxGroupedYearCount) * 72)
                         )
 
                         return (
@@ -859,15 +1085,15 @@ export default function DryAlpsClient({
                             key={year}
                             type="button"
                             onClick={() => toggleYearFilter(year)}
-                            className={`group flex w-16 shrink-0 flex-col items-center gap-2 rounded-2xl border px-2 py-3 text-center transition ${
+                            className={`group flex w-full flex-col items-center gap-2 rounded-2xl border px-2 py-3 text-center transition sm:w-16 sm:shrink-0 ${
                               isSelectedYear
                                 ? 'border-stone-800 bg-stone-800 text-stone-50 dark:border-stone-100 dark:bg-stone-100 dark:text-stone-950'
                                 : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-400 hover:bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-200 dark:hover:border-zinc-700'
                             }`}
                           >
-                            <div className="flex h-24 items-end">
+                            <div className="flex h-16 items-end sm:h-24">
                               <div
-                                className={`w-5 rounded-full transition ${
+                                className={`w-4 rounded-full transition sm:w-5 ${
                                   isSelectedYear
                                     ? 'bg-amber-400 dark:bg-amber-300'
                                     : 'bg-stone-300 group-hover:bg-stone-500 dark:bg-zinc-600 dark:group-hover:bg-zinc-500'
@@ -934,9 +1160,9 @@ export default function DryAlpsClient({
                   }
                 >
                   <summary className="cursor-pointer list-none text-sm font-medium text-zinc-700 marker:hidden dark:text-zinc-200">
-                    More filters
+                    Refine results
                     <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      search, period, SPEI-1, measures, mapping, regions
+                      use these when year and sector are not enough
                     </span>
                   </summary>
 
@@ -947,6 +1173,8 @@ export default function DryAlpsClient({
                       </span>
                       <input
                         type="search"
+                        name="impact-search"
+                        autoComplete="off"
                         value={searchQuery}
                         onChange={(event) => {
                           const nextValue = event.target.value
@@ -954,7 +1182,7 @@ export default function DryAlpsClient({
                             setSearchQuery(nextValue)
                           })
                         }}
-                        placeholder="Search impacts, places, measures or news..."
+                        placeholder="Search impacts, places, measures or news…"
                         className="w-full rounded-full border border-stone-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-stone-500 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-100 dark:focus:border-stone-400"
                       />
                     </label>
@@ -1113,6 +1341,8 @@ export default function DryAlpsClient({
                       <div className="mt-3 space-y-3">
                         <input
                           type="search"
+                          name="region-search"
+                          autoComplete="off"
                           value={regionSearchQuery}
                           onChange={(event) => {
                             const nextValue = event.target.value
@@ -1120,7 +1350,7 @@ export default function DryAlpsClient({
                               setRegionSearchQuery(nextValue)
                             })
                           }}
-                          placeholder="Search NUTS3 regions..."
+                          placeholder="Search NUTS3 regions…"
                           className="w-full rounded-full border border-stone-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-stone-500 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-100 dark:focus:border-stone-400"
                         />
 
@@ -1185,22 +1415,14 @@ export default function DryAlpsClient({
                         className="grid gap-4 lg:grid-cols-[96px_minmax(0,1fr)] lg:gap-6"
                       >
                         <div className="lg:sticky lg:top-44 lg:self-start">
-                          <button
-                            type="button"
-                            onClick={() => toggleYearFilter(year)}
-                            className={`w-full rounded-[24px] border px-4 py-4 text-left transition ${
-                              yearFilters.includes(year)
-                                ? 'border-stone-800 bg-stone-800 text-stone-50 dark:border-stone-100 dark:bg-stone-100 dark:text-stone-950'
-                                : 'border-stone-200 bg-stone-50 text-zinc-800 hover:border-stone-300 hover:bg-white dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-100 dark:hover:border-zinc-700'
-                            }`}
-                          >
+                          <div className="w-full border border-stone-200 bg-stone-50 px-4 py-4 text-left text-zinc-800 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-100">
                             <div className="text-2xl font-semibold tracking-tight">
                               {year}
                             </div>
                             <div className="mt-2 text-[11px] uppercase tracking-[0.18em] opacity-70">
                               {impacts.length} impact{impacts.length === 1 ? '' : 's'}
                             </div>
-                          </button>
+                          </div>
                         </div>
 
                         <div className="relative pl-6 before:absolute before:bottom-0 before:left-[11px] before:top-0 before:w-px before:bg-stone-200 before:content-[''] dark:before:bg-zinc-800">
@@ -1244,6 +1466,7 @@ export default function DryAlpsClient({
                                           : impact.id
                                       )
                                     }
+                                    aria-expanded={isSelected}
                                     className="w-full text-left"
                                   >
                                     <div className="grid gap-4 xl:grid-cols-[156px_minmax(0,1fr)_auto]">
@@ -1260,7 +1483,21 @@ export default function DryAlpsClient({
                                       </div>
 
                                       <div className="space-y-3">
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500 dark:text-zinc-400">
+                                          Where
+                                        </div>
+
+                                        <h3 className="text-lg font-semibold leading-7 text-zinc-950 dark:text-white">
+                                          {getPrimaryLocationLabel(impact)}
+                                        </h3>
+
+                                        {locationNames.length > 1 ? (
+                                          <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                                            {locationNames.join(' · ')}
+                                          </p>
+                                        ) : null}
+
+                                        <div className="flex flex-wrap items-center gap-2">
                                           <span
                                             className="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
                                             style={{
@@ -1272,29 +1509,47 @@ export default function DryAlpsClient({
                                           >
                                             {impact.impactedSector}
                                           </span>
+                                          {locationNames.length > 1 ? (
+                                            <span className="inline-flex rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-300">
+                                              +{locationNames.length - 1} more place
+                                              {locationNames.length - 1 === 1 ? '' : 's'}
+                                            </span>
+                                          ) : null}
                                         </div>
 
-                                        <h3 className="text-lg font-semibold leading-7 text-zinc-950 dark:text-white">
-                                          {getImpactHeading(impact)}
-                                        </h3>
-
-                                        {locationNames.length ? (
-                                          <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                                            {locationNames.join(' · ')}
+                                        {getImpactHeading(impact) !==
+                                        getPrimaryLocationLabel(impact) ? (
+                                          <p className="text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                                            {getImpactHeading(impact)}
                                           </p>
                                         ) : null}
                                       </div>
 
-                                      <div className="shrink-0 border border-stone-200 bg-stone-50 px-3 py-2 text-right text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-300">
-                                        <div>
-                                          {impact.mappedNutsIds.length
-                                            ? `${impact.mappedNutsIds.length} NUTS3`
-                                            : 'List only'}
+                                      <div className="shrink-0 border border-stone-200 bg-stone-50 px-3 py-3 text-xs dark:border-zinc-700 dark:bg-zinc-950/50">
+                                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                                          Coverage
                                         </div>
-                                        <div className="mt-1">
-                                          {impact.newsItems.length
-                                            ? `${impact.newsItems.length} source${impact.newsItems.length === 1 ? '' : 's'}`
-                                            : 'No source'}
+                                        <div className="mt-2 space-y-2">
+                                          <div>
+                                            <div className="text-[10px] uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+                                              Map
+                                            </div>
+                                            <div className="mt-1 font-medium text-zinc-700 dark:text-zinc-200">
+                                              {impact.mappedNutsIds.length
+                                                ? `${impact.mappedNutsIds.length} NUTS3`
+                                                : 'List only'}
+                                            </div>
+                                          </div>
+                                          <div>
+                                            <div className="text-[10px] uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+                                              Sources
+                                            </div>
+                                            <div className="mt-1 font-medium text-zinc-700 dark:text-zinc-200">
+                                              {impact.newsItems.length
+                                                ? `${impact.newsItems.length} source${impact.newsItems.length === 1 ? '' : 's'}`
+                                                : 'No source'}
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
@@ -1303,168 +1558,193 @@ export default function DryAlpsClient({
                                   {isSelected ? (
                                     <div className="mt-5 space-y-4 border-t border-stone-300/80 pt-4 dark:border-zinc-700/70">
                                       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-                                        <div className="border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
-                                          <div className="text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                                        <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
                                             Time
-                                          </div>
-                                          <dl className="mt-3 space-y-3 text-sm leading-6">
-                                            {getImpactTimeRange(impact) &&
-                                            getImpactTimeRange(impact) !==
-                                              getImpactSubline(impact) ? (
+                                          </summary>
+                                          <div className="mt-3 hidden group-open:block xl:mt-0 xl:block">
+                                            <div className="hidden text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400 xl:block">
+                                              Time
+                                            </div>
+                                            <dl className="mt-0 space-y-3 text-sm leading-6 xl:mt-3">
+                                              {getImpactTimeRange(impact) &&
+                                              getImpactTimeRange(impact) !==
+                                                getImpactSubline(impact) ? (
+                                                <div className="flex items-start justify-between gap-4">
+                                                  <dt className="text-zinc-500 dark:text-zinc-400">
+                                                    Structured range
+                                                  </dt>
+                                                  <dd className="text-right font-medium text-zinc-900 dark:text-zinc-100">
+                                                    {getImpactTimeRange(impact)}
+                                                  </dd>
+                                                </div>
+                                              ) : null}
+
                                               <div className="flex items-start justify-between gap-4">
                                                 <dt className="text-zinc-500 dark:text-zinc-400">
-                                                  Structured range
+                                                  Period
                                                 </dt>
-                                                <dd className="text-right font-medium text-zinc-900 dark:text-zinc-100">
-                                                  {getImpactTimeRange(impact)}
+                                                <dd className="text-right font-medium capitalize text-zinc-900 dark:text-zinc-100">
+                                                  {impact.periodOfOccurrence}
                                                 </dd>
                                               </div>
-                                            ) : null}
 
-                                            <div className="flex items-start justify-between gap-4">
-                                              <dt className="text-zinc-500 dark:text-zinc-400">
-                                                Period
-                                              </dt>
-                                              <dd className="text-right font-medium capitalize text-zinc-900 dark:text-zinc-100">
-                                                {impact.periodOfOccurrence}
-                                              </dd>
-                                            </div>
-
-                                            <div className="flex items-start justify-between gap-4">
-                                              <dt className="text-zinc-500 dark:text-zinc-400">
-                                                Precision
-                                              </dt>
-                                              <dd className="text-right font-medium text-zinc-900 dark:text-zinc-100">
-                                                {getTimeResolutionLabel(impact.timeResolution)}
-                                              </dd>
-                                            </div>
-                                          </dl>
-                                        </div>
-
-                                        <div className="border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
-                                          <div className="text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
-                                            Counter measures
+                                              <div className="flex items-start justify-between gap-4">
+                                                <dt className="text-zinc-500 dark:text-zinc-400">
+                                                  Precision
+                                                </dt>
+                                                <dd className="text-right font-medium text-zinc-900 dark:text-zinc-100">
+                                                  {getTimeResolutionLabel(impact.timeResolution)}
+                                                </dd>
+                                              </div>
+                                            </dl>
                                           </div>
-                                          {impact.counterMeasures.length ? (
-                                            <div className="mt-3 flex flex-wrap gap-2">
-                                              {impact.counterMeasures.map((measure) => (
-                                                <span
-                                                  key={measure}
-                                                  className="rounded-full border border-stone-200 bg-white px-3 py-2 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-                                                >
-                                                  {measure}
-                                                </span>
-                                              ))}
+                                        </details>
+
+                                        <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
+                                            Counter measures
+                                          </summary>
+                                          <div className="mt-3 hidden group-open:block xl:mt-0 xl:block">
+                                            <div className="hidden text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400 xl:block">
+                                              Counter measures
                                             </div>
-                                          ) : (
-                                            <p className="mt-3 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-                                              No counter measures are recorded for this impact.
-                                            </p>
-                                          )}
-                                        </div>
+                                            {impact.counterMeasures.length ? (
+                                              <div className="mt-3 flex flex-wrap gap-2">
+                                                {impact.counterMeasures.map((measure) => (
+                                                  <span
+                                                    key={measure}
+                                                    className="rounded-full border border-stone-200 bg-white px-3 py-2 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                                                  >
+                                                    {measure}
+                                                  </span>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <p className="mt-3 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                                                No counter measures are recorded for this impact.
+                                              </p>
+                                            )}
+                                          </div>
+                                        </details>
                                       </div>
 
                                       {impact.speiContext ? (
-                                        <div className="border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
-                                          <div className="flex flex-wrap items-start justify-between gap-3">
-                                            <div>
-                                              <div className="text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
-                                                SPEI-1 Context
+                                        <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
+                                            SPEI-1 Context
+                                          </summary>
+                                          <div className="mt-3 hidden group-open:block xl:mt-0 xl:block">
+                                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                              <div>
+                                                <div className="hidden text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400 xl:block">
+                                                  SPEI-1 Context
+                                                </div>
+                                                <p className="mt-0 text-sm leading-6 text-zinc-600 dark:text-zinc-300 xl:mt-2">
+                                                  Mock drought context for{' '}
+                                                  <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                                                    {impact.speiContext.nuts3Id}
+                                                  </span>{' '}
+                                                  in{' '}
+                                                  <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                                                    {formatYearMonth(
+                                                      impact.speiContext.month
+                                                    )}
+                                                  </span>
+                                                  .
+                                                </p>
                                               </div>
-                                              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                                                Mock drought context for{' '}
-                                                <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                                                  {impact.speiContext.nuts3Id}
-                                                </span>{' '}
-                                                in{' '}
-                                                <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                                                  {formatYearMonth(
-                                                    impact.speiContext.month
-                                                  )}
-                                                </span>
-                                                .
-                                              </p>
+
+                                              <span
+                                                className="inline-flex rounded-full border border-stone-300 px-3 py-1 text-xs font-medium text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
+                                                style={{
+                                                  backgroundColor:
+                                                    impact.speiContext.color,
+                                                }}
+                                              >
+                                                {impact.speiContext.label}
+                                              </span>
                                             </div>
 
-                                            <span
-                                              className="inline-flex rounded-full border border-stone-300 px-3 py-1 text-xs font-medium text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
-                                              style={{
-                                                backgroundColor:
-                                                  impact.speiContext.color,
-                                              }}
-                                            >
-                                              {impact.speiContext.label}
-                                            </span>
+                                            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+                                              <span className="rounded-full border border-stone-200 bg-white px-3 py-2 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
+                                                SPEI-1 {impact.speiContext.value}
+                                              </span>
+                                              <span className="rounded-full border border-stone-200 bg-white px-3 py-2 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
+                                                NUTS3 {impact.speiContext.nuts3Id}
+                                              </span>
+                                            </div>
                                           </div>
-
-                                          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-                                            <span className="rounded-full border border-stone-200 bg-white px-3 py-2 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
-                                              SPEI-1 {impact.speiContext.value}
-                                            </span>
-                                            <span className="rounded-full border border-stone-200 bg-white px-3 py-2 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
-                                              NUTS3 {impact.speiContext.nuts3Id}
-                                            </span>
-                                          </div>
-                                        </div>
+                                        </details>
                                       ) : null}
 
-                                    {impact.newsItems.length ? (
-                                      impact.newsItems.map((newsItem) => (
-                                        <div
-                                          key={newsItem.id}
-                                          className="border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50"
-                                        >
-                                          <div className="text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
-                                            {formatCalendarDate(newsItem.published)}
+                                      <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
+                                          Sources ({impact.newsItems.length})
+                                        </summary>
+                                        <div className="mt-3 hidden space-y-4 group-open:block xl:mt-0 xl:block">
+                                          <div className="hidden text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400 xl:block">
+                                            Sources
                                           </div>
-
-                                          <h4 className="mt-2 text-base font-semibold leading-6 text-zinc-950 dark:text-white">
-                                            {newsItem.title}
-                                          </h4>
-
-                                          <div className="mt-3 border border-stone-200 bg-white px-3 py-3 dark:border-zinc-800 dark:bg-zinc-900/60">
-                                            <div className="text-[11px] uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
-                                              Source
-                                            </div>
-                                            <div className="mt-2 flex flex-wrap items-center gap-2">
-                                              <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200">
-                                                {getUrlHostname(newsItem.url)}
-                                              </span>
-                                              <a
-                                                href={newsItem.url}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                title={newsItem.url}
-                                                className="min-w-0 flex-1 truncate text-sm text-zinc-600 underline decoration-stone-300 underline-offset-4 transition hover:text-zinc-900 dark:text-zinc-300 dark:decoration-zinc-600 dark:hover:text-white"
+                                          {impact.newsItems.length ? (
+                                            impact.newsItems.map((newsItem) => (
+                                              <div
+                                                key={newsItem.id}
+                                                className="border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50"
                                               >
-                                                {truncateUrl(newsItem.url)}
-                                              </a>
+                                                <div className="text-xs uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                                                  {formatCalendarDate(newsItem.published)}
+                                                </div>
+
+                                                <h4 className="mt-2 text-base font-semibold leading-6 text-zinc-950 dark:text-white">
+                                                  {newsItem.title}
+                                                </h4>
+
+                                                <div className="mt-3 border border-stone-200 bg-white px-3 py-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+                                                  <div className="text-[11px] uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                                                    Source
+                                                  </div>
+                                                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                                                    <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200">
+                                                      {getUrlHostname(newsItem.url)}
+                                                    </span>
+                                                    <a
+                                                      href={newsItem.url}
+                                                      target="_blank"
+                                                      rel="noreferrer"
+                                                      title={newsItem.url}
+                                                      className="min-w-0 flex-1 truncate text-sm text-zinc-600 underline decoration-stone-300 underline-offset-4 transition hover:text-zinc-900 dark:text-zinc-300 dark:decoration-zinc-600 dark:hover:text-white"
+                                                    >
+                                                      {truncateUrl(newsItem.url)}
+                                                    </a>
+                                                  </div>
+                                                </div>
+
+                                                {newsItem.excerpt ? (
+                                                  <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-300">
+                                                    {newsItem.excerpt}
+                                                  </p>
+                                                ) : null}
+
+                                                <div className="mt-4">
+                                                  <a
+                                                    href={newsItem.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="inline-flex items-center rounded-full bg-stone-800 px-4 py-2 text-sm font-medium text-stone-50 transition hover:bg-stone-700 dark:bg-stone-100 dark:text-stone-950 dark:hover:bg-white"
+                                                  >
+                                                    Open article
+                                                  </a>
+                                                </div>
+                                              </div>
+                                            ))
+                                          ) : (
+                                            <div className="border border-dashed border-stone-300 bg-stone-50 px-4 py-5 text-sm leading-6 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950/30 dark:text-zinc-300">
+                                              No related news items are exposed for this impact.
                                             </div>
-                                          </div>
-
-                                          {newsItem.excerpt ? (
-                                            <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-300">
-                                              {newsItem.excerpt}
-                                            </p>
-                                          ) : null}
-
-                                          <div className="mt-4">
-                                            <a
-                                              href={newsItem.url}
-                                              target="_blank"
-                                              rel="noreferrer"
-                                              className="inline-flex items-center rounded-full bg-stone-800 px-4 py-2 text-sm font-medium text-stone-50 transition hover:bg-stone-700 dark:bg-stone-100 dark:text-stone-950 dark:hover:bg-white"
-                                            >
-                                              Open article
-                                            </a>
-                                          </div>
+                                          )}
                                         </div>
-                                      ))
-                                    ) : (
-                                      <div className="border border-dashed border-stone-300 bg-stone-50 px-4 py-5 text-sm leading-6 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950/30 dark:text-zinc-300">
-                                        No related news items are exposed for this impact.
-                                      </div>
-                                    )}
+                                      </details>
                                     </div>
                                   ) : null}
                                 </article>
@@ -1483,14 +1763,17 @@ export default function DryAlpsClient({
               </div>
             </aside>
 
-            <section className="self-start overflow-hidden border border-stone-200/80 bg-white/94 shadow-[0_20px_70px_-45px_rgba(41,37,36,0.34)] backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/88 xl:sticky xl:top-28">
+            <section
+              className={`${mobileViewMode === 'map' ? 'block' : 'hidden'} self-start overflow-hidden border border-stone-200/80 bg-white/94 shadow-[0_20px_70px_-45px_rgba(41,37,36,0.34)] backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/88 xl:sticky xl:top-28 xl:block`}
+            >
               <div className="flex items-center justify-between border-b border-stone-200/80 px-5 py-4 dark:border-zinc-800/80">
                 <div>
                   <h2 className="text-lg font-semibold">Map overview</h2>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     The map follows the same active filters as the timeline. Click
-                    regions to add or remove spatial filters; the active impact
-                    stays highlighted on the ADO NUTS3 base map.
+                    regions to add or remove spatial filters. Impact selection
+                    happens in the timeline. Darker regions indicate higher
+                    concentrations of mapped impacts.
                   </p>
                 </div>
                 <div className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-300">
@@ -1498,7 +1781,7 @@ export default function DryAlpsClient({
                 </div>
               </div>
 
-              <div className="relative h-[520px] w-full xl:h-[calc(100vh-16rem)]">
+              <div className="relative h-[360px] w-full sm:h-[420px] xl:h-[calc(100vh-16rem)]">
                 {MAPBOX_TOKEN ? (
                   <MapView
                     ref={mapRef}
@@ -1555,45 +1838,6 @@ export default function DryAlpsClient({
                             )
                           : [...currentFilters, nutsId]
                       )
-
-                      const normalizedQuery =
-                        deferredSearchQuery.trim().toLowerCase()
-                      const nextImpact = dataset.impacts.find((impact) => {
-                        if (!impact.mappedNutsIds.includes(nutsId)) {
-                          return false
-                        }
-
-                        if (
-                          sectorFilter !== 'all' &&
-                          impact.impactedSector !== sectorFilter
-                        ) {
-                          return false
-                        }
-
-                        if (
-                          periodFilter !== 'all' &&
-                          impact.periodOfOccurrence !== periodFilter
-                        ) {
-                          return false
-                        }
-
-                        if (showMappedOnly && !impact.mappedNutsIds.length) {
-                          return false
-                        }
-
-                        if (
-                          normalizedQuery &&
-                          !impact.searchableText.includes(normalizedQuery)
-                        ) {
-                          return false
-                        }
-
-                        return true
-                      })
-
-                      if (nextImpact) {
-                        setSelectedImpactId(nextImpact.id)
-                      }
                     }}
                   >
                     <Source
@@ -1687,7 +1931,72 @@ export default function DryAlpsClient({
                   </div>
                 ) : null}
 
-                <div className="absolute left-4 top-4 z-10 max-w-[28rem] border border-stone-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur dark:border-zinc-700 dark:bg-zinc-950/95">
+                <details className="absolute left-3 top-3 z-10 w-[calc(100%-1.5rem)] max-w-sm border border-stone-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur dark:border-zinc-700 dark:bg-zinc-950/95 xl:hidden">
+                  <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500 marker:hidden dark:text-zinc-400">
+                    Active scope
+                  </summary>
+
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                        Years
+                      </div>
+                      {yearFilters.length ? (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {yearFilters.map((year) => (
+                            <button
+                              key={year}
+                              type="button"
+                              onClick={() => toggleYearFilter(year)}
+                              className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-1.5 text-xs text-amber-950 transition hover:border-amber-400 hover:bg-amber-200 dark:border-amber-900/70 dark:bg-amber-950/60 dark:text-amber-100 dark:hover:border-amber-800"
+                            >
+                              <span>{year}</span>
+                              <span className="text-xs opacity-70">x</span>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-xs leading-5 text-zinc-600 dark:text-zinc-300">
+                          All years
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="border-t border-stone-200 pt-3 dark:border-zinc-800">
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                        Regions
+                      </div>
+                      {selectedRegionLabels.length ? (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {selectedRegionLabels.map((region) => (
+                            <button
+                              key={region.nutsId}
+                              type="button"
+                              onClick={() =>
+                                setRegionFilters((currentFilters) =>
+                                  currentFilters.filter(
+                                    (currentNutsId) =>
+                                      currentNutsId !== region.nutsId
+                                  )
+                                )
+                              }
+                              className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-stone-100 px-2.5 py-1.5 text-xs text-stone-800 transition hover:border-stone-400 hover:bg-stone-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600"
+                            >
+                              <span>{region.regionName}</span>
+                              <span className="text-xs opacity-70">x</span>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-xs leading-5 text-zinc-600 dark:text-zinc-300">
+                          No spatial filter
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </details>
+
+                <div className="absolute left-4 top-4 z-10 hidden max-w-[28rem] border border-stone-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur dark:border-zinc-700 dark:bg-zinc-950/95 xl:block">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500 dark:text-zinc-400">
                     Active scope
                   </div>
@@ -1748,6 +2057,26 @@ export default function DryAlpsClient({
                           No spatial filter
                         </p>
                       )}
+                    </div>
+
+                    <div className="border-t border-stone-200 pt-4 dark:border-zinc-800">
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
+                        Impact density
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {impactDensityLegend.map((item) => (
+                          <div
+                            key={item.label}
+                            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1.5 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-200"
+                          >
+                            <span
+                              className="h-2.5 w-2.5 rounded-full border border-white/50 dark:border-black/20"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span>{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

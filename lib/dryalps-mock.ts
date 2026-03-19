@@ -457,7 +457,7 @@ export async function fetchMockDryAlpsDataset(
       buildMockLocation(feature, index)
     )
 
-  const weightedLocations = mockLocations.flatMap((location) =>
+  const weightedLocations = mockLocations.flatMap((location: DryAlpsLocation) =>
     Array.from({ length: getRegionalHotspotWeight(location) }, () => location)
   )
 
