@@ -17,7 +17,8 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
           !pathname.includes('impact') &&
             !pathname.includes('hydro') &&
             !pathname.includes('/md') &&
-            !pathname.includes('/vulnerabilities')
+            !pathname.includes('/vulnerabilities') &&
+            !pathname.includes('/dryalps')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -34,6 +35,14 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
       >
         <Link href="/impacts" prefetch={false}>
           Reported Impacts
+        </Link>
+      </div>
+
+      <div
+        className={pathname === '/dryalps' ? 'sideBarItem active' : 'sideBarItem'}
+      >
+        <Link href="/dryalps" prefetch={false}>
+          DryAlps
         </Link>
       </div>
 

@@ -21,6 +21,67 @@ export interface PostData {
   [key: string]: any
 }
 
+export interface DryAlpsNewsItem {
+  id: number
+  title: string
+  url: string
+  published: string | null
+  excerpt: string | null
+}
+
+export interface DryAlpsLocation {
+  id: number
+  name: string
+  naturalLocation: string | null
+  nuts1: string[]
+  nuts2: string[]
+  nuts3: string[]
+  mappedNutsIds: string[]
+  coordinate: [number, number] | null
+}
+
+export type DryAlpsSpeiCategory =
+  | 'extremely_dry'
+  | 'very_dry'
+  | 'moderately_dry'
+  | 'normal'
+  | 'moderately_wet'
+  | 'very_wet'
+  | 'extremely_wet'
+
+export interface DryAlpsSpeiContext {
+  nuts3Id: string
+  month: string
+  value: number
+  category: DryAlpsSpeiCategory
+  label: string
+  color: string
+}
+
+export interface DryAlpsImpact {
+  id: number
+  impactedSector: string
+  periodOfOccurrence: string
+  timeOfOccurrence: string | null
+  startDate: string | null
+  endDate: string | null
+  timeResolution: string | null
+  isSpecific: boolean
+  counterMeasures: string[]
+  coordinate: [number, number] | null
+  mappedNutsIds: string[]
+  locations: DryAlpsLocation[]
+  newsItems: DryAlpsNewsItem[]
+  speiContext?: DryAlpsSpeiContext
+  displayDate: string | null
+  searchableText: string
+}
+
+export interface DryAlpsDataset {
+  impacts: DryAlpsImpact[]
+  nutsMap: NutsGeoJSON
+}
+
 // NUTS region types
 export interface NutsRegion {
   id: number
@@ -156,6 +217,13 @@ export interface ImpactsClientProps {
   allPosts: PostData[]
 }
 
+export interface DryAlpsClientProps {
+  dataset: DryAlpsDataset
+  allPosts: PostData[]
+  dataMode: 'api' | 'mock'
+  error?: string
+}
+
 // Map layer types
 export interface MapLayer {
   type: string
@@ -211,5 +279,3 @@ export interface TimeSeriesProps {
   }
   onIndexChange?: (newIndex: string) => void
 }
-
-
