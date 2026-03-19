@@ -907,7 +907,7 @@ export default function DryAlpsClient({
   return (
     <Layout posts={allPosts}>
       <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(180,83,9,0.08),_transparent_32%),linear-gradient(180deg,_#fafaf9_0%,_#f5f5f4_44%,_#ffffff_100%)] pt-28 text-zinc-900 dark:bg-[radial-gradient(circle_at_top_left,_rgba(180,83,9,0.12),_transparent_28%),linear-gradient(180deg,_#09090b_0%,_#18181b_48%,_#27272a_100%)] dark:text-zinc-100">
-        <section className="mx-auto flex w-full max-w-[1760px] flex-col gap-6 px-4 pb-10 md:px-6 xl:px-8">
+        <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 pb-10 md:px-6 xl:px-8">
           <div className="overflow-hidden border border-stone-200/80 bg-white/88 shadow-[0_25px_80px_-45px_rgba(41,37,36,0.32)] backdrop-blur dark:border-zinc-800/70 dark:bg-zinc-900/80">
             <div className="grid gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)] lg:px-8">
               <div className="space-y-5">
@@ -918,21 +918,19 @@ export default function DryAlpsClient({
                   <div className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white/90 p-1 text-xs dark:border-zinc-700 dark:bg-zinc-900/90">
                     <Link
                       href="/dryalps?source=api"
-                      className={`rounded-full px-3 py-1.5 font-medium transition ${
-                        dataMode === 'api'
+                      className={`rounded-full px-3 py-1.5 font-medium transition ${dataMode === 'api'
                           ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-950'
                           : 'text-zinc-600 hover:bg-stone-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                      }`}
+                        }`}
                     >
                       API
                     </Link>
                     <Link
                       href="/dryalps?source=mock"
-                      className={`rounded-full px-3 py-1.5 font-medium transition ${
-                        dataMode === 'mock'
+                      className={`rounded-full px-3 py-1.5 font-medium transition ${dataMode === 'mock'
                           ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-950'
                           : 'text-zinc-600 hover:bg-stone-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                      }`}
+                        }`}
                     >
                       Mock
                     </Link>
@@ -996,29 +994,27 @@ export default function DryAlpsClient({
               <button
                 type="button"
                 onClick={() => setMobileViewMode('timeline')}
-                className={`px-3 py-2 text-sm font-medium transition ${
-                  mobileViewMode === 'timeline'
+                className={`px-3 py-2 text-sm font-medium transition ${mobileViewMode === 'timeline'
                     ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-950'
                     : 'text-zinc-600 hover:bg-stone-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                }`}
+                  }`}
               >
                 Timeline
               </button>
               <button
                 type="button"
                 onClick={() => setMobileViewMode('map')}
-                className={`px-3 py-2 text-sm font-medium transition ${
-                  mobileViewMode === 'map'
+                className={`px-3 py-2 text-sm font-medium transition ${mobileViewMode === 'map'
                     ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-950'
                     : 'text-zinc-600 hover:bg-stone-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                }`}
+                  }`}
               >
                 Map
               </button>
             </div>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[minmax(620px,1.28fr)_minmax(420px,0.72fr)]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(520px,1.2fr)_minmax(360px,0.8fr)]">
             <aside
               className={`${mobileViewMode === 'timeline' ? 'block' : 'hidden'} overflow-x-hidden overflow-y-visible border border-stone-200/80 bg-white/92 shadow-[0_20px_70px_-45px_rgba(41,37,36,0.34)] backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/88 xl:block`}
             >
@@ -1085,19 +1081,17 @@ export default function DryAlpsClient({
                             key={year}
                             type="button"
                             onClick={() => toggleYearFilter(year)}
-                            className={`group flex w-full flex-col items-center gap-2 rounded-2xl border px-2 py-3 text-center transition sm:w-16 sm:shrink-0 ${
-                              isSelectedYear
+                            className={`group flex w-full flex-col items-center gap-2 rounded-2xl border px-2 py-3 text-center transition sm:w-16 sm:shrink-0 ${isSelectedYear
                                 ? 'border-stone-800 bg-stone-800 text-stone-50 dark:border-stone-100 dark:bg-stone-100 dark:text-stone-950'
                                 : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-400 hover:bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-200 dark:hover:border-zinc-700'
-                            }`}
+                              }`}
                           >
                             <div className="flex h-16 items-end sm:h-24">
                               <div
-                                className={`w-4 rounded-full transition sm:w-5 ${
-                                  isSelectedYear
+                                className={`w-4 rounded-full transition sm:w-5 ${isSelectedYear
                                     ? 'bg-amber-400 dark:bg-amber-300'
                                     : 'bg-stone-300 group-hover:bg-stone-500 dark:bg-zinc-600 dark:group-hover:bg-zinc-500'
-                                }`}
+                                  }`}
                                 style={{ height: `${barHeight}px` }}
                               />
                             </div>
@@ -1201,11 +1195,10 @@ export default function DryAlpsClient({
                               onClick={() =>
                                 setPeriodFilter(active ? 'all' : period)
                               }
-                              className={`rounded-full border px-3 py-2 text-sm transition ${
-                                active
+                              className={`rounded-full border px-3 py-2 text-sm transition ${active
                                   ? 'border-stone-700 bg-stone-700 text-stone-50 dark:border-stone-300 dark:bg-stone-200 dark:text-stone-950'
                                   : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-200 dark:hover:border-zinc-600'
-                              }`}
+                                }`}
                             >
                               {period}
                             </button>
@@ -1215,11 +1208,10 @@ export default function DryAlpsClient({
                         <button
                           type="button"
                           onClick={() => setShowMappedOnly((value) => !value)}
-                          className={`rounded-full border px-3 py-2 text-sm transition ${
-                            showMappedOnly
+                          className={`rounded-full border px-3 py-2 text-sm transition ${showMappedOnly
                               ? 'border-stone-700 bg-stone-700 text-stone-50 dark:border-stone-300 dark:bg-stone-200 dark:text-stone-950'
                               : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-200 dark:hover:border-zinc-600'
-                          }`}
+                            }`}
                         >
                           Mapped only
                         </button>
@@ -1243,17 +1235,16 @@ export default function DryAlpsClient({
                                   setSpeiFilters((currentCategories) =>
                                     currentCategories.includes(option.category)
                                       ? currentCategories.filter(
-                                          (currentCategory) =>
-                                            currentCategory !== option.category
-                                        )
+                                        (currentCategory) =>
+                                          currentCategory !== option.category
+                                      )
                                       : [...currentCategories, option.category]
                                   )
                                 }
-                                className={`rounded-full border px-3 py-2 text-sm transition ${
-                                  active
+                                className={`rounded-full border px-3 py-2 text-sm transition ${active
                                     ? 'border-stone-700 bg-stone-700 text-stone-50 dark:border-stone-300 dark:bg-stone-200 dark:text-stone-950'
                                     : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-200 dark:hover:border-zinc-600'
-                                }`}
+                                  }`}
                               >
                                 {option.label}
                               </button>
@@ -1282,17 +1273,16 @@ export default function DryAlpsClient({
                                   setCounterMeasureFilters((currentMeasures) =>
                                     currentMeasures.includes(option.measure)
                                       ? currentMeasures.filter(
-                                          (currentMeasure) =>
-                                            currentMeasure !== option.measure
-                                        )
+                                        (currentMeasure) =>
+                                          currentMeasure !== option.measure
+                                      )
                                       : [...currentMeasures, option.measure]
                                   )
                                 }
-                                className={`rounded-full border px-3 py-2 text-sm transition ${
-                                  active
+                                className={`rounded-full border px-3 py-2 text-sm transition ${active
                                     ? 'border-stone-700 bg-stone-700 text-stone-50 dark:border-stone-300 dark:bg-stone-200 dark:text-stone-950'
                                     : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-200 dark:hover:border-zinc-600'
-                                }`}
+                                  }`}
                               >
                                 {option.measure}{' '}
                                 <span className="opacity-70">{option.count}</span>
@@ -1366,17 +1356,16 @@ export default function DryAlpsClient({
                                   setRegionFilters((currentFilters) =>
                                     currentFilters.includes(region.nutsId)
                                       ? currentFilters.filter(
-                                          (currentNutsId) =>
-                                            currentNutsId !== region.nutsId
-                                        )
+                                        (currentNutsId) =>
+                                          currentNutsId !== region.nutsId
+                                      )
                                       : [...currentFilters, region.nutsId]
                                   )
                                 }
-                                className={`rounded-full border px-3 py-2 text-sm transition ${
-                                  active
+                                className={`rounded-full border px-3 py-2 text-sm transition ${active
                                     ? 'border-stone-700 bg-stone-700 text-stone-50 dark:border-stone-300 dark:bg-stone-200 dark:text-stone-950'
                                     : 'border-stone-200 bg-white text-zinc-700 hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-200 dark:hover:border-zinc-600'
-                                }`}
+                                  }`}
                               >
                                 {region.regionName}{' '}
                                 <span className="opacity-70">{region.count}</span>
@@ -1443,19 +1432,17 @@ export default function DryAlpsClient({
                                 className="relative pb-4 last:pb-0"
                               >
                                 <span
-                                  className={`absolute left-[-16px] top-9 h-4 w-4 rounded-full border-4 ${
-                                    isSelected
+                                  className={`absolute left-[-16px] top-9 h-4 w-4 rounded-full border-4 ${isSelected
                                       ? 'border-stone-600 bg-white dark:bg-zinc-950'
                                       : 'border-stone-300 bg-white dark:border-zinc-700 dark:bg-zinc-950'
-                                  }`}
+                                    }`}
                                 />
 
                                 <article
-                                  className={`border px-5 py-5 transition duration-200 ${
-                                    isSelected
+                                  className={`border px-5 py-5 transition duration-200 ${isSelected
                                       ? 'border-amber-700/50 bg-stone-200 shadow-[0_18px_45px_-35px_rgba(41,37,36,0.28)] dark:border-amber-400/50 dark:bg-stone-800/85'
                                       : 'border-stone-200 bg-white hover:-translate-y-0.5 hover:border-stone-500 hover:bg-stone-50 hover:shadow-[0_22px_50px_-32px_rgba(41,37,36,0.22)] dark:border-zinc-800 dark:bg-zinc-950/40 dark:hover:border-stone-500 dark:hover:bg-zinc-900/80'
-                                  }`}
+                                    }`}
                                 >
                                   <button
                                     type="button"
@@ -1518,7 +1505,7 @@ export default function DryAlpsClient({
                                         </div>
 
                                         {getImpactHeading(impact) !==
-                                        getPrimaryLocationLabel(impact) ? (
+                                          getPrimaryLocationLabel(impact) ? (
                                           <p className="text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                                             {getImpactHeading(impact)}
                                           </p>
@@ -1568,7 +1555,7 @@ export default function DryAlpsClient({
                                             </div>
                                             <dl className="mt-0 space-y-3 text-sm leading-6 xl:mt-3">
                                               {getImpactTimeRange(impact) &&
-                                              getImpactTimeRange(impact) !==
+                                                getImpactTimeRange(impact) !==
                                                 getImpactSubline(impact) ? (
                                                 <div className="flex items-start justify-between gap-4">
                                                   <dt className="text-zinc-500 dark:text-zinc-400">
@@ -1834,8 +1821,8 @@ export default function DryAlpsClient({
                       setRegionFilters((currentFilters) =>
                         currentFilters.includes(nutsId)
                           ? currentFilters.filter(
-                              (currentNutsId) => currentNutsId !== nutsId
-                            )
+                            (currentNutsId) => currentNutsId !== nutsId
+                          )
                           : [...currentFilters, nutsId]
                       )
                     }}

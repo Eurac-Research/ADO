@@ -339,10 +339,10 @@ function buildMockImpact(
       ? toIsoDate(baseDate.getUTCFullYear(), 0, 1)
       : timeResolution === 'day'
         ? toIsoDate(
-            baseDate.getUTCFullYear(),
-            baseDate.getUTCMonth(),
-            ((index % 27) + 1)
-          )
+          baseDate.getUTCFullYear(),
+          baseDate.getUTCMonth(),
+          ((index % 27) + 1)
+        )
         : toIsoDate(baseDate.getUTCFullYear(), baseDate.getUTCMonth(), 1)
 
   const endDate =
@@ -365,9 +365,9 @@ function buildMockImpact(
     index % 6 === 0
       ? [mockMeasures[index % mockMeasures.length]]
       : [
-          mockMeasures[index % mockMeasures.length],
-          mockMeasures[(index + 3) % mockMeasures.length],
-        ]
+        mockMeasures[index % mockMeasures.length],
+        mockMeasures[(index + 3) % mockMeasures.length],
+      ]
 
   const mappedNutsIds = Array.from(
     new Set(relatedLocations.flatMap((location) => location.mappedNutsIds))
@@ -402,10 +402,10 @@ function buildMockImpact(
   const baseSpeiContext = mockSpeiLegend[index % mockSpeiLegend.length]
   const speiContext: DryAlpsSpeiContext | undefined = mappedNutsIds[0]
     ? {
-        ...baseSpeiContext,
-        nuts3Id: mappedNutsIds[0],
-        month: startDate.slice(0, 7),
-      }
+      ...baseSpeiContext,
+      nuts3Id: mappedNutsIds[0],
+      month: startDate.slice(0, 7),
+    }
     : undefined
 
   return {
