@@ -1558,7 +1558,7 @@ export default function DryAlpsClient({
                                   {isSelected ? (
                                     <div className="mt-5 space-y-4 border-t border-stone-300/80 pt-4 dark:border-zinc-700/70">
                                       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-                                        <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                        <details open className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
                                           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
                                             Time
                                           </summary>
@@ -1601,7 +1601,7 @@ export default function DryAlpsClient({
                                           </div>
                                         </details>
 
-                                        <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                        <details open className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
                                           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
                                             Counter measures
                                           </summary>
@@ -1630,7 +1630,7 @@ export default function DryAlpsClient({
                                       </div>
 
                                       {impact.speiContext ? (
-                                        <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                        <details open className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
                                           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
                                             SPEI-1 Context
                                           </summary>
@@ -1678,7 +1678,7 @@ export default function DryAlpsClient({
                                         </details>
                                       ) : null}
 
-                                      <details className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+                                      <details open className="group border border-stone-200 bg-stone-50/70 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
                                         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-stone-500 marker:hidden dark:text-zinc-400 xl:hidden">
                                           Sources ({impact.newsItems.length})
                                         </summary>
