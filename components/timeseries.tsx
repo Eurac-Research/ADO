@@ -396,19 +396,19 @@ function TimeSeries(props: TimeSeriesProps) {
     toolbox: {
       show: true,
       feature: {
-        dataView: { readOnly: false },
         magicType: { type: ['line', 'bar'] },
         restore: {},
         saveAsImage: {},
       },
-      right: '50',
+      right: '8',
       top: '0',
+      itemSize: 12,
     },
     grid: {
-      top: 100,
-      right: 80,
+      top: 80,
+      right: 16,
       bottom: 80,
-      left: 80,
+      left: 50,
       containLabel: false,
     },
     dataset: {
@@ -477,7 +477,7 @@ function TimeSeries(props: TimeSeriesProps) {
     legend: {
       type: 'scroll',
       orient: 'horizontal',
-      top: '40',
+      top: '30',
       icon: 'roundRect',
       selected: selectedDimensions,
     },
@@ -502,7 +502,7 @@ function TimeSeries(props: TimeSeriesProps) {
         <>
           <ReactECharts
             option={options}
-            style={{ height: '400px', marginTop: '10px' }}
+            style={{ height: props.style?.height || '400px', marginTop: '10px' }}
             theme={'mytheme'}
             onEvents={onChartEvents}
           />

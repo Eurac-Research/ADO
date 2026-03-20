@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { getAllPosts } from '@/lib/api'
+import { getRegionName } from '@/lib/region-names'
 import RegionDetail from '@/components/RegionDetail'
 import type { PostData } from '@/types'
 
@@ -19,14 +20,8 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { regionId, index: rawIndex } = await params
-
-  // Normalize index to lowercase (convention: 'spei-1', not 'SPEI-1')
   const index = rawIndex.toLowerCase()
-
-  // Fetch posts on the server side
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
-
-  // Get current date
   const day = new Date().toISOString().split('T')[0]
 
   return (
@@ -46,9 +41,10 @@ export default async function Page({ params }: PageProps) {
 export async function generateMetadata({ params }: PageProps) {
   const { regionId, index: rawIndex } = await params
   const index = rawIndex.toLowerCase()
+  const regionName = await getRegionName(regionId)
 
   return {
-    title: `${regionId} - ${index.toUpperCase()} | Drought Observatory`,
-    description: `Detailed drought analysis for region ${regionId} using ${index.toUpperCase()} index`,
+    title: `${regionName} – ${index.toUpperCase()} | Alpine Drought Observatory`,
+    description: `Drought analysis for ${regionName} (${regionId}) using the ${index.toUpperCase()} index – Alpine Drought Observatory`,
   }
 }
