@@ -216,11 +216,11 @@ function getCategoryLabel(
   }
 
   if (colorScale === 'vegetation') {
-    if (value >= 100) return 'Very healthy vegetation'
-    if (value >= 75) return 'Healthy vegetation'
-    if (value >= 50) return 'Moderate drought'
-    if (value >= 25) return 'Severe drought'
-    return 'Extreme drought'
+    if (value >= 75) return 'Extremely high vitality'
+    if (value >= 50) return 'High vitality'
+    if (value >= 25) return 'Average vitality'
+    if (value > 0) return 'Low vitality'
+    return 'Extremely low vitality'
   }
 
   if (colorScale === 'snowpack') {
