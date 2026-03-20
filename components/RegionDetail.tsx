@@ -24,6 +24,16 @@ const DroughtHeatmap = dynamic(() => import('@/components/DroughtHeatmap'), {
 
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
+const COUNTRY_NAMES: Record<string, string> = {
+  AT: 'Austria',
+  CH: 'Switzerland',
+  DE: 'Germany',
+  FR: 'France',
+  IT: 'Italy',
+  LI: 'Liechtenstein',
+  SI: 'Slovenia',
+}
+
 interface RegionDetailProps {
   // Required props
   nutsId: string
@@ -95,6 +105,9 @@ export default function RegionDetail({
   className = ''
 }: RegionDetailProps) {
   const router = useRouter()
+  const countryCode = nutsId.slice(0, 2).toUpperCase()
+  const countryName = COUNTRY_NAMES[countryCode] || countryCode
+  const nutsLevel = Math.max(0, nutsId.length - 2)
 
   // State for fetched data
   const [nutsName, setNutsName] = useState<string>(initialNutsName || nutsId)
@@ -115,6 +128,8 @@ export default function RegionDetail({
   const [comparisonRegionData, setComparisonRegionData] = useState<TimeSeriesData[] | null>(null)
   const [availableRegions, setAvailableRegions] = useState<RegionInfo[]>([])
   const [isLoadingComparison, setIsLoadingComparison] = useState(false)
+  const firstDataDate = nutsData?.[0]?.date
+  const lastDataDate = nutsData?.[nutsData.length - 1]?.date
 
   // Handle index change from TimeSeries component
   const handleIndexChange = useCallback((newIndex: string) => {
@@ -658,13 +673,31 @@ export default function RegionDetail({
                 <dd className="text-blue-900 dark:text-blue-100">{nutsName}</dd>
               </div>
               <div className="flex justify-between">
+                <dt className="text-blue-700 dark:text-blue-300">Country:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">{countryName}</dd>
+              </div>
+              <div className="flex justify-between">
                 <dt className="text-blue-700 dark:text-blue-300">Current Index:</dt>
                 <dd className="text-blue-900 dark:text-blue-100">{datatype}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-blue-700 dark:text-blue-300">Current Date:</dt>
-                <dd className="text-blue-900 dark:text-blue-100">{day}</dd>
+                <dt className="text-blue-700 dark:text-blue-300">NUTS Level:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">NUTS-{nutsLevel}</dd>
               </div>
+              {nutsData && (
+                <>
+                  <div className="flex justify-between">
+                    <dt className="text-blue-700 dark:text-blue-300">Data Points:</dt>
+                    <dd className="text-blue-900 dark:text-blue-100">{nutsData.length}</dd>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-blue-700 dark:text-blue-300">Time Coverage:</dt>
+                    <dd className="text-blue-900 dark:text-blue-100 text-right">
+                      {firstDataDate && lastDataDate ? `${firstDataDate} to ${lastDataDate}` : 'N/A'}
+                    </dd>
+                  </div>
+                </>
+              )}
             </dl>
           </div>
 
