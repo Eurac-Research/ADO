@@ -598,6 +598,11 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
           <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 truncate">
             {isInDailyZoom ? 'Raw daily values' : metrics.find((m) => m.key === selectedMetric)?.shortLabel} {currentIndex.fullName}
           </p>
+          {!isInDailyZoom && (
+            <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+              The matrix is based on daily data, aggregated into monthly statistics (e.g., mean, median).
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
