@@ -416,6 +416,7 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [selectedMetric, setSelectedMetric] = useState<MetricKey>('median')
   const [zoomedYear, setZoomedYear] = useState<number | null>(null)
+  const [isInDailyZoom, setIsInDailyZoom] = useState(false)
 
   const availableIndices = useMemo(
     () =>
@@ -592,10 +593,10 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
       <div className="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-            {zoomedYear ? `${zoomedYear} – Weekly detail` : 'Monthly drought matrix'}{regionName ? ` – ${regionName}` : ''}
+            {isInDailyZoom ? `${zoomedYear} – Daily detail` : zoomedYear ? `${zoomedYear} – Weekly detail` : 'Monthly drought matrix'}{regionName ? ` – ${regionName}` : ''}
           </h3>
           <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 truncate">
-            {metrics.find((m) => m.key === selectedMetric)?.shortLabel} {currentIndex.fullName}
+            {isInDailyZoom ? 'Raw daily values' : metrics.find((m) => m.key === selectedMetric)?.shortLabel} {currentIndex.fullName}
           </p>
         </div>
 
@@ -616,21 +617,23 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
             ))}
           </div>
 
-          <div className="flex rounded-md border border-gray-300 bg-gray-100 p-0.5 dark:border-gray-600 dark:bg-gray-900">
-            {metrics.map((m) => (
-              <button
-                key={m.key}
-                type="button"
-                onClick={() => setSelectedMetric(m.key)}
-                className={`rounded px-2 py-1 text-xs font-medium transition ${selectedMetric === m.key
-                  ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
-                  : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
-                  }`}
-              >
-                {m.shortLabel}
-              </button>
-            ))}
-          </div>
+          {!isInDailyZoom && (
+            <div className="flex rounded-md border border-gray-300 bg-gray-100 p-0.5 dark:border-gray-600 dark:bg-gray-900">
+              {metrics.map((m) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  onClick={() => setSelectedMetric(m.key)}
+                  className={`rounded px-2 py-1 text-xs font-medium transition ${selectedMetric === m.key
+                    ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
+                    : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
+                    }`}
+                >
+                  {m.shortLabel}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -661,7 +664,8 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
           selectedMetric={selectedMetric}
           thresholdLabel={thresholdConfig.label}
           metrics={metrics}
-          onBack={() => setZoomedYear(null)}
+          onBack={() => { setZoomedYear(null); setIsInDailyZoom(false) }}
+          onDailyZoomChange={setIsInDailyZoom}
         />
       )}
     </div>
@@ -679,6 +683,7 @@ function WeeklyZoom({
   thresholdLabel,
   metrics,
   onBack,
+  onDailyZoomChange,
 }: {
   data: TimeSeriesData[]
   year: number
@@ -690,7 +695,9 @@ function WeeklyZoom({
   thresholdLabel: string
   metrics: { key: MetricKey; label: string; shortLabel: string }[]
   onBack: () => void
+  onDailyZoomChange: (inDaily: boolean) => void
 }) {
+  const [zoomedWeek, setZoomedWeek] = useState<number | null>(null)
   const weeklyAgg = useMemo(
     () => aggregateWeekly(data, indexKey, threshold, year),
     [data, indexKey, threshold, year]
@@ -761,6 +768,7 @@ function WeeklyZoom({
         <div style="font-size:11px;color:${getReadableTextColor(color)};margin-bottom:6px">${category} &middot; ${activeMetric?.label || selectedMetric}: ${selectedMetric === 'ratioBelow' ? currentVal.toFixed(1) + '%' : fmt(currentVal)}</div>
         ${sparkline}
         <div style="font-size:11px;margin-top:4px">${rows}</div>
+        <div style="font-size:10px;color:#a8a29e;margin-top:6px;text-align:center">Click to zoom into days</div>
       </div>`
     },
     [weeklyAgg, colorScale, family, selectedMetric, metrics, thresholdLabel, year]
@@ -834,14 +842,197 @@ function WeeklyZoom({
         >
           ← Back to overview
         </button>
+        {zoomedWeek && (
+          <button
+            type="button"
+            onClick={() => { setZoomedWeek(null); onDailyZoomChange(false) }}
+            className="rounded px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+          >
+            ← Back to weekly
+          </button>
+        )}
       </div>
-      <div>
-        <ReactECharts
-          option={option}
-          style={{ width: '100%', minWidth: '400px', height: '100px' }}
-          notMerge
+
+      {!zoomedWeek && (
+        <div>
+          <ReactECharts
+            option={option}
+            style={{ width: '100%', minWidth: '400px', height: '100px' }}
+            notMerge
+            onEvents={{
+              click: (params: any) => {
+                if (params.componentType === 'series') {
+                  const weekNum = params.data[0] + 1
+                  if (weeklyAgg.has(weekNum)) {
+                    setZoomedWeek(weekNum)
+                    onDailyZoomChange(true)
+                  }
+                }
+              },
+            }}
+          />
+        </div>
+      )}
+
+      {zoomedWeek && (
+        <DailyZoom
+          data={data}
+          year={year}
+          week={zoomedWeek}
+          indexKey={indexKey}
+          family={family}
+          colorScale={colorScale}
+          selectedMetric={selectedMetric}
         />
+      )}
+    </div>
+  )
+}
+
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+function DailyZoom({
+  data,
+  year,
+  week,
+  indexKey,
+  family,
+  colorScale,
+  selectedMetric,
+}: {
+  data: TimeSeriesData[]
+  year: number
+  week: number
+  indexKey: string
+  family: IndexFamily
+  colorScale: ColorScale
+  selectedMetric: MetricKey
+}) {
+  const dailyData = useMemo(() => {
+    const days: { date: string; label: string; value: number }[] = []
+    for (const row of data) {
+      const val = row[indexKey]
+      if (val === null || val === undefined || val === '' || typeof val === 'string') continue
+      const num = Number(val)
+      if (!Number.isFinite(num)) continue
+      const d = new Date(row.date)
+      if (d.getUTCFullYear() !== year) continue
+      if (getISOWeek(d) !== week) continue
+      const dayOfWeek = (d.getUTCDay() + 6) % 7 // 0=Mon, 6=Sun
+      const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+      days.push({
+        date: dateStr,
+        label: `${DAY_NAMES[dayOfWeek]} ${d.getUTCDate()}.${d.getUTCMonth() + 1}`,
+        value: num,
+      })
+    }
+    days.sort((a, b) => a.date.localeCompare(b.date))
+    return days
+  }, [data, indexKey, year, week])
+
+  const heatmapData = useMemo(() => {
+    return dailyData.map((d, i) => [i, 0, Number(d.value.toFixed(2))] as [number, number, number])
+  }, [dailyData])
+
+  const dayLabels = useMemo(() => dailyData.map((d) => d.label), [dailyData])
+
+  // Daily values are raw index values, never ratioBelow — always use 'median' scale
+  const dailyMetric: MetricKey = selectedMetric === 'ratioBelow' ? 'median' : selectedMetric
+
+  const visualMapConfig = useMemo(
+    () => buildVisualMapConfig(dailyMetric, colorScale),
+    [dailyMetric, colorScale]
+  )
+
+  const tooltipFormatter = useCallback(
+    (params: any) => {
+      const dayIdx = params.data[0]
+      const day = dailyData[dayIdx]
+      if (!day) return ''
+
+      const color = params.color || getColorForValue(day.value, colorScale, dailyMetric)
+      const category = getCategoryLabel(day.value, colorScale, dailyMetric)
+      const fmt = (v: number) => v.toFixed(2)
+
+      return `<div style="min-width:140px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${color}"></span>
+          <strong>${day.date}</strong>
+        </div>
+        <div style="font-size:11px;color:${getReadableTextColor(color)};margin-bottom:2px">${category}</div>
+        <div style="font-size:12px">${fmt(day.value)}</div>
+      </div>`
+    },
+    [dailyData, colorScale, dailyMetric]
+  )
+
+  const option = useMemo(
+    () => ({
+      tooltip: {
+        formatter: tooltipFormatter,
+        backgroundColor: 'rgba(255,255,255,0.96)',
+        borderColor: '#e7e5e4',
+        textStyle: { color: '#1c1917', fontSize: 12 },
+        padding: [8, 10],
+        extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
+        appendToBody: true,
+      },
+      grid: { top: 8, right: 4, bottom: 48, left: 4 },
+      xAxis: {
+        type: 'category',
+        data: dayLabels,
+        splitArea: { show: false },
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: { fontSize: 10, color: '#78716c' },
+        position: 'top',
+      },
+      yAxis: {
+        type: 'category',
+        data: [`W${week}`],
+        splitArea: { show: false },
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: { show: false },
+      },
+      visualMap: visualMapConfig,
+      series: [
+        {
+          type: 'heatmap',
+          data: heatmapData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 4,
+              shadowColor: 'rgba(0, 0, 0, 0.25)',
+              borderColor: '#1c1917',
+              borderWidth: 1.5,
+            },
+          },
+          itemStyle: {
+            borderColor: 'transparent',
+            borderWidth: 0,
+          },
+        },
+      ],
+    }),
+    [heatmapData, tooltipFormatter, visualMapConfig, dayLabels, week]
+  )
+
+  if (dailyData.length === 0) {
+    return (
+      <div className="py-4 text-center text-sm text-gray-400">
+        No data for W{week} {year}
       </div>
+    )
+  }
+
+  return (
+    <div>
+      <ReactECharts
+        option={option}
+        style={{ width: '100%', height: '100px' }}
+        notMerge
+      />
     </div>
   )
 }

@@ -1,7 +1,8 @@
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 // Force static generation
 export const dynamic = 'force-static'
+export const dynamicParams = false
 
 interface IndexPageProps {
   params: Promise<{
@@ -27,7 +28,7 @@ export default async function IndexPage({ params }: IndexPageProps) {
 
   // Validate the slug
   if (!indices.includes(slug)) {
-    redirect('/?index=spei-1')
+    notFound()
   }
 
   // Redirect to main page with index query param
