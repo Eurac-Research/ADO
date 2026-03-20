@@ -46,6 +46,37 @@ interface TimeSeriesData {
   [key: string]: string | number
 }
 
+function sanitizeTimeseriesJson(rawPayload: string): string {
+  return rawPayload.replace(
+    /(^|[\[{:,]\s*)(-?Infinity|NaN)(?=\s*[,}\]])/g,
+    '$1null'
+  )
+}
+
+async function fetchTimeseriesJson(url: string): Promise<unknown> {
+  const response = await fetch(url, { cache: 'no-store' })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  const rawPayload = await response.text()
+  return JSON.parse(sanitizeTimeseriesJson(rawPayload))
+}
+
+function isTimeSeriesArray(value: unknown): value is TimeSeriesData[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (item) =>
+        Boolean(item) &&
+        typeof item === 'object' &&
+        'date' in item &&
+        typeof (item as TimeSeriesData).date === 'string'
+    )
+  )
+}
+
 export default function RegionDetail({
   nutsId,
   nutsName: initialNutsName,
@@ -223,8 +254,8 @@ export default function RegionDetail({
     setIsLoadingComparison(true)
     try {
       const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${regionId}.json`
-      const result = await axios(url)
-      setComparisonRegionData(result.data)
+      const data = await fetchTimeseriesJson(url)
+      setComparisonRegionData(isTimeSeriesArray(data) ? data : null)
     } catch (error) {
       console.error('Error fetching comparison region data:', error)
       setComparisonRegionData(null)
@@ -241,23 +272,32 @@ export default function RegionDetail({
       setIsLoading(true)
       try {
         const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${nutsId}.json`
-        const result = await axios(url)
-        setNutsData(result.data)
+        const data = await fetchTimeseriesJson(url)
+
+        if (!isTimeSeriesArray(data)) {
+          console.error('Unexpected time series payload for region:', nutsId, data)
+          setNutsData(null)
+          setAvailableYears([])
+          setSelectedYears([])
+          setIsError(true)
+          return
+        }
+
+        setNutsData(data)
 
         // Extract available years from the data
-        if (result.data && Array.isArray(result.data)) {
-          const years = [...new Set(result.data.map((item: TimeSeriesData) => {
-            return new Date(item.date).getFullYear()
-          }))].sort((a, b) => b - a) // Sort descending (newest first)
+        const years = [...new Set(data.map((item: TimeSeriesData) => {
+          return new Date(item.date).getFullYear()
+        }))].sort((a, b) => b - a) // Sort descending (newest first)
 
-          setAvailableYears(years)
+        setAvailableYears(years)
 
-          // Set default selected years (last 3 years)
-          const defaultYears = years.slice(0, 3)
-          setSelectedYears(defaultYears)
-        }
+        // Set default selected years (last 3 years)
+        const defaultYears = years.slice(0, 3)
+        setSelectedYears(defaultYears)
       } catch (error) {
         console.error('Error fetching NUTS data:', error)
+        setNutsData(null)
         setIsError(true)
       }
       setIsLoading(false)
