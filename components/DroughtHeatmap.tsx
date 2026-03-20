@@ -775,6 +775,7 @@ function WeeklyZoom({
         textStyle: { color: '#1c1917', fontSize: 12 },
         padding: [8, 10],
         extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
+        appendToBody: true,
       },
       grid: { top: 8, right: 4, bottom: 48, left: 4 },
       xAxis: {
@@ -834,7 +835,7 @@ function WeeklyZoom({
           ← Back to overview
         </button>
       </div>
-      <div className="overflow-x-auto">
+      <div>
         <ReactECharts
           option={option}
           style={{ width: '100%', minWidth: '400px', height: '100px' }}
