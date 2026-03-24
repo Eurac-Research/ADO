@@ -45,7 +45,7 @@ export default async function DryAlpsPage({ searchParams }: DryAlpsPageProps) {
 
     return (
       <DryAlpsClient
-        dataset={{ impacts: [], nutsMap: { type: 'FeatureCollection', features: [] } }}
+        dataset={{ impacts: [], nutsMap: { type: 'FeatureCollection', features: [] }, nuts2Map: { type: 'FeatureCollection', features: [] } }}
         allPosts={allPosts}
         dataMode={resolveDryAlpsDataMode()}
         error="Failed to load DryAlps data. Please try again later."

@@ -254,14 +254,14 @@ export async function fetchDryAlpsDataset(): Promise<DryAlpsDataset> {
 
       const normalizedNewsItems: DryAlpsNewsItem[] = newsItem
         ? [
-            {
-              id: newsItem.id,
-              title: newsItem.title,
-              url: newsItem.url,
-              published: newsItem.published,
-              excerpt: buildExcerpt(newsItem.content),
-            },
-          ]
+          {
+            id: newsItem.id,
+            title: newsItem.title,
+            url: newsItem.url,
+            published: newsItem.published,
+            excerpt: buildExcerpt(newsItem.content),
+          },
+        ]
         : []
 
       const mappedNutsIds = Array.from(
@@ -326,6 +326,7 @@ export async function fetchDryAlpsDataset(): Promise<DryAlpsDataset> {
   return {
     impacts,
     nutsMap: nuts3GeoJson,
+    nuts2Map: nuts2GeoJson,
   }
 }
 

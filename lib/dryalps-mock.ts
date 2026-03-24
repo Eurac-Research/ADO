@@ -37,15 +37,10 @@ const mockMeasures = [
 const mockPeriods = ['past', 'past', 'present', 'future'] as const
 
 const mockYearWeights = [
-  { year: 2025, weight: 0.22 },
-  { year: 2024, weight: 0.14 },
-  { year: 2023, weight: 0.17 },
-  { year: 2022, weight: 0.12 },
-  { year: 2021, weight: 0.13 },
-  { year: 2020, weight: 0.08 },
-  { year: 2019, weight: 0.09 },
-  { year: 2018, weight: 0.03 },
-  { year: 2017, weight: 0.02 },
+  { year: 2025, weight: 0.28 },
+  { year: 2024, weight: 0.27 },
+  { year: 2023, weight: 0.25 },
+  { year: 2022, weight: 0.20 },
 ] as const
 
 const mockSpeiLegend: DryAlpsSpeiContext[] = [
@@ -437,7 +432,10 @@ function buildMockImpact(
 export async function fetchMockDryAlpsDataset(
   impactCount = 200
 ): Promise<DryAlpsDataset> {
-  const nuts3GeoJson = await fetchNutsGeoJSON('nuts3', mockFetchOptions)
+  const [nuts3GeoJson, nuts2GeoJson] = await Promise.all([
+    fetchNutsGeoJSON('nuts3', mockFetchOptions),
+    fetchNutsGeoJSON('nuts2', mockFetchOptions),
+  ])
 
   const eligibleFeatures = nuts3GeoJson.features
     .filter((feature: NutsFeature) => {
@@ -465,6 +463,7 @@ export async function fetchMockDryAlpsDataset(
     return {
       impacts: [],
       nutsMap: nuts3GeoJson,
+      nuts2Map: nuts2GeoJson,
     }
   }
 
@@ -484,5 +483,6 @@ export async function fetchMockDryAlpsDataset(
   return {
     impacts,
     nutsMap: nuts3GeoJson,
+    nuts2Map: nuts2GeoJson,
   }
 }

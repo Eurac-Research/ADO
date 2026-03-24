@@ -28,7 +28,7 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
 
       <div
         className={
-          pathname === '/impacts' || pathname === '/impacts-nuts3'
+          pathname === '/impacts' || pathname === '/impacts-nuts3' || pathname === '/dryalps'
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -36,14 +36,17 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
         <Link href="/impacts" prefetch={false}>
           Reported Impacts
         </Link>
-      </div>
-
-      <div
-        className={pathname === '/dryalps' ? 'sideBarItem active' : 'sideBarItem'}
-      >
-        <Link href="/dryalps" prefetch={false}>
-          DryAlps
-        </Link>
+        <div
+          className={
+            pathname === '/dryalps'
+              ? 'sideBarItemSub active'
+              : 'sideBarItemSub'
+          }
+        >
+          <Link href="/dryalps" prefetch={false}>
+            DryAlps
+          </Link>
+        </div>
       </div>
 
       <div

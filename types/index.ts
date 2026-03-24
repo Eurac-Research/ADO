@@ -80,6 +80,7 @@ export interface DryAlpsImpact {
 export interface DryAlpsDataset {
   impacts: DryAlpsImpact[]
   nutsMap: NutsGeoJSON
+  nuts2Map: NutsGeoJSON
 }
 
 // NUTS region types
