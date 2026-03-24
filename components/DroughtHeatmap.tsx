@@ -621,20 +621,49 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <div className="flex rounded-md border border-gray-300 bg-gray-100 p-0.5 dark:border-gray-600 dark:bg-gray-900">
+          {/* Mobile: select dropdown */}
+          <select
+            value={selectedIndex}
+            onChange={(e) => setSelectedIndex(Number(e.target.value))}
+            className="sm:hidden rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
+          >
             {availableIndices.map((idx, i) => (
-              <button
-                key={idx.key}
-                type="button"
-                onClick={() => setSelectedIndex(i)}
-                className={`rounded px-2 py-1 text-xs font-medium transition ${i === selectedIndex
-                  ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
-                  : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
-                  }`}
-              >
-                {idx.label}
-              </button>
+              <option key={idx.key} value={i}>{idx.label}</option>
             ))}
+          </select>
+
+          {/* Desktop: grouped buttons */}
+          <div className="hidden sm:flex flex-wrap items-center gap-1">
+            {(() => {
+              const groups: { prefix: string; indices: { idx: typeof availableIndices[number]; originalIndex: number }[] }[] = []
+              availableIndices.forEach((idx, i) => {
+                const match = idx.key.match(/^([A-Z]+)(?:-\d+)?$/)
+                const prefix = match ? match[1] : idx.key
+                let group = groups.find((g) => g.prefix === prefix)
+                if (!group) {
+                  group = { prefix, indices: [] }
+                  groups.push(group)
+                }
+                group.indices.push({ idx, originalIndex: i })
+              })
+              return groups.map((group) => (
+                <div key={group.prefix} className="flex rounded-md border border-gray-300 bg-gray-100 p-0.5 dark:border-gray-600 dark:bg-gray-900">
+                  {group.indices.map(({ idx, originalIndex }) => (
+                    <button
+                      key={idx.key}
+                      type="button"
+                      onClick={() => setSelectedIndex(originalIndex)}
+                      className={`rounded px-2 py-1 text-xs font-medium transition ${originalIndex === selectedIndex
+                        ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
+                        : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
+                        }`}
+                    >
+                      {idx.label}
+                    </button>
+                  ))}
+                </div>
+              ))
+            })()}
           </div>
 
           {!isInDailyZoom && (
