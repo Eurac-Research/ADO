@@ -10,9 +10,16 @@ type IndexFamily = 'drought' | 'vegetation'
 type ColorScale = 'drought' | 'snowpack' | 'vegetation'
 
 const HEATMAP_INDICES: { key: string; label: string; fullName: string; family: IndexFamily; colorScale: ColorScale }[] = [
-  { key: 'SPEI-1', label: 'SPEI-1', fullName: 'Standardized Precipitation Evapotranspiration Index - 1', family: 'drought', colorScale: 'drought' },
-  { key: 'SPEI-3', label: 'SPEI-3', fullName: 'Standardized Precipitation Evapotranspiration Index - 3', family: 'drought', colorScale: 'drought' },
-  { key: 'SPI-1', label: 'SPI-1', fullName: 'Standardized Precipitation Index - 1', family: 'drought', colorScale: 'drought' },
+  { key: 'SPEI-1', label: 'SPEI-1', fullName: 'Standardized Precipitation Evapotranspiration Index - 1 month', family: 'drought', colorScale: 'drought' },
+  { key: 'SPEI-2', label: 'SPEI-2', fullName: 'Standardized Precipitation Evapotranspiration Index - 2 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPEI-3', label: 'SPEI-3', fullName: 'Standardized Precipitation Evapotranspiration Index - 3 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPEI-6', label: 'SPEI-6', fullName: 'Standardized Precipitation Evapotranspiration Index - 6 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPEI-12', label: 'SPEI-12', fullName: 'Standardized Precipitation Evapotranspiration Index - 12 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPI-1', label: 'SPI-1', fullName: 'Standardized Precipitation Index - 1 month', family: 'drought', colorScale: 'drought' },
+  { key: 'SPI-2', label: 'SPI-2', fullName: 'Standardized Precipitation Index - 2 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPI-3', label: 'SPI-3', fullName: 'Standardized Precipitation Index - 3 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPI-6', label: 'SPI-6', fullName: 'Standardized Precipitation Index - 6 months', family: 'drought', colorScale: 'drought' },
+  { key: 'SPI-12', label: 'SPI-12', fullName: 'Standardized Precipitation Index - 12 months', family: 'drought', colorScale: 'drought' },
   { key: 'SSPI-10', label: 'SSPI-10', fullName: 'Standardized Snowpack Index - 10', family: 'drought', colorScale: 'snowpack' },
   { key: 'SMA', label: 'SMA', fullName: 'Soil Moisture Anomaly', family: 'drought', colorScale: 'drought' },
   { key: 'VCI', label: 'VCI', fullName: 'Vegetation Condition Index', family: 'vegetation', colorScale: 'vegetation' },
@@ -599,8 +606,16 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
             {isInDailyZoom ? 'Raw daily values' : metrics.find((m) => m.key === selectedMetric)?.shortLabel} {currentIndex.fullName}
           </p>
           {!isInDailyZoom && (
-            <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
-              The matrix is based on daily data, aggregated into monthly statistics (e.g., mean, median).
+            <p className="mt-1 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 max-w-3xl">
+              {zoomedYear
+                ? 'Each cell summarises pre-computed daily index values per calendar week (e.g. mean, median, minimum or share of days below threshold).'
+                : 'Each cell summarises pre-computed daily index values per calendar month (e.g. mean, median, minimum or share of days below threshold).'}
+              {' '}Indices such as SPEI and SPI are standardised values expressing the deviation from long-term normal conditions (ref.&nbsp;period 1981–2020).
+              <span className="italic block">
+                {zoomedYear
+                  ? ' Weekly values are derived from daily index values and serve as visual aggregation — they are not independently calibrated weekly indices.'
+                  : ' Monthly values are derived from daily index values and serve as visual aggregation — they are not independently calibrated monthly indices.'}
+              </span>
             </p>
           )}
         </div>
