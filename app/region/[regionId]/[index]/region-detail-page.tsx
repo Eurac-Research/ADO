@@ -119,35 +119,35 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
     <Layout posts={allPosts}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
         {/* Header with breadcrumb */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center gap-4">
+        <div className="sticky top-20 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <button
                 onClick={handleBackToMap}
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                className="flex items-center gap-1 sm:gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Map
               </button>
 
-              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 min-w-0">
                 <span>/</span>
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                 <Link
                   href={`/region/${regionId}`}
-                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline truncate"
                 >
                   {regionName || regionId}
                 </Link>
                 <span>/</span>
-                <span className="font-medium">{index.toUpperCase()}</span>
+                <span className="font-medium shrink-0">{index.toUpperCase()}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main content */}
-        <div className="container mx-auto px-4 py-8 ">
+        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 overflow-x-hidden">
           {staticMetaData && (
             <RegionDetail
               nutsId={regionId}

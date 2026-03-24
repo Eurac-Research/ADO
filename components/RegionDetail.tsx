@@ -17,7 +17,22 @@ const TimeSeries = dynamic(() => import('@/components/timeseries'), {
   ssr: false,
 })
 
+const DroughtHeatmap = dynamic(() => import('@/components/DroughtHeatmap'), {
+  loading: () => <p>Loading heatmap...</p>,
+  ssr: false,
+})
+
 const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+
+const COUNTRY_NAMES: Record<string, string> = {
+  AT: 'Austria',
+  CH: 'Switzerland',
+  DE: 'Germany',
+  FR: 'France',
+  IT: 'Italy',
+  LI: 'Liechtenstein',
+  SI: 'Slovenia',
+}
 
 interface RegionDetailProps {
   // Required props
@@ -90,6 +105,9 @@ export default function RegionDetail({
   className = ''
 }: RegionDetailProps) {
   const router = useRouter()
+  const countryCode = nutsId.slice(0, 2).toUpperCase()
+  const countryName = COUNTRY_NAMES[countryCode] || countryCode
+  const nutsLevel = Math.max(0, nutsId.length - 2)
 
   // State for fetched data
   const [nutsName, setNutsName] = useState<string>(initialNutsName || nutsId)
@@ -110,6 +128,8 @@ export default function RegionDetail({
   const [comparisonRegionData, setComparisonRegionData] = useState<TimeSeriesData[] | null>(null)
   const [availableRegions, setAvailableRegions] = useState<RegionInfo[]>([])
   const [isLoadingComparison, setIsLoadingComparison] = useState(false)
+  const firstDataDate = nutsData?.[0]?.date
+  const lastDataDate = nutsData?.[nutsData.length - 1]?.date
 
   // Handle index change from TimeSeries component
   const handleIndexChange = useCallback((newIndex: string) => {
@@ -327,8 +347,8 @@ export default function RegionDetail({
     : "w-full min-h-screen"
 
   const contentClasses = mode === 'modal'
-    ? "dataOverlay max-w-4xl max-h-[90vh] overflow-y-auto"
-    : "container mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
+    ? "dataOverlay max-w-4xl w-[95vw] max-h-[95vh] overflow-y-auto p-4 sm:p-6"
+    : "container mx-auto p-3 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
 
   // Loading state
   if (isLoadingMeta) {
@@ -343,7 +363,7 @@ export default function RegionDetail({
 
     if (mode === 'page') {
       return (
-        <Layout posts={allPosts}>
+        <Layout posts={allPosts} headerMode={1}>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
             {loadingContent}
           </div>
@@ -371,7 +391,7 @@ export default function RegionDetail({
 
     if (mode === 'page') {
       return (
-        <Layout posts={allPosts}>
+        <Layout posts={allPosts} headerMode={1}>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
             <div className="container mx-auto px-4 py-8">
               {errorContent}
@@ -391,15 +411,15 @@ export default function RegionDetail({
 
       <div className={contentClasses}>
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <div className="flex flex-col sm:flex-row items-start justify-between mb-4 sm:mb-6 gap-2">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">
               {nutsName}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-1">
+            <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-300 mb-1 break-words">
               {datatype} - {staticMetaData?.long_name}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Region ID: {nutsId}
             </p>
           </div>
@@ -450,12 +470,12 @@ export default function RegionDetail({
         {/* Time Series Controls */}
         {!isLoading && !isError && (
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                 Historical Data & Analysis
               </h2>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => {
                     if (!compareYears) {
@@ -597,7 +617,7 @@ export default function RegionDetail({
 
         {/* Time Series Chart */}
         {!isLoading && !isError && nutsData && staticMetaData && (
-          <div className="mb-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div className="mb-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-4">
             <TimeSeries
               key={`timeseries-${compareYears ? 'year' : ''}-${compareRegions ? 'region' : ''}-${selectedComparisonRegion || ''}-${selectedYears.join(',')}`}
               data={nutsData}
@@ -624,15 +644,22 @@ export default function RegionDetail({
               onIndexChange={handleIndexChange}
               style={{
                 width: '100%',
-                height: '400px',
+                height: typeof window !== 'undefined' && window.innerWidth < 640 ? '280px' : '400px',
                 position: 'relative',
               }}
             />
           </div>
         )}
 
+        {/* Drought Heatmap */}
+        {!isLoading && !isError && nutsData && (
+          <div className="mb-8">
+            <DroughtHeatmap data={nutsData} regionName={nutsName} />
+          </div>
+        )}
+
         {/* Region Information & Resources */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Region Stats */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
             <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">Region Information</h3>
@@ -646,13 +673,31 @@ export default function RegionDetail({
                 <dd className="text-blue-900 dark:text-blue-100">{nutsName}</dd>
               </div>
               <div className="flex justify-between">
+                <dt className="text-blue-700 dark:text-blue-300">Country:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">{countryName}</dd>
+              </div>
+              <div className="flex justify-between">
                 <dt className="text-blue-700 dark:text-blue-300">Current Index:</dt>
                 <dd className="text-blue-900 dark:text-blue-100">{datatype}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-blue-700 dark:text-blue-300">Current Date:</dt>
-                <dd className="text-blue-900 dark:text-blue-100">{day}</dd>
+                <dt className="text-blue-700 dark:text-blue-300">NUTS Level:</dt>
+                <dd className="text-blue-900 dark:text-blue-100">NUTS-{nutsLevel}</dd>
               </div>
+              {nutsData && (
+                <>
+                  <div className="flex justify-between">
+                    <dt className="text-blue-700 dark:text-blue-300">Data Points:</dt>
+                    <dd className="text-blue-900 dark:text-blue-100">{nutsData.length}</dd>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-blue-700 dark:text-blue-300">Time Coverage:</dt>
+                    <dd className="text-blue-900 dark:text-blue-100 text-right">
+                      {firstDataDate && lastDataDate ? `${firstDataDate} to ${lastDataDate}` : 'N/A'}
+                    </dd>
+                  </div>
+                </>
+              )}
             </dl>
           </div>
 
@@ -720,37 +765,44 @@ export default function RegionDetail({
   // Wrap in Layout for page mode, return directly for modal mode
   if (mode === 'page') {
     return (
-      <Layout posts={allPosts}>
+      <Layout posts={allPosts} headerMode={1}>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 mt-20">
           {/* Header with breadcrumb */}
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="container mx-auto px-4 py-4">
-              <div className="flex items-center gap-4">
+          <div className="sticky top-20 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                 <button
                   onClick={handleBackToMap}
-                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors shrink-0"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back to Map
                 </button>
 
-                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 min-w-0">
+                  <span>/</span>
+                  <Link
+                    href="/regions"
+                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    Regions
+                  </Link>
                   <span>/</span>
                   <Link
                     href={`/region/${nutsId}`}
-                    className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    className="font-medium text-blue-600 dark:text-blue-400 hover:underline truncate"
                   >
                     {nutsName}
                   </Link>
                   <span>/</span>
-                  <span className="font-medium">{datatype.toUpperCase()}</span>
+                  <span className="font-medium shrink-0">{datatype.toUpperCase()}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main content */}
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 overflow-x-hidden">
             {mainContent}
           </div>
         </div>
