@@ -12,11 +12,16 @@ class StationDataCache {
   // Cache for 10 minutes
   private defaultTTL = 10 * 60 * 1000
 
-  set<T>(cache: Map<string, CacheEntry<T>>, key: string, data: T, ttl = this.defaultTTL) {
+  set<T>(
+    cache: Map<string, CacheEntry<T>>,
+    key: string,
+    data: T,
+    ttl = this.defaultTTL
+  ) {
     cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     })
   }
 
@@ -56,7 +61,7 @@ class StationDataCache {
   getStats() {
     return {
       timeseriesEntries: this.timeseriesCache.size,
-      htmlEntries: this.htmlCache.size
+      htmlEntries: this.htmlCache.size,
     }
   }
 }

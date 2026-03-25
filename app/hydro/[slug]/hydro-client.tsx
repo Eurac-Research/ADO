@@ -6,14 +6,13 @@ import Map, {
   Source,
   Layer,
   ScaleControl,
-  NavigationControl
-} from 'react-map-gl'
+  NavigationControl,
+} from 'react-map-gl/mapbox'
 import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
 import { format } from 'date-format-parse'
-import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import { stationCache } from '@/lib/station-cache'
 import type { PostData } from '@/types'
@@ -28,7 +27,26 @@ const TimeSeries = dynamic(() => import('@/components/timeseries'), {
 })
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+async function fetchText(url: string): Promise<string> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.text()
+}
 
 interface HydroClientProps {
   datatype: string
@@ -58,32 +76,52 @@ export default function HydroClient({
   stationsData,
   allPosts,
   indices,
-  error
+  error,
 }: HydroClientProps) {
   const mapRef = useRef<any>(null)
   const [theme] = useThemeContext()
 
   // Convert string dates to timestamps safely
   const getTimestamp = (dateStr: string | undefined): number => {
-    if (!dateStr) return 0;
+    if (!dateStr) return 0
     try {
-      return Math.floor(new Date(dateStr).getTime() / 1000);
+      return Math.floor(new Date(dateStr).getTime() / 1000)
     } catch (e) {
-      console.error('Invalid date:', dateStr);
-      return 0;
+      console.error('Invalid date:', dateStr)
+      return 0
     }
-  };
+  }
 
   // Memoized values for date calculations
   const firstDayTimestamp = useMemo(() => {
-    return getTimestamp(staticData?.metadata?.properties?.firstDate ||
-      staticMetaData?.timerange?.properties?.firstDate) / 60 / 60 / 24;
-  }, [staticData?.metadata?.properties?.firstDate, staticMetaData?.timerange?.properties?.firstDate]);
+    return (
+      getTimestamp(
+        staticData?.metadata?.properties?.firstDate ||
+        staticMetaData?.timerange?.properties?.firstDate
+      ) /
+      60 /
+      60 /
+      24
+    )
+  }, [
+    staticData?.metadata?.properties?.firstDate,
+    staticMetaData?.timerange?.properties?.firstDate,
+  ])
 
   const lastDayTimestamp = useMemo(() => {
-    return getTimestamp(staticData?.metadata?.properties?.lastDate ||
-      staticMetaData?.timerange?.properties?.lastDate) / 60 / 60 / 24;
-  }, [staticData?.metadata?.properties?.lastDate, staticMetaData?.timerange?.properties?.lastDate]);
+    return (
+      getTimestamp(
+        staticData?.metadata?.properties?.lastDate ||
+        staticMetaData?.timerange?.properties?.lastDate
+      ) /
+      60 /
+      60 /
+      24
+    )
+  }, [
+    staticData?.metadata?.properties?.lastDate,
+    staticMetaData?.timerange?.properties?.lastDate,
+  ])
 
   // State
   const [day, setDay] = useState<string>(() => {
@@ -91,8 +129,8 @@ export default function HydroClient({
     // metaData ? metaData?.timerange?.properties?.lastDate : staticMetaData?.timerange?.properties?.lastDate
     // Where metaData is from catchmentData, so prioritize that source first
 
-    const lastDateFromCatchment = staticData?.metadata?.properties?.lastDate;
-    const lastDateFromMetadata = staticMetaData?.timerange?.properties?.lastDate;
+    const lastDateFromCatchment = staticData?.metadata?.properties?.lastDate
+    const lastDateFromMetadata = staticMetaData?.timerange?.properties?.lastDate
 
     // Log the available dates for debugging
     // console.log('Setting initial day value:', {
@@ -102,7 +140,7 @@ export default function HydroClient({
     // });
 
     // Prioritize the date from catchment data, exactly like in legacy code
-    return lastDateFromCatchment || lastDateFromMetadata || "";
+    return lastDateFromCatchment || lastDateFromMetadata || ''
   })
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
   const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null)
@@ -113,69 +151,90 @@ export default function HydroClient({
 
   // Add a validation for selected day - make sure it exists in the range and data
   useEffect(() => {
-    if (!staticData?.features?.length || !day) return;
+    if (!staticData?.features?.length || !day) return
 
     try {
       // First validate against the date range from metadata
-      const timestamp = getTimestamp(day);
-      const dayFromTimestamp = timestamp / 60 / 60 / 24;
+      const timestamp = getTimestamp(day)
+      const dayFromTimestamp = timestamp / 60 / 60 / 24
 
       // Similar to legacy code's fixedDay validation
       if (dayFromTimestamp > lastDayTimestamp) {
         // console.log(`Day ${day} is after the last available date, adjusting to last available`);
-        setDay(format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'));
-        return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setDay(
+          format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+        )
+        return
       } else if (dayFromTimestamp < firstDayTimestamp) {
         // console.log(`Day ${day} is before the first available date, adjusting to last available`);
-        setDay(format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'));
-        return;
+        setDay(
+          format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+        )
+        return
       }
 
       // Then check if the day exists in the actual data
-      const firstFeature = staticData.features[0];
-      const dtUpper = datatype.toUpperCase();
+      const firstFeature = staticData.features[0]
+      const dtUpper = datatype.toUpperCase()
 
       // If the current day doesn't exist in the data, find the closest one
-      if (firstFeature.properties[dtUpper] && !(day in firstFeature.properties[dtUpper])) {
+      if (
+        firstFeature.properties[dtUpper] &&
+        !(day in firstFeature.properties[dtUpper])
+      ) {
         // console.log(`Day ${day} not found in data, finding closest available date...`);
 
         // Get all available dates and sort them
-        const availableDates = Object.keys(firstFeature.properties[dtUpper]).sort();
+        const availableDates = Object.keys(
+          firstFeature.properties[dtUpper]
+        ).sort()
 
         if (availableDates.length > 0) {
           // Find the closest date to the selected one
-          const selectedDate = new Date(day);
-          let closestDate = availableDates[0];
-          let smallestDiff = Math.abs(new Date(closestDate).getTime() - selectedDate.getTime());
+          const selectedDate = new Date(day)
+          let closestDate = availableDates[0]
+          let smallestDiff = Math.abs(
+            new Date(closestDate).getTime() - selectedDate.getTime()
+          )
 
           for (const dateStr of availableDates) {
-            const diff = Math.abs(new Date(dateStr).getTime() - selectedDate.getTime());
+            const diff = Math.abs(
+              new Date(dateStr).getTime() - selectedDate.getTime()
+            )
             if (diff < smallestDiff) {
-              smallestDiff = diff;
-              closestDate = dateStr;
+              smallestDiff = diff
+              closestDate = dateStr
             }
           }
 
           // console.log(`Found closest available date: ${closestDate}`);
-          setDay(closestDate);
+          setDay(closestDate)
         } else {
           // If no dates available, use the last date from metadata
-          const fallbackDate = staticData?.metadata?.properties?.lastDate ||
-            staticMetaData?.timerange?.properties?.lastDate;
+          const fallbackDate =
+            staticData?.metadata?.properties?.lastDate ||
+            staticMetaData?.timerange?.properties?.lastDate
 
           if (fallbackDate) {
-
-            setDay(fallbackDate);
+            setDay(fallbackDate)
           }
         }
       }
     } catch (error) {
-      console.error('Error validating day:', error);
+      console.error('Error validating day:', error)
     }
-  }, [day, staticData, datatype, staticMetaData?.timerange?.properties?.lastDate, firstDayTimestamp, lastDayTimestamp]);
+  }, [
+    day,
+    staticData,
+    datatype,
+    staticMetaData?.timerange?.properties?.lastDate,
+    firstDayTimestamp,
+    lastDayTimestamp,
+  ])
 
   // Memoized values
-  const paint = staticMetaData?.colormap;
+  const paint = staticMetaData?.colormap
   // console.log('Paint/colormap from metadata:', {
   //   hasPaint: !!paint,
   //   paintType: paint?.type,
@@ -184,7 +243,7 @@ export default function HydroClient({
   //   legendStops: paint?.legend?.stops?.length
   // });
 
-  const dataLayer = paint;
+  const dataLayer = paint
 
   const stationPaintLayer = {
     id: 'stationPoint',
@@ -215,13 +274,13 @@ export default function HydroClient({
 
   const data = useMemo(() => {
     if (!staticData || !staticData.features || !day) {
-      return null;
+      return null
     }
 
     // Log the first feature to understand its structure
-    const firstFeature = staticData.features[0];
-    const propertyKeys = Object.keys(firstFeature.properties || {});
-    const dtUpper = datatype.toUpperCase();
+    const firstFeature = staticData.features[0]
+    const propertyKeys = Object.keys(firstFeature.properties || {})
+    const dtUpper = datatype.toUpperCase()
 
     // console.log('First feature data structure:', {
     //   propertyKeys,
@@ -243,24 +302,23 @@ export default function HydroClient({
         // Match legacy access pattern exactly: f.properties[`${datatype}`][day]
         // In our case, we need to use the uppercase datatype like in our fetch URL
         if (f.properties[dtUpper] && day in f.properties[dtUpper]) {
-          const value = f.properties[dtUpper][day];
-          return value;
+          const value = f.properties[dtUpper][day]
+          return value
         }
 
         // Try alternate ways of accessing if the main path fails
         if (f.properties[datatype] && day in f.properties[datatype]) {
           //console.log(`Using original case datatype for feature`, { id: f.properties.id || f.id });
-          return f.properties[datatype][day];
+          return f.properties[datatype][day]
         }
-
       } catch (e) {
         console.error('Error accessing property for feature:', {
           featureId: f.properties.id || f.id,
-          error: e instanceof Error ? e.message : String(e)
-        });
-        return null;
+          error: e instanceof Error ? e.message : String(e),
+        })
+        return null
       }
-    });
+    })
   }, [datatype, staticData, day])
 
   // Event handlers
@@ -279,43 +337,21 @@ export default function HydroClient({
       )},${Math.round(
         hoveredFeature?.layer?.paint?.['fill-color'].g * 255
       )},${Math.round(
-        hoveredFeature?.layer?.paint?.['fill-color'].b * 255)},1)`
+        hoveredFeature?.layer?.paint?.['fill-color'].b * 255
+      )},1)`
 
-    setHoverInfo(hoveredFeature && {
-      rgbaColor: featureColor,
-      feature: hoveredFeature,
-      x,
-      y
-    })
+    setHoverInfo(
+      hoveredFeature && {
+        rgbaColor: featureColor,
+        feature: hoveredFeature,
+        x,
+        y,
+      }
+    )
   }, [])
 
   const onOut = useCallback(() => {
     setHoverInfo(null)
-  }, [])
-
-  const onClick = useCallback(async (event: any) => {
-    const { features } = event
-    const hoveredFeature = features && features[0]
-    setClickInfo(
-      hoveredFeature
-        ? {
-          feature: hoveredFeature,
-        }
-        : null
-    )
-
-    // Fetch timeseries data if available - handle both station_id and id_station formats
-    const stationId = hoveredFeature?.properties?.station_id || hoveredFeature?.properties?.id_station
-    if (stationId) {
-      await getTimeseriesData(stationId)
-      await getHtmlData(stationId)
-    }
-  }, [])
-
-  const onClose = useCallback(() => {
-    setClickInfo(null)
-    setTimeseriesData(null)
-    setHtmlData(null)
   }, [])
 
   // Data fetching functions with caching
@@ -329,28 +365,11 @@ export default function HydroClient({
 
     const fetchData = async () => {
       try {
-        // Try both formats for HTML reports, prioritizing the legacy format
-        const urls = [
-          `https://${ADO_DATA_URL}/html/report_${stationId}.html`,
-          `https://${ADO_DATA_URL}/html/hydro/${stationId}.html`
-        ]
-
-        for (const url of urls) {
-          try {
-            const result = await axios(url)
-            if (result.data) {
-              // Cache the result
-              stationCache.setHtml(stationId, result.data)
-              setHtmlData(result.data)
-              return
-            }
-          } catch (error) {
-            // Failed to fetch from this URL, try next
-          }
-        }
-
-        console.error('Error: Could not fetch HTML data from any URL')
-        setHtmlData(null)
+        const html = await fetchText(
+          `/api/html-report/${encodeURIComponent(stationId)}`
+        )
+        stationCache.setHtml(stationId, html)
+        setHtmlData(html)
       } catch (error) {
         console.error('Error fetching HTML data:', error)
         setHtmlData(null)
@@ -373,30 +392,11 @@ export default function HydroClient({
       setIsError(false)
       setIsLoading(true)
       try {
-        // Try both formats for timeseries data, prioritizing the legacy format with ID_STATION_ prefix
-        const urls = [
-          `https://${ADO_DATA_URL}/json/hydro/timeseries/ID_STATION_${stationId}.json`,
-          `https://${ADO_DATA_URL}/json/hydro/timeseries/${stationId}.json`
-        ]
-
-        for (const url of urls) {
-          try {
-            const result = await axios(url)
-            if (result.data) {
-              // console.log('Timeseries data loaded from:', url)
-              // Cache the result
-              stationCache.setTimeseries(stationId, result.data)
-              setTimeseriesData(result.data)
-              setIsLoading(false)
-              return
-            }
-          } catch (error) {
-            // Failed to fetch from this URL, try next
-          }
-        }
-
-        console.error('Error: Could not fetch timeseries data from any URL')
-        setIsError(true)
+        const timeseries = await fetchJson<any>(
+          `/api/timeseries/${encodeURIComponent(stationId)}`
+        )
+        stationCache.setTimeseries(stationId, timeseries)
+        setTimeseriesData(timeseries)
       } catch (error) {
         console.error('Error fetching timeseries data:', error)
         setIsError(true)
@@ -405,6 +405,33 @@ export default function HydroClient({
     }
     fetchData()
   }
+
+  const onClick = useCallback(async (event: any) => {
+    const { features } = event
+    const hoveredFeature = features && features[0]
+    setClickInfo(
+      hoveredFeature
+        ? {
+          feature: hoveredFeature,
+        }
+        : null
+    )
+
+    // Fetch timeseries data if available - handle both station_id and id_station formats
+    const stationId =
+      hoveredFeature?.properties?.station_id ||
+      hoveredFeature?.properties?.id_station
+    if (stationId) {
+      await getTimeseriesData(stationId)
+      await getHtmlData(stationId)
+    }
+  }, [])
+
+  const onClose = useCallback(() => {
+    setClickInfo(null)
+    setTimeseriesData(null)
+    setHtmlData(null)
+  }, [])
 
   // Loading state
   if (metadata === undefined) {
@@ -417,7 +444,7 @@ export default function HydroClient({
           </div>
         </div>
       </Layout>
-    );
+    )
   }
 
   // Error state
@@ -426,15 +453,23 @@ export default function HydroClient({
       <Layout posts={allPosts}>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center p-8 bg-white dark:bg-gray-800 rounded shadow-lg max-w-2xl">
-            <h1 className="text-2xl font-bold mb-4 text-red-600">Error Loading Data</h1>
+            <h1 className="text-2xl font-bold mb-4 text-red-600">
+              Error Loading Data
+            </h1>
             <p className="mb-4">{error}</p>
             <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-left overflow-auto">
-              <pre>{JSON.stringify({ datatype, hasStaticData: !!staticData }, null, 2)}</pre>
+              <pre>
+                {JSON.stringify(
+                  { datatype, hasStaticData: !!staticData },
+                  null,
+                  2
+                )}
+              </pre>
             </div>
           </div>
         </div>
       </Layout>
-    );
+    )
   }
 
   // Data format error
@@ -443,21 +478,36 @@ export default function HydroClient({
       <Layout posts={allPosts}>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center p-8 bg-white dark:bg-gray-800 rounded shadow-lg max-w-2xl">
-            <h1 className="text-2xl font-bold mb-4 text-yellow-600">Data Format Issue</h1>
-            <p className="mb-4">The data was loaded but appears to be in an unexpected format.</p>
+            <h1 className="text-2xl font-bold mb-4 text-yellow-600">
+              Data Format Issue
+            </h1>
+            <p className="mb-4">
+              The data was loaded but appears to be in an unexpected format.
+            </p>
             <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-left overflow-auto">
-              <pre>{JSON.stringify({
-                datatype,
-                hasStaticData: !!staticData,
-                hasFeatures: staticData?.features?.length > 0,
-                featuresType: typeof staticData?.features,
-                firstFewProps: staticData?.features?.[0]?.properties ? Object.keys(staticData.features[0].properties).slice(0, 5) : []
-              }, null, 2)}</pre>
+              <pre>
+                {JSON.stringify(
+                  {
+                    datatype,
+                    hasStaticData: !!staticData,
+                    hasFeatures: staticData?.features?.length > 0,
+                    featuresType: typeof staticData?.features,
+                    firstFewProps: staticData?.features?.[0]?.properties
+                      ? Object.keys(staticData.features[0].properties).slice(
+                        0,
+                        5
+                      )
+                      : [],
+                  },
+                  null,
+                  2
+                )}
+              </pre>
             </div>
           </div>
         </div>
       </Layout>
-    );
+    )
   }
 
   const scaleControlStyle = {}
@@ -490,12 +540,12 @@ export default function HydroClient({
           onClick={onClick}
         >
           <Source id="stationData" type="geojson" data={stationsData as any}>
-            <Layer {...stationPaintLayer as any} />
+            <Layer {...(stationPaintLayer as any)} />
           </Source>
 
           {data && (
             <Source type="geojson" data={data as any} generateId={true}>
-              <Layer {...dataLayer as any} beforeId="waterway-shadow" />
+              <Layer {...(dataLayer as any)} beforeId="waterway-shadow" />
             </Source>
           )}
           <ScaleControl
@@ -527,33 +577,39 @@ export default function HydroClient({
 
                     <span className="block text-xs">
                       {(() => {
-                        if (!metadata?.colormap?.legend?.stops) return '';
+                        if (!metadata?.colormap?.legend?.stops) return ''
 
-                        const value = parseFloat(hoverInfo.feature.properties.value);
-                        if (isNaN(value)) return 'No data';
+                        const value = parseFloat(
+                          hoverInfo.feature.properties.value
+                        )
+                        if (isNaN(value)) return 'No data'
 
-                        const stops = metadata.colormap.legend.stops;
-                        const sortedStops = [...stops].sort((a: any, b: any) =>
-                          parseFloat(a[0]) - parseFloat(b[0])
-                        );
+                        const stops = metadata.colormap.legend.stops
+                        const sortedStops = [...stops].sort(
+                          (a: any, b: any) =>
+                            parseFloat(a[0]) - parseFloat(b[0])
+                        )
 
                         if (value < parseFloat(sortedStops[0][0])) {
-                          return sortedStops[0]['1'];
+                          return sortedStops[0]['1']
                         }
 
-                        if (value >= parseFloat(sortedStops[sortedStops.length - 1][0])) {
-                          return sortedStops[sortedStops.length - 1]['1'];
+                        if (
+                          value >=
+                          parseFloat(sortedStops[sortedStops.length - 1][0])
+                        ) {
+                          return sortedStops[sortedStops.length - 1]['1']
                         }
 
                         for (let i = 0; i < sortedStops.length - 1; i++) {
-                          const currentValue = parseFloat(sortedStops[i][0]);
-                          const nextValue = parseFloat(sortedStops[i + 1][0]);
+                          const currentValue = parseFloat(sortedStops[i][0])
+                          const nextValue = parseFloat(sortedStops[i + 1][0])
                           if (value >= currentValue && value < nextValue) {
-                            return sortedStops[i]['1'];
+                            return sortedStops[i]['1']
                           }
                         }
 
-                        return '';
+                        return ''
                       })()}
                     </span>
                   </>
@@ -563,7 +619,9 @@ export default function HydroClient({
               </span>
               <div>
                 {hoverInfo.feature.properties.station_name && (
-                  <div>Station: {hoverInfo.feature.properties.station_name}</div>
+                  <div>
+                    Station: {hoverInfo.feature.properties.station_name}
+                  </div>
                 )}
                 {hoverInfo.feature.properties.id_station && (
                   <div>ID: {hoverInfo.feature.properties.id_station}</div>
@@ -595,42 +653,49 @@ export default function HydroClient({
         style={{ opacity: clickInfo ? '0' : '1' }}
       >
         <div className="legend">
-          {staticMetaData?.colormap?.legend?.stops?.map((item: any, index: number) => {
-            if (!item || !item['1'] || !item['2']) return null;
-            return (
-              <div key={`legend${index}`} className="legendItem">
-                <div
-                  className="legendColor"
-                  style={{ background: item['2'] }}
-                ></div>
-                <p className="legendLabel">{item['1']}</p>
-              </div>
-            )
-          })}
+          {staticMetaData?.colormap?.legend?.stops?.map(
+            (item: any, index: number) => {
+              if (!item || !item['1'] || !item['2']) return null
+              return (
+                <div key={`legend${index}`} className="legendItem">
+                  <div
+                    className="legendColor"
+                    style={{ background: item['2'] }}
+                  ></div>
+                  <p className="legendLabel">{item['1']}</p>
+                </div>
+              )
+            }
+          )}
         </div>
 
         <ControlPanel
           metadata={metadata}
           day={day}
           hideDaySwitchTabs={true}
-          firstDay={staticData?.metadata?.properties?.firstDate || staticMetaData?.timerange?.properties?.firstDate}
-          lastDay={staticData?.metadata?.properties?.lastDate || staticMetaData?.timerange?.properties?.lastDate}
+          firstDay={
+            staticData?.metadata?.properties?.firstDate ||
+            staticMetaData?.timerange?.properties?.firstDate
+          }
+          lastDay={
+            staticData?.metadata?.properties?.lastDate ||
+            staticMetaData?.timerange?.properties?.lastDate
+          }
           onChange={(value: any) => {
             try {
               // Parse the timestamp value received from the slider
-              const timestamp = parseFloat(value);
+              const timestamp = parseFloat(value)
 
               // Create a date from the timestamp (seconds since epoch * 24 hours)
-              const date = new Date(timestamp * 60 * 60 * 24 * 1000);
+              const date = new Date(timestamp * 60 * 60 * 24 * 1000)
 
               // Format to YYYY-MM-DD, same as in the legacy code using format()
               // In legacy: format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
-              const formattedDate = date.toISOString().split('T')[0];
+              const formattedDate = date.toISOString().split('T')[0]
 
-
-              setDay(formattedDate);
+              setDay(formattedDate)
             } catch (error) {
-              console.error('Error processing date:', error);
+              console.error('Error processing date:', error)
             }
           }}
         />
@@ -655,7 +720,8 @@ export default function HydroClient({
                   {clickInfo.feature.properties.country},{' '}
                   {clickInfo.feature.properties.region},{' '}
                   {clickInfo.feature.properties.location_s} -{' '}
-                  {clickInfo.feature.properties.station_id || clickInfo.feature.properties.id_station}
+                  {clickInfo.feature.properties.station_id ||
+                    clickInfo.feature.properties.id_station}
                 </>
               ) : (
                 <>
@@ -663,15 +729,18 @@ export default function HydroClient({
                 </>
               )}
             </h1>
-            {isError && (
-              <p>Error loading timeseries data</p>
-            )}
+            {isError && <p>Error loading timeseries data</p>}
             {clickInfo.feature.properties.station_name && (
               <p>Station: {clickInfo.feature.properties.station_name}</p>
             )}
-            {(clickInfo.feature.properties.station_id || clickInfo.feature.properties.id_station) && (
-              <p>ID: {clickInfo.feature.properties.station_id || clickInfo.feature.properties.id_station}</p>
-            )}
+            {(clickInfo.feature.properties.station_id ||
+              clickInfo.feature.properties.id_station) && (
+                <p>
+                  ID:{' '}
+                  {clickInfo.feature.properties.station_id ||
+                    clickInfo.feature.properties.id_station}
+                </p>
+              )}
             <TimeSeriesLegend />
             {timeseriesData && (
               <TimeSeries
@@ -680,11 +749,19 @@ export default function HydroClient({
                 indices={indices}
                 index={datatype.toUpperCase()}
                 metadata={staticMetaData}
-                firstDate={day ? new Date(new Date(day).getTime() - 3 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : ""}
+                firstDate={
+                  day
+                    ? new Date(
+                      new Date(day).getTime() - 3 * 365 * 24 * 60 * 60 * 1000
+                    )
+                      .toISOString()
+                      .split('T')[0]
+                    : ''
+                }
                 lastDate={day}
                 style={{
                   width: '100%',
-                  height: '100%',
+                  height: '400px',
                   position: 'relative',
                   zIndex: '102',
                   top: '0',

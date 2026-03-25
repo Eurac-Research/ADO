@@ -2,7 +2,7 @@ import { getAllPosts } from '@/lib/api'
 import {
   fetchHydroData as fetchHydroDataUtil,
   fetchHydroMetadata,
-  fetchGaugingStations
+  fetchGaugingStations,
 } from '@/lib/data-fetcher'
 import HydroClient from './hydro-client'
 import { notFound } from 'next/navigation'
@@ -40,7 +40,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export async function generateMetadata({ params }: HydroPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: HydroPageProps): Promise<Metadata> {
   const { slug } = await params
 
   return {
@@ -50,19 +52,24 @@ export async function generateMetadata({ params }: HydroPageProps): Promise<Meta
 }
 
 async function fetchHydroData(datatype: string) {
-  const datatypeUpper = datatype.toUpperCase();
+  const datatypeUpper = datatype.toUpperCase()
 
   try {
     const [catchmentData, staticMetaData, stationsData] = await Promise.all([
       fetchHydroDataUtil(datatypeUpper),
       fetchHydroMetadata(datatypeUpper),
-      fetchGaugingStations()
+      fetchGaugingStations(),
     ])
 
     return { staticData: catchmentData, staticMetaData, stationsData }
   } catch (error) {
     console.error('Error fetching hydro data:', error)
-    return { staticData: null, staticMetaData: null, stationsData: null, error: 'Failed to load data' }
+    return {
+      staticData: null,
+      staticMetaData: null,
+      stationsData: null,
+      error: 'Failed to load data',
+    }
   }
 }
 
@@ -76,10 +83,14 @@ export default async function HydroPage({ params }: HydroPageProps) {
 
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
   // Always fetch using the provided slug or fallback
-  const { staticData, staticMetaData, stationsData, error } = await fetchHydroData(dataSlug)
+  const { staticData, staticMetaData, stationsData, error } =
+    await fetchHydroData(dataSlug)
 
   // Log the latest date from the metadata and catchment data for debugging
-  if (staticData?.metadata?.properties?.lastDate || staticMetaData?.timerange?.properties?.lastDate) {
+  if (
+    staticData?.metadata?.properties?.lastDate ||
+    staticMetaData?.timerange?.properties?.lastDate
+  ) {
     // console.log('Available dates in hydro data:', {
     //   lastDateFromCatchment: staticData?.metadata?.properties?.lastDate,
     //   lastDateFromMetadata: staticMetaData?.timerange?.properties?.lastDate,
@@ -90,11 +101,11 @@ export default async function HydroPage({ params }: HydroPageProps) {
 
     // If the data has features, inspect the date range in the first feature
     if (staticData?.features?.[0]?.properties) {
-      const firstFeature = staticData.features[0];
-      const dtUpper = dataSlug.toUpperCase();
+      const firstFeature = staticData.features[0]
+      const dtUpper = dataSlug.toUpperCase()
       if (firstFeature.properties[dtUpper]) {
-        const dateKeys = Object.keys(firstFeature.properties[dtUpper]);
-        const sortedDates = dateKeys.sort();
+        const dateKeys = Object.keys(firstFeature.properties[dtUpper])
+        const sortedDates = dateKeys.sort()
         // console.log('Date range in actual feature data:', {
         //   firstDate: sortedDates[0],
         //   lastDate: sortedDates[sortedDates.length - 1],

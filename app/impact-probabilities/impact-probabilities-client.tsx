@@ -1,18 +1,19 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
+import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Map, {
   Source,
   Layer,
   ScaleControl,
   NavigationControl,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import Link from 'next/link'
 import ControlPanelImpactsProbsTs from '@/components/ControlPanelImpactsProbsTs'
 import ReportedImpactsIntro from '@/components/ReportedImpactsIntro'
 import Layout from '@/components/layout'
 import { useThemeContext } from '@/context/theme'
+import { useMounted } from '@/lib/hooks'
 import interpolate from 'color-interpolate'
 import type { PostData } from '@/types'
 
@@ -39,11 +40,7 @@ function ImpactProbabilitiesContent({
   const mapRef = useRef<any>(null)
   const [theme] = useThemeContext()
   const searchParams = useSearchParams()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useMounted()
 
   const type = searchParams.get('type') || 'spei'
 
@@ -132,7 +129,8 @@ function ImpactProbabilitiesContent({
   )
 
   // Determine the type of impact probability based on the route parameter
-  const probabilityType = type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
+  const probabilityType =
+    type === 'sma' ? 'DSM_PredictedProb' : 'DH_PredictedProb'
 
   // Helper function to find impact data for a specific NUTS ID
   function impactByNutsId(NUTS_ID: string) {
@@ -148,6 +146,7 @@ function ImpactProbabilitiesContent({
   // Build a match expression for coloring the map
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
+  let hasEntries = false
   for (const row of impactDataByIndicatorValue) {
     // Get the probability value
     const amount = row[probabilityType]
@@ -157,7 +156,15 @@ function ImpactProbabilitiesContent({
     const color = colormap(amount)
 
     // Only provide a color if amount is not null
-    amount && matchExpression.push(row['NUTS_ID'], color)
+    if (amount) {
+      matchExpression.push(row['NUTS_ID'], color)
+      hasEntries = true
+    }
+  }
+
+  // match expression requires at least one label/output pair
+  if (!hasEntries) {
+    matchExpression.push('', 'rgba(255, 255, 255, 1)')
   }
 
   // Default color for regions with no data
@@ -262,7 +269,7 @@ function ImpactProbabilitiesContent({
               data={nutsMap}
               generateId={true}
             >
-              <Layer {...dataLayer as any} beforeId="waterway-shadow" />
+              <Layer {...(dataLayer as any)} beforeId="waterway-shadow" />
             </Source>
           )}
 
@@ -280,7 +287,8 @@ function ImpactProbabilitiesContent({
               style={{ left: hoverInfo.x, top: hoverInfo.y }}
             >
               <div>
-                {hoverInfo.feature.properties.NUTS_NAME} ({hoverInfo.feature.properties.NUTS_ID})
+                {hoverInfo.feature.properties.NUTS_NAME} (
+                {hoverInfo.feature.properties.NUTS_ID})
               </div>
               {impactByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
                 <>
@@ -288,7 +296,8 @@ function ImpactProbabilitiesContent({
                     <div>
                       DSM impact probability:{' '}
                       {(
-                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)?.DSM_PredictedProb * 100
+                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
+                          ?.DSM_PredictedProb * 100
                       ).toFixed(1)}
                       %
                     </div>
@@ -296,7 +305,8 @@ function ImpactProbabilitiesContent({
                     <div>
                       DH impact probability:{' '}
                       {(
-                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)?.DH_PredictedProb * 100
+                        impactByNutsId(hoverInfo.feature.properties.NUTS_ID)
+                          ?.DH_PredictedProb * 100
                       ).toFixed(1)}
                       %
                     </div>
@@ -356,7 +366,6 @@ export default function ImpactProbabilitiesClient({
   nutsMap,
   allPosts,
 }: ImpactProbabilitiesClientProps) {
-
   useEffect(() => {
     // Add global styles for loading and error states
     const styles = `

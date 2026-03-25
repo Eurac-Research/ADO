@@ -6,7 +6,7 @@ import Map, {
   Layer,
   ScaleControl,
   NavigationControl,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
@@ -20,7 +20,9 @@ import IndicesNavigation from '@/components/IndicesNavigation'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const ADO_DATA_URL =
+  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
+  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 interface IndexClientProps {
   datatype: string
@@ -54,14 +56,15 @@ export default function IndexClient({
   indices,
   error,
   onIndexChange,
-  onIndexHover
+  onIndexHover,
 }: IndexClientProps) {
   const router = useRouter()
   const [theme] = useThemeContext()
 
   // State
   const [day, setDay] = useState(
-    extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
+    extractedMetadata?.properties?.lastDate ||
+    staticData?.metadata?.properties?.lastDate
   )
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
   const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null)
@@ -71,7 +74,6 @@ export default function IndexClient({
     return staticMetaData ? staticMetaData?.colormap : {}
   }, [staticMetaData])
 
-
   // Memoized values
   const metadata = useMemo(() => {
     return staticMetaData
@@ -80,35 +82,64 @@ export default function IndexClient({
   const timestamp = format(day, 'X')
   const dayFromTimestamp = parseInt(timestamp) / 60 / 60 / 24
   const firstDayTimestamp =
-    parseInt(format(extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate, 'X')) / 60 / 60 / 24
+    parseInt(
+      format(
+        extractedMetadata?.properties?.firstDate ||
+        staticData?.metadata?.properties?.firstDate,
+        'X'
+      )
+    ) /
+    60 /
+    60 /
+    24
   const lastDayTimestamp =
-    parseInt(format(extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate, 'X')) / 60 / 60 / 24
+    parseInt(
+      format(
+        extractedMetadata?.properties?.lastDate ||
+        staticData?.metadata?.properties?.lastDate,
+        'X'
+      )
+    ) /
+    60 /
+    60 /
+    24
 
   // Effect to update day when staticData changes (when index changes)
   useEffect(() => {
-    const lastDate = extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate
+    const lastDate =
+      extractedMetadata?.properties?.lastDate ||
+      staticData?.metadata?.properties?.lastDate
     if (lastDate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDay(lastDate)
     }
-  }, [extractedMetadata?.properties?.lastDate, staticData?.metadata?.properties?.lastDate, staticData?.metadata?.properties?.firstDate, datatype])
+  }, [
+    extractedMetadata?.properties?.lastDate,
+    staticData?.metadata?.properties?.lastDate,
+    staticData?.metadata?.properties?.firstDate,
+    datatype,
+  ])
 
-  // Fix day if it's out of range
-  const fixedDay =
-    dayFromTimestamp > lastDayTimestamp
-      ? setDay(
-        format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
-      )
-      : dayFromTimestamp < firstDayTimestamp
-        ? setDay(
-          format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
-        )
-        : day
+  // Compute the effective day, clamping to valid range
+  const effectiveDay = useMemo(() => {
+    if (dayFromTimestamp > lastDayTimestamp) {
+      return format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+    }
+    if (dayFromTimestamp < firstDayTimestamp) {
+      return format(new Date(lastDayTimestamp * 60 * 60 * 24 * 1000), 'YYYY-MM-DD')
+    }
+    return day
+  }, [day, dayFromTimestamp, firstDayTimestamp, lastDayTimestamp])
 
   const data = useMemo(() => {
-    const result = staticData &&
-      updatePercentiles(staticData, (f: any) => f.properties[`${datatype}`][day])
+    const result =
+      staticData &&
+      updatePercentiles(
+        staticData,
+        (f: any) => f.properties[`${datatype}`][effectiveDay]
+      )
     return result
-  }, [datatype, staticData, day])
+  }, [datatype, staticData, effectiveDay])
 
   // Event handlers
   const onHover = useCallback((event: any) => {
@@ -123,12 +154,14 @@ export default function IndexClient({
       hoveredFeature?.layer?.paint?.['fill-color'].g * 255
     )},${Math.round(hoveredFeature?.layer?.paint?.['fill-color'].b * 255)},1)`
 
-    setHoverInfo(hoveredFeature && {
-      rgbaColor: featureColor,
-      feature: hoveredFeature,
-      x,
-      y
-    })
+    setHoverInfo(
+      hoveredFeature && {
+        rgbaColor: featureColor,
+        feature: hoveredFeature,
+        x,
+        y,
+      }
+    )
   }, [])
 
   const onOut = useCallback(() => {
@@ -170,8 +203,6 @@ export default function IndexClient({
 
   const scaleControlStyle = {}
   const navControlStyle = {}
-
-
 
   return (
     <Layout posts={allPosts}>
@@ -231,18 +262,24 @@ export default function IndexClient({
 
                     <span className="block text-xs">
                       {(() => {
-                        const value = parseFloat(hoverInfo.feature.properties.value)
+                        const value = parseFloat(
+                          hoverInfo.feature.properties.value
+                        )
                         const stops = metadata.colormap.legend.stops
 
-                        const sortedStops = [...stops].sort((a: any, b: any) =>
-                          parseFloat(a[0]) - parseFloat(b[0])
+                        const sortedStops = [...stops].sort(
+                          (a: any, b: any) =>
+                            parseFloat(a[0]) - parseFloat(b[0])
                         )
 
                         if (value < parseFloat(sortedStops[0][0])) {
                           return sortedStops[0]['1']
                         }
 
-                        if (value >= parseFloat(sortedStops[sortedStops.length - 1][0])) {
+                        if (
+                          value >=
+                          parseFloat(sortedStops[sortedStops.length - 1][0])
+                        ) {
                           return sortedStops[sortedStops.length - 1]['1']
                         }
 
@@ -266,40 +303,46 @@ export default function IndexClient({
                 {hoverInfo.feature.properties.NUTS_NAME}
               </span>
               <span className="tooltipCTA mt-2 text-white/60 leading-[120%]">
-                Click to view details <br />and historical data
+                Click to view details <br />
+                and historical data
               </span>
             </div>
           )}
         </Map>
       </div>
 
-      <div
-        className="controlContainer"
-      >
+      <div className="controlContainer">
         <div className="legend">
-          {staticMetaData?.colormap?.legend.stops.map((item: any, index: number) => {
-            return (
-              <div key={`legend${index}`} className="legendItem">
-                <div
-                  className="legendColor"
-                  style={{ background: item['2'] }}
-                ></div>
-                <p className="legendLabel">{item['1']}</p>
-              </div>
-            )
-          })}
+          {staticMetaData?.colormap?.legend.stops.map(
+            (item: any, index: number) => {
+              return (
+                <div key={`legend${index}`} className="legendItem">
+                  <div
+                    className="legendColor"
+                    style={{ background: item['2'] }}
+                  ></div>
+                  <p className="legendLabel">{item['1']}</p>
+                </div>
+              )
+            }
+          )}
         </div>
 
         <ControlPanel
           metadata={metadata}
           day={day}
-          firstDay={extractedMetadata?.properties?.firstDate || staticData?.metadata?.properties?.firstDate}
-          lastDay={extractedMetadata?.properties?.lastDate || staticData?.metadata?.properties?.lastDate}
+          firstDay={
+            extractedMetadata?.properties?.firstDate ||
+            staticData?.metadata?.properties?.firstDate
+          }
+          lastDay={
+            extractedMetadata?.properties?.lastDate ||
+            staticData?.metadata?.properties?.lastDate
+          }
           onChange={(value: any) =>
             setDay(format(new Date(value * 60 * 60 * 24 * 1000), 'YYYY-MM-DD'))
           }
         />
-
       </div>
 
       <IndicesNavigation

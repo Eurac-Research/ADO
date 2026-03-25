@@ -1,4 +1,10 @@
-import { CloudRain, Droplets, Leaf, Map as MapIcon, Snowflake } from 'lucide-react'
+import {
+  CloudRain,
+  Droplets,
+  Leaf,
+  Map as MapIcon,
+  Snowflake,
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 export interface DroughtCategory {
@@ -21,57 +27,81 @@ export const DROUGHT_CATEGORIES: Record<string, DroughtCategory> = {
     id: 'precipitation',
     name: 'Precipitation & Evaporation',
     shortName: 'Precipitation',
-    description: 'Monitor drought through standardized precipitation and evapotranspiration measures.',
+    description:
+      'Monitor drought through standardized precipitation and evapotranspiration measures.',
     icon: CloudRain,
     gradient: {
       from: 'from-blue-50',
       to: 'to-blue-100',
       darkFrom: 'dark:from-blue-900/50',
-      darkTo: 'dark:to-blue-900'
+      darkTo: 'dark:to-blue-900',
     },
-    indices: ['spi-1', 'spi-3', 'spi-6', 'spi-12', 'spei-1', 'spei-3', 'spei-6', 'spei-12', 'precipitation']
+    indices: [
+      'spi-1',
+      'spi-3',
+      'spi-6',
+      'spi-12',
+      'spei-1',
+      'spei-3',
+      'spei-6',
+      'spei-12',
+      'precipitation',
+    ],
   },
   soil: {
     id: 'soil',
     name: 'Soil Moisture',
     shortName: 'Soil Moisture',
-    description: 'Monitor drought through soil water content and moisture anomalies.',
+    description:
+      'Monitor drought through soil water content and moisture anomalies.',
     icon: Droplets,
     gradient: {
       from: 'from-blue-50',
       to: 'to-blue-100',
       darkFrom: 'dark:from-blue-900/50',
-      darkTo: 'dark:to-blue-900'
+      darkTo: 'dark:to-blue-900',
     },
-    indices: ['smi', 'soil_moisture', 'swi', 'sma']
+    indices: ['smi', 'soil_moisture', 'swi', 'sma'],
   },
   vegetation: {
     id: 'vegetation',
     name: 'Vegetation',
     shortName: 'Vegetation',
-    description: 'Monitor vegetation health and condition through satellite-derived measurements.',
+    description:
+      'Monitor vegetation health and condition through satellite-derived measurements.',
     icon: Leaf,
     gradient: {
       from: 'from-blue-50',
       to: 'to-blue-100',
       darkFrom: 'dark:from-blue-900/50',
-      darkTo: 'dark:to-blue-900'
+      darkTo: 'dark:to-blue-900',
     },
-    indices: ['vci', 'vhi', 'ndvi', 'evi', 'vegetation', 'fapar', 'lai']
+    indices: ['vci', 'vhi', 'ndvi', 'evi', 'vegetation', 'fapar', 'lai'],
   },
   snow: {
     id: 'snow',
     name: 'Snow',
     shortName: 'Snow',
-    description: 'Monitor snow cover, depth, and water equivalent for drought assessment.',
+    description:
+      'Monitor snow cover, depth, and water equivalent for drought assessment.',
     icon: Snowflake,
     gradient: {
       from: 'from-blue-50',
       to: 'to-blue-100',
       darkFrom: 'dark:from-blue-900/50',
-      darkTo: 'dark:to-blue-900'
+      darkTo: 'dark:to-blue-900',
     },
-    indices: ['sspi-1', 'sspi-3', 'sspi-6', 'sspi-12', 'snow', 'swe', 'snow_depth', 'snow_cover', 'snowpack']
+    indices: [
+      'sspi-1',
+      'sspi-3',
+      'sspi-6',
+      'sspi-12',
+      'snow',
+      'swe',
+      'snow_depth',
+      'snow_cover',
+      'snowpack',
+    ],
   },
   other: {
     id: 'other',
@@ -83,10 +113,10 @@ export const DROUGHT_CATEGORIES: Record<string, DroughtCategory> = {
       from: 'from-slate-50',
       to: 'to-slate-200',
       darkFrom: 'dark:from-slate-900/50',
-      darkTo: 'dark:to-slate-900'
+      darkTo: 'dark:to-slate-900',
     },
-    indices: []
-  }
+    indices: [],
+  },
 }
 
 /**
@@ -95,16 +125,27 @@ export const DROUGHT_CATEGORIES: Record<string, DroughtCategory> = {
 export function getCategoryForIndex(index: string): DroughtCategory | null {
   const indexLower = index.toLowerCase()
 
-  if (indexLower.startsWith('spi') || indexLower.startsWith('spei') || indexLower === 'precipitation') {
+  if (
+    indexLower.startsWith('spi') ||
+    indexLower.startsWith('spei') ||
+    indexLower === 'precipitation'
+  ) {
     return DROUGHT_CATEGORIES.precipitation
   }
   if (['smi', 'soil_moisture', 'swi', 'sma'].includes(indexLower)) {
     return DROUGHT_CATEGORIES.soil
   }
-  if (['vci', 'vhi', 'ndvi', 'evi', 'vegetation', 'fapar', 'lai'].includes(indexLower)) {
+  if (
+    ['vci', 'vhi', 'ndvi', 'evi', 'vegetation', 'fapar', 'lai'].includes(
+      indexLower
+    )
+  ) {
     return DROUGHT_CATEGORIES.vegetation
   }
-  if (indexLower.startsWith('sspi') || ['snow', 'swe', 'snow_depth', 'snow_cover', 'snowpack'].includes(indexLower)) {
+  if (
+    indexLower.startsWith('sspi') ||
+    ['snow', 'swe', 'snow_depth', 'snow_cover', 'snowpack'].includes(indexLower)
+  ) {
     return DROUGHT_CATEGORIES.snow
   }
 

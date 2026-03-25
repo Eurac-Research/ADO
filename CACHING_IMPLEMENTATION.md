@@ -1,294 +1,119 @@
-# 🚀 Caching Implementation Strategy
+# Caching & Data Strategy
 
 ## Overview
-The Alpine Drought Observatory (ADO) implements a **hybrid caching strategy** optimized for Next.js 15 App Router, providing instant initial load with efficient progressive enhancement.
 
-## 🎯 Current Architecture
+ADO uses a **hybrid static + runtime API** setup on Next.js 16:
 
-### **Static Generation + Client-Side Caching**
-```mermaid
-graph TD
-    A[Build Time] --> B[Pre-fetch SPEI-1 Only]
-    B --> C[Generate Static Page]
-    C --> D[Deploy to Vercel Edge]
-    
-    E[User Visit] --> F[Instant SPEI-1 Load]
-    F --> G[User Switches Index]
-    G --> H{Cached?}
-    H -->|Yes| I[Instant Switch]
-    H -->|No| J[Fetch + Cache]
-    J --> I
-    
-    K[Background] --> L[Smart Prefetching]
-    L --> M[Related Indices]
+- Most pages are pre-rendered at build time.
+- Data freshness is primarily deployment-driven (`ado-data` update -> workflow -> Vercel rebuild).
+- Some runtime API routes are intentionally dynamic (`/api/*`, region/station detail interactions).
+
+This project currently uses the **previous caching model** (`fetch` cache options / route config). `cacheComponents` is not enabled in `next.config.js`.
+
+## Data Flow
+
+```txt
+ado-data repo (GitHub)
+  -> push to main
+  -> GitHub Action (extract/minify/copy markdown)
+  -> POST to Vercel deploy hook
+  -> ADO build on Vercel
+  -> static artifacts + server code deployed
 ```
 
-## 📋 Implementation Details
+## Cache Configuration
 
-### **1. Server-Side Static Generation**
-```tsx
-// app/page.tsx
-export const dynamic = 'force-static'
-export const revalidate = false // Cache until next build
+### Shared server fetch defaults (`lib/data-fetcher.ts`)
 
-async function fetchInitialIndexData(index: string): Promise<InitialData | null> {
-  const datatype = index.toUpperCase()
-  
-  const [staticDataResponse, metadataResponse] = await Promise.all([
-    fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`, {
-      next: { revalidate: false } // Vercel Data Cache
-    }),
-    fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
-      next: { revalidate: false }
-    })
-  ])
-  
-  return { staticData, staticMetaData }
+```ts
+export const defaultCacheOptions: RequestInit = {
+  next: { revalidate: false },
+  cache: 'force-cache',
 }
 ```
 
-### **2. Client-Side Caching Strategy**
-```tsx
-// drought-monitor-client.tsx
-const [dataCache, setDataCache] = useState<Map<string, CachedData>>(
-  () => {
-    const initialCache = new Map()
-    if (initialData) {
-      initialCache.set('spei-1', initialData)
-    }
-    return initialCache
-  }
-)
+Interpretation:
 
-async function fetchIndexData(index: string) {
-  const response = await fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`, {
-    cache: 'default' // Browser HTTP cache
-  })
-  
-  // Cache in React state for instant switching
-  setDataCache(prev => new Map(prev).set(index, data))
-}
-```
+- `revalidate: false`: cache entries are indefinite unless evicted/redeployed.
+- `cache: 'force-cache'`: server fetches prefer the Next Data Cache.
 
-### **3. Smart Prefetching Logic**
-```tsx
-// Prefetch related indices in background
-const prefetchRelatedIndices = useCallback(async (currentIndex: string) => {
-  const related = getRelatedIndices(currentIndex)
-  
-  for (const index of related) {
-    if (!dataCache.has(index)) {
-      await fetchIndexData(index)
-    }
-  }
-}, [dataCache])
+### API response cache profiles (`lib/http-cache.ts`)
 
-// Hover prefetching
-const handleHover = useCallback((index: string) => {
-  if (!dataCache.has(index)) {
-    fetchIndexData(index)
-  }
-}, [dataCache])
-```
+API routes now set explicit `Cache-Control` headers by data volatility:
 
-## 🔧 Cache Layers
+- `LOW_CHURN`: metadata-like responses (`s-maxage=7d`)
+- `DAILY_CHURN`: daily-updated map layers (`s-maxage=24h`)
+- `INTERACTIVE`: region/station detail payloads (`s-maxage=24h`)
+- `NO_STORE`: all error responses (404/500) to avoid stale-error caching
 
-### **Layer 1: Vercel Edge Cache**
-- **Scope**: Static page with SPEI-1 data
-- **TTL**: Until next deployment
-- **Location**: Global edge locations
-- **Benefit**: Instant page loads worldwide
+### Important: cache unification is partial
 
-### **Layer 2: Browser HTTP Cache**
-- **Scope**: Individual drought index files
-- **TTL**: Browser-controlled
-- **Location**: User's browser
-- **Benefit**: Reduced network requests
+Many server-side fetches go through `lib/data-fetcher.ts`, but not all fetches in the repository do. Some pages and utilities still call `fetch` directly with route-specific options.
 
-### **Layer 3: React Memory Cache**
-- **Scope**: Fetched drought indices
-- **TTL**: Until page refresh
-- **Location**: Browser memory
-- **Benefit**: Instant index switching
+## Route Behavior (Current)
 
-## 📊 Performance Metrics
+| Route | Current behavior |
+|---|---|
+| `/` | `force-static`, build-time data fetch |
+| `/[slug]` | static params + redirect behavior |
+| `/hydro/[slug]` | static params + build-time fetch for base hydro data |
+| `/impacts`, `/impacts-nuts3`, `/impact-probabilities`, `/regions`, `/vulnerabilities` | static build output |
+| `/md/[slug]` | static params from local markdown |
+| `/drought-monitor` | request-time redirect based on `searchParams` |
+| `/region/[regionId]`, `/region/[regionId]/[index]` | runtime-rendered routes with client-side interactive fetches |
+| `/api/*` routes | runtime handlers used as same-origin data proxies |
 
-### **Build Output**
-```bash
-Route (app)                    Size     First Load JS
-┌ ○ /                          3.73 kB        91.2 kB
-├ ○ /[slug]                    142 B          87.6 kB
-├ ○ /drought-monitor           0 B                0 B
-└ ○ /hydro/[slug]             1.04 kB        88.5 kB
+## Same-Origin API Layer
 
-○ (Static)  automatically rendered as static HTML
-```
+Region and hydro clients are routed through same-origin APIs:
 
-### **Cache Hit Rates**
-- **Initial Load**: 100% (static, pre-cached)
-- **Index Switching**: 95% (after prefetching)
-- **Repeat Visits**: 100% (browser cache)
+- `/api/timeseries/[stationId]`
+- `/api/html-report/[stationId]`
+- `/api/nuts/metadata/[datatype]`
+- `/api/nuts/latest/[datatype]`
+- `/api/nuts/timeseries/[regionId]`
 
-## 🎯 Benefits Achieved
+Cache profile mapping:
 
-### **Performance**
-- ✅ **Instant Initial Load**: SPEI-1 pre-cached at build time
-- ✅ **Fast Switching**: Client-side cache eliminates loading states
-- ✅ **Progressive Enhancement**: Background prefetching of related indices
-- ✅ **Reduced Bandwidth**: Smart caching minimizes duplicate requests
+- `/api/nuts/metadata/[datatype]` -> `LOW_CHURN`
+- `/api/nuts/latest/[datatype]` -> `DAILY_CHURN`
+- `/api/nuts/timeseries/[regionId]` -> `INTERACTIVE`
+- `/api/timeseries/[stationId]` -> `INTERACTIVE`
+- `/api/html-report/[stationId]` -> `INTERACTIVE`
 
-### **User Experience**
-- ✅ **No Loading Spinners**: For frequently accessed indices
-- ✅ **Predictive Loading**: Hover-based prefetching
-- ✅ **Offline Resilience**: Cached data works offline
-- ✅ **Global Performance**: Edge caching for worldwide users
+This removes direct browser calls to `raw.githubusercontent.com` in:
 
-### **Developer Experience**
-- ✅ **Simple Architecture**: Easy to understand and maintain
-- ✅ **Type Safety**: Full TypeScript support
-- ✅ **Error Handling**: Graceful fallbacks for failed requests
-- ✅ **Debugging**: Clear cache states and logging
+- `components/RegionDetail.tsx`
+- `app/hydro/[slug]/hydro-client.tsx`
 
-## 🔄 Data Flow
+## Runtime Client Fetches
 
-### **Initial Page Load**
-1. User visits `/`
-2. Vercel serves static page from edge
-3. Page includes pre-fetched SPEI-1 data
-4. Client initializes with cached data
-5. **Result**: Instant drought map display
+Client-side runtime fetches are still used for interactivity (region detail panels, hydro station overlays, index switching), but they now use same-origin API routes in core map/detail flows.
 
-### **Index Switching**
-1. User selects SPEI-3
-2. Client checks memory cache
-3. If not cached: fetch from API + cache
-4. If cached: instant switch
-5. **Result**: Sub-second index switching
+## Cache Layers
 
-### **Background Prefetching**
-1. User interacts with SPEI-1
-2. System prefetches SPEI-2, SPEI-3, SPEI-6
-3. User hovers over SPEI-6 button
-4. System prefetches SPEI-6 if not cached
-5. **Result**: Predictive loading
+| Layer | Scope | TTL / lifetime | Notes |
+|---|---|---|---|
+| Static prerender output | Static routes | Until next deploy | Main delivery path for static pages |
+| Next Data Cache | Server `fetch()` with cache options | Indefinite (`revalidate: false`) unless evicted/redeployed | Used heavily via `data-fetcher` |
+| API route runtime responses | `/api/*` handlers | Handler/fetch-option dependent | Used for interactive detail fetches |
+| Browser memory/state | Client components | Until navigation/refresh | e.g. in-memory station cache / React state |
 
-## 📈 Optimization Strategies
+## Invalidation Model
 
-### **Bundle Optimization**
-```tsx
-// Dynamic imports for heavy components
-const TimeSeries = dynamic(() => import('@/components/timeseries'), {
-  loading: () => <div>Loading chart...</div>,
-  ssr: false
-})
-```
+Primary invalidation remains **deployment-based**:
 
-### **Network Optimization**
-```tsx
-// Parallel requests for related data
-const [staticData, metadata] = await Promise.all([
-  fetch(dataUrl),
-  fetch(metadataUrl)
-])
-```
+1. Update `ado-data`
+2. Workflow triggers Vercel rebuild
+3. New deployment ships fresh static output and server code
 
-### **Memory Management**
-```tsx
-// Smart cache size limits
-const MAX_CACHE_SIZE = 10
-if (dataCache.size > MAX_CACHE_SIZE) {
-  // Remove least recently used entries
-  const oldestKey = Array.from(dataCache.keys())[0]
-  dataCache.delete(oldestKey)
-}
-```
+There is currently no broad time-based revalidation policy across the app.
 
-## 🛠️ Configuration
+## Verification
 
-### **Environment Variables**
-```env
-NEXT_PUBLIC_ADO_DATA_URL=raw.githubusercontent.com/Eurac-Research/ado-data/main
-NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token_here
-```
+Use `scripts/verify-caching.sh` for targeted checks:
 
-### **Next.js Config**
-```tsx
-// next.config.js
-module.exports = {
-  experimental: {
-    optimizeCss: true,
-    optimizeServerReact: true,
-  },
-  images: {
-    domains: ['raw.githubusercontent.com'],
-  },
-}
-```
-
-## 🔍 Monitoring & Debugging
-
-### **Cache Performance**
-```tsx
-// Add to components for debugging
-useEffect(() => {
-  console.log(`Cache size: ${dataCache.size}`)
-  console.log(`Cached indices: ${Array.from(dataCache.keys()).join(', ')}`)
-}, [dataCache])
-```
-
-### **Network Monitoring**
-```tsx
-// Track fetch performance
-const startTime = performance.now()
-const data = await fetchIndexData(index)
-const endTime = performance.now()
-console.log(`Fetch ${index} took ${endTime - startTime}ms`)
-```
-
-## 🚀 Deployment Considerations
-
-### **Vercel Configuration**
-```json
-{
-  "builds": [
-    {
-      "src": "next.config.js",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/"
-    }
-  ]
-}
-```
-
-### **CDN Optimization**
-- **Static Assets**: Automatically cached by Vercel
-- **API Responses**: Cached with appropriate headers
-- **Edge Functions**: Used for dynamic content when needed
-
-## 📋 Maintenance
-
-### **Cache Invalidation**
-- **Automatic**: New deployments invalidate static cache
-- **Manual**: Clear browser cache for testing
-- **Programmatic**: Reset React cache on data updates
-
-### **Performance Monitoring**
-- **Lighthouse**: Regular performance audits
-- **Vercel Analytics**: Real-world performance data
-- **User Feedback**: Monitor actual usage patterns
-
-## 🎉 Summary
-
-The current caching implementation provides:
-- **🚀 Instant initial loads** through static generation
-- **⚡ Fast index switching** via client-side caching
-- **🎯 Smart prefetching** for predictive loading
-- **🌍 Global performance** with edge caching
-- **🔧 Easy maintenance** with clear architecture
-
-This hybrid approach balances performance, user experience, and maintainability, making it ideal for data-intensive applications like the Alpine Drought Observatory.
+- `RegionDetail` uses `/api/nuts/*` and does not call raw GitHub directly.
+- Hydro client uses `/api/timeseries/*` and `/api/html-report/*`.
+- `defaultCacheOptions` exists and is consumed by API/server code.
+- Optional build-manifest context if `.next/prerender-manifest.json` is present.

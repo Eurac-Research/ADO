@@ -1,40 +1,89 @@
 #!/bin/bash
 
-# Script to verify Next.js caching implementation
-# Run this in the production environment after deployment
+set -euo pipefail
 
-echo "=== Next.js Caching Verification Tool ==="
-echo "Checking for server-side caching issues..."
+echo "=== ADO Targeted Caching Verification ==="
 
-# Check for missing static generation directives
-echo "\n=== Checking for routes without force-static ==="
-grep -r --include="*.tsx" --include="*.ts" "export" app | grep -v "force-static" | grep "page.tsx"
-echo "Any routes listed above may not be statically generated. Verify if intentional."
+failures=0
 
-# Check for fetch calls without caching
-echo "\n=== Checking for fetch calls without caching options ==="
-grep -r --include="*.tsx" --include="*.ts" "fetch(" app lib | grep -v "revalidate" | grep -v "force-cache" | grep -v "monthlyRevalidationOptions"
-echo "Any fetch calls listed above may not be properly cached. Verify if intentional."
+pass() {
+  echo "PASS: $1"
+}
 
-# Check for monthly cache utilization
-echo "\n=== Usage of monthly revalidation option ==="
-grep -r --include="*.tsx" --include="*.ts" "monthlyRevalidationOptions" app lib
-echo "These files use monthly revalidation instead of static caching."
+fail() {
+  echo "FAIL: $1"
+  failures=$((failures + 1))
+}
 
-# Check for generateStaticParams in dynamic routes
-echo "\n=== Checking for dynamic routes without generateStaticParams ==="
-find app -type d -name "\[*\]" -exec sh -c 'for dir; do find "$dir" -name "page.tsx" | xargs grep -L "generateStaticParams" | grep -v "api"; done' _ {} \;
-echo "Dynamic routes listed above may not be pre-generating all paths. Verify if intentional."
+echo ""
+echo "=== RegionDetail same-origin checks ==="
+if rg -n "/api/nuts/metadata/|/api/nuts/latest/|/api/nuts/timeseries/" components/RegionDetail.tsx >/dev/null; then
+  pass "RegionDetail uses same-origin /api/nuts/* endpoints"
+else
+  fail "RegionDetail is missing expected /api/nuts/* calls"
+fi
 
-# Check for client-side components
-echo "\n=== Client components that may bypass server caching ==="
-grep -r --include="*.tsx" "use client" app | grep -v "client.tsx"
-echo "These client components may need review for direct fetch calls that bypass server caching."
+if rg -n "raw.githubusercontent.com/Eurac-Research/ado-data|https://\\$\\{ADO_DATA_URL\\}" components/RegionDetail.tsx >/dev/null; then
+  fail "RegionDetail still contains direct raw.githubusercontent.com calls"
+else
+  pass "RegionDetail does not call raw.githubusercontent.com directly"
+fi
 
-# Check build output
-echo "\n=== Checking static build output ==="
-find .next/server/app -type f -name "*.html" | wc -l
-echo "Number of pre-rendered HTML files (should match expected number of static routes)"
+echo ""
+echo "=== Hydro client same-origin checks ==="
+if rg -n "/api/timeseries/|/api/html-report/" 'app/hydro/[slug]/hydro-client.tsx' >/dev/null; then
+  pass "Hydro client uses same-origin station API routes"
+else
+  fail "Hydro client is missing expected /api/timeseries or /api/html-report calls"
+fi
 
-echo "\n=== Verification complete ==="
-echo "For comprehensive verification, also check network tab in browser for duplicate API calls"
+if rg -n "raw.githubusercontent.com/Eurac-Research/ado-data|https://\\$\\{ADO_DATA_URL\\}" 'app/hydro/[slug]/hydro-client.tsx' >/dev/null; then
+  fail "Hydro client still contains direct raw.githubusercontent.com calls"
+else
+  pass "Hydro client does not call raw.githubusercontent.com directly"
+fi
+
+echo ""
+echo "=== Cache utility checks ==="
+if rg -n "defaultCacheOptions" lib/data-fetcher.ts >/dev/null; then
+  pass "defaultCacheOptions is defined in lib/data-fetcher.ts"
+else
+  fail "defaultCacheOptions was not found in lib/data-fetcher.ts"
+fi
+
+if rg -n "defaultCacheOptions" app/api >/dev/null; then
+  pass "At least one API route consumes defaultCacheOptions"
+else
+  fail "No API route appears to use defaultCacheOptions"
+fi
+
+echo ""
+echo "=== API cache-header checks ==="
+if rg -n "Cache-Control" app/api >/dev/null; then
+  pass "API routes set Cache-Control headers"
+else
+  fail "No Cache-Control headers found in app/api routes"
+fi
+
+if rg -n "CACHE_CONTROL.NO_STORE" app/api >/dev/null; then
+  pass "API routes mark error responses with no-store"
+else
+  fail "API routes are missing no-store headers for errors"
+fi
+
+echo ""
+echo "=== Optional build manifest context ==="
+if [ -f .next/prerender-manifest.json ]; then
+  echo "INFO: .next/prerender-manifest.json present"
+  rg -n '"/drought-monitor"|"/impact-probabilities"|"/regions"|"/vulnerabilities"' .next/prerender-manifest.json || true
+else
+  echo "INFO: .next/prerender-manifest.json not found (run pnpm build for route output checks)"
+fi
+
+echo ""
+if [ "$failures" -gt 0 ]; then
+  echo "Verification completed with $failures failure(s)."
+  exit 1
+fi
+
+echo "Verification completed successfully."

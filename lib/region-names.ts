@@ -1,7 +1,9 @@
 // In-memory cache for NUTS region names (id → name)
 // Fetched once from GeoJSON and reused for all metadata calls
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const ADO_DATA_URL =
+  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
+  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 let regionNameMap: Map<string, string> | null = null
 let fetchPromise: Promise<Map<string, string>> | null = null
@@ -11,7 +13,7 @@ async function loadRegionNames(): Promise<Map<string, string>> {
   try {
     const res = await fetch(
       `https://${ADO_DATA_URL}/json/nuts/SPEI-3-latest.geojson`,
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: false } }
     )
     if (res.ok) {
       const data = await res.json()

@@ -18,16 +18,21 @@ export async function generateStaticParams() {
   }))
 }
 
-export async function generateMetadata({ params }: MarkdownPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: MarkdownPageProps): Promise<Metadata> {
   const { slug } = await params
-  const post = getPostBySlug(slug, ['title', 'excerpt']) as { title: string; excerpt?: string } | null
-  
+  const post = getPostBySlug(slug, ['title', 'excerpt']) as {
+    title: string
+    excerpt?: string
+  } | null
+
   if (!post) {
     return {
       title: 'Page Not Found - Alpine Drought Observatory',
     }
   }
-  
+
   return {
     title: `${post.title} - Alpine Drought Observatory | Eurac Research`,
     description: post.excerpt || `${post.title} - Alpine Drought Observatory`,
@@ -36,7 +41,7 @@ export async function generateMetadata({ params }: MarkdownPageProps): Promise<M
 
 export default async function MarkdownPage({ params }: MarkdownPageProps) {
   const { slug } = await params
-  
+
   const post = getPostBySlug(slug, [
     'title',
     'date',
@@ -54,11 +59,5 @@ export default async function MarkdownPage({ params }: MarkdownPageProps) {
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
   const content = await markdownToHtml(post.content || '')
 
-  return (
-    <MarkdownContent
-      post={post}
-      content={content}
-      posts={allPosts}
-    />
-  )
+  return <MarkdownContent post={post} content={content} posts={allPosts} />
 }

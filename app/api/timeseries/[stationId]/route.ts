@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchStationTimeseries } from '@/lib/data-fetcher'
+import { CACHE_CONTROL } from '@/lib/http-cache'
 
 export async function GET(
   request: NextRequest,
@@ -9,19 +10,33 @@ export async function GET(
     const { stationId } = await params
 
     const data = await fetchStationTimeseries(stationId)
-    return NextResponse.json(data)
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': CACHE_CONTROL.INTERACTIVE,
+      },
+    })
   } catch (error) {
     if (error instanceof Error && error.message.includes('not found')) {
       return NextResponse.json(
         { error: 'Timeseries data not found' },
-        { status: 404 }
+        {
+          status: 404,
+          headers: {
+            'Cache-Control': CACHE_CONTROL.NO_STORE,
+          },
+        }
       )
     }
 
     console.error('Error fetching timeseries data:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': CACHE_CONTROL.NO_STORE,
+        },
+      }
     )
   }
 }

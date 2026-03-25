@@ -1,8 +1,19 @@
-import SideBar from './SideBar'
-import Header from '../components/Header'
+'use client'
+
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import Header from './Header'
 import { useThemeContext } from '../context/theme'
-import CookieConsent from 'react-cookie-consent'
 import type { LayoutProps } from '@/types'
+
+const SideBar = dynamic(() => import('./SideBar'), {
+  loading: () => null,
+})
+
+const CookieConsentBanner = dynamic(() => import('./CookieConsentBanner'), {
+  ssr: false,
+  loading: () => null,
+})
 
 interface LayoutComponentProps extends LayoutProps {
   headerMode?: number
@@ -11,9 +22,16 @@ interface LayoutComponentProps extends LayoutProps {
 export default function Layout({
   children,
   posts,
-  headerMode = 0
+  headerMode = 0,
 }: LayoutComponentProps) {
   const [theme, setTheme] = useThemeContext()
+  const [showCookieConsent, setShowCookieConsent] = useState(false)
+
+  useEffect(() => {
+    // Defer non-critical cookie banner to reduce initial hydration work.
+    const timer = window.setTimeout(() => setShowCookieConsent(true), 1500)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   return (
     <div className={theme}>
@@ -31,10 +49,7 @@ export default function Layout({
         }
       >
         {theme === 'light' ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 512 512"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
             <path d="M283.21 512c78.96 0 151.08-35.92 198.86-94.8 7.07-8.7-.64-21.42-11.56-19.34-124.2 23.65-238.27-71.58-238.27-196.96a200.43 200.43 0 0 1 101.5-174.39C343.43 21 341 6.31 330 4.28A258.16 258.16 0 0 0 283.2 0c-141.3 0-256 114.51-256 256 0 141.3 114.51 256 256 256z" />
           </svg>
         ) : (
@@ -52,27 +67,9 @@ export default function Layout({
           </svg>
         )}
       </div>
-      <CookieConsent
-        location="bottom"
-        buttonText="OK"
-        cookieName="cookieConsentAccepted"
-        style={{ background: '#222', left: 'auto', right: '0', zIndex: 40 }}
-        buttonStyle={{
-          background: '#36a036',
-          color: '#fff',
-          padding: '6px 12px',
-          fontWeight: 'bold',
-          fontSize: '14px',
-        }}
-        expires={150}
-      >
-        In order to give you a better service this site uses cookies.
-        Additionally third party cookies are used. By continuing to browse the
-        site you are agreeing to our use of cookies.{' '}
-        <a href="https://privacy.eurac.edu" className="privacyLink">
-          Privacy Policy
-        </a>
-      </CookieConsent>
+      {showCookieConsent && (
+        <CookieConsentBanner />
+      )}
     </div>
   )
 }

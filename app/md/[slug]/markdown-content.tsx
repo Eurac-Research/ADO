@@ -11,13 +11,18 @@ interface MarkdownContentProps {
   posts: PostData[]
 }
 
-export default function MarkdownContent({ post, content, posts }: MarkdownContentProps) {
+export default function MarkdownContent({
+  post,
+  content,
+  posts,
+}: MarkdownContentProps) {
   const [theme] = useThemeContext()
 
   return (
     <Layout posts={posts} headerMode={1}>
       <div className="mx-auto px-5 py-36 min-h-screen md:max-w-4xl md:px-0 md:pt-36 bg-white dark:bg-gray-900">
-        <div className="prose prose-lg max-w-none dark:prose-invert bg-white dark:bg-gray-900
+        <div
+          className="prose prose-lg max-w-none dark:prose-invert bg-white dark:bg-gray-900
           prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-gray-900
           dark:prose-headings:text-gray-100
           prose-h1:text-3xl prose-h1:border-b prose-h1:border-gray-200 prose-h1:pb-3 prose-h1:mt-6 prose-h1:mb-4
@@ -58,8 +63,8 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
           prose-li:my-1 prose-li:text-gray-700
           dark:prose-li:text-gray-300
           prose-strong:text-gray-900 dark:prose-strong:text-gray-100
-          prose-em:text-gray-700 dark:prose-em:text-gray-300">
-
+          prose-em:text-gray-700 dark:prose-em:text-gray-300"
+        >
           <h1 className="mb-8 text-4xl font-bold tracking-tight text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-4">
             {post.title}
           </h1>
@@ -70,7 +75,6 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
           />
         </div>
         <div>
-
           {/* Partner Logos Section for About the Project page */}
           {post?.slug === 'about-the-project' && (
             <>
@@ -100,84 +104,296 @@ export default function MarkdownContent({ post, content, posts }: MarkdownConten
                   </div>
                 </a>
 
-                <a href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="KGZM-B" src="https://www.datocms-assets.com/31538/1763118611-kgzmb-logo.svg" width={200} height={150} className="h-24 w-auto " />
+                <a
+                  href="https://www.kmetijski-zavod.si/en-us/about-us/about-the-institute"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="KGZM-B"
+                    src="https://www.datocms-assets.com/31538/1763118611-kgzmb-logo.svg"
+                    width={200}
+                    height={150}
+                    className="h-24 w-auto "
+                  />
                 </a>
 
-                <a href="https://www.dia4s.fr/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="DIA4S" src="https://www.datocms-assets.com/31538/1763118900-dia4s-fr.svg" width={200} height={150} className="h-24 w-auto" />
+                <a
+                  href="https://www.dia4s.fr/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="DIA4S"
+                    src="https://www.datocms-assets.com/31538/1763118900-dia4s-fr.svg"
+                    width={200}
+                    height={150}
+                    className="h-24 w-auto"
+                  />
                 </a>
 
-                <a href="https://www.geosphere.at/de" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="GeoSphere Austria" src="https://www.datocms-assets.com/31538/1727259358-geosphere-logo.svg" width={200} height={150} className="h-20 w-auto" />
+                <a
+                  href="https://www.geosphere.at/de"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="GeoSphere Austria"
+                    src="https://www.datocms-assets.com/31538/1727259358-geosphere-logo.svg"
+                    width={200}
+                    height={150}
+                    className="h-20 w-auto"
+                  />
                 </a>
 
-                <a href="https://www.lmu.de/en/index.html" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="LMU Munich" src="https://www.datocms-assets.com/31538/1662112761-logo_lmu.svg" width={200} height={150} className="h-24 w-auto" />
+                <a
+                  href="https://www.lmu.de/en/index.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="LMU Munich"
+                    src="https://www.datocms-assets.com/31538/1662112761-logo_lmu.svg"
+                    width={200}
+                    height={150}
+                    className="h-24 w-auto"
+                  />
                 </a>
 
-                <a href="https://cf.regione.vda.it/it/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="Centro Funzionale Valle d'Aosta" src="https://www.datocms-assets.com/31538/1732792788-centro-funzionale-aosta_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://cf.regione.vda.it/it/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="Centro Funzionale Valle d'Aosta"
+                    src="https://www.datocms-assets.com/31538/1732792788-centro-funzionale-aosta_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.cimafoundation.org/en/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="CIMA Research Foundation" src="https://www.datocms-assets.com/31538/1727259515-cima_research_foundation_logo.jpeg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.cimafoundation.org/en/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="CIMA Research Foundation"
+                    src="https://www.datocms-assets.com/31538/1727259515-cima_research_foundation_logo.jpeg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://lessem.lyon-grenoble.hub.inrae.fr/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="LESSEM" src="https://www.datocms-assets.com/31538/1763119542-4e8cc0fc3d94-lessem_couleur-1.png?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://lessem.lyon-grenoble.hub.inrae.fr/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="LESSEM"
+                    src="https://www.datocms-assets.com/31538/1763119542-4e8cc0fc3d94-lessem_couleur-1.png?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.cee.ed.tum.de/cee/startseite/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="TU Munich" src="https://www.datocms-assets.com/31538/1636727308-tumtechnische-universitaet-muenchen-munic-logo.gif?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.cee.ed.tum.de/cee/startseite/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="TU Munich"
+                    src="https://www.datocms-assets.com/31538/1636727308-tumtechnische-universitaet-muenchen-munic-logo.gif?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.tuwien.at/mg/geo" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="TU Wien" src="https://www.datocms-assets.com/31538/1697190437-tu-wien_logo.png?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.tuwien.at/mg/geo"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="TU Wien"
+                    src="https://www.datocms-assets.com/31538/1697190437-tu-wien_logo.png?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.uni-lj.si/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="University of Ljubljana" src="https://www.datocms-assets.com/31538/1697190577-ljubljana-university_logo.png?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.uni-lj.si/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="University of Ljubljana"
+                    src="https://www.datocms-assets.com/31538/1697190577-ljubljana-university_logo.png?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-
-
-
-                <a href="https://www.regione.piemonte.it/web/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="Regione Piemonte" src="https://www.datocms-assets.com/31538/1624965085-regionepiemontelogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={79} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.regione.piemonte.it/web/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="Regione Piemonte"
+                    src="https://www.datocms-assets.com/31538/1624965085-regionepiemontelogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={79}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.arso.gov.si/en/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="ARSO" src="https://www.datocms-assets.com/31538/1624964035-arsologo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={62} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.arso.gov.si/en/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="ARSO"
+                    src="https://www.datocms-assets.com/31538/1624964035-arsologo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={62}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.wsl.ch/en/index.html" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="WSL" src="https://www.datocms-assets.com/31538/1624969001-wsllogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={157} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.wsl.ch/en/index.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="WSL"
+                    src="https://www.datocms-assets.com/31538/1624969001-wsllogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={157}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.land-oberoesterreich.gv.at/default.htm" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="Land Oberösterreich" src="https://www.datocms-assets.com/31538/1624968920-landoberosterreichlogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={199} height={140} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.land-oberoesterreich.gv.at/default.htm"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="Land Oberösterreich"
+                    src="https://www.datocms-assets.com/31538/1624968920-landoberosterreichlogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={199}
+                    height={140}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-
-                <a href="https://www.unr.uni-freiburg.de/en" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="University of Freiburg" src="https://www.datocms-assets.com/31538/1624964892-unifreiburglogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={161} height={150} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.unr.uni-freiburg.de/en"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="University of Freiburg"
+                    src="https://www.datocms-assets.com/31538/1624964892-unifreiburglogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={161}
+                    height={150}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.anbi.it/?lang=en" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="ANBI" src="https://www.datocms-assets.com/31538/1624963431-anbilogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={98} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.anbi.it/?lang=en"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="ANBI"
+                    src="https://www.datocms-assets.com/31538/1624963431-anbilogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={98}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
-                <a href="https://www.inrae.fr/en" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="INRAE" src="https://www.datocms-assets.com/31538/1624963435-inrae.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={107} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.inrae.fr/en"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="INRAE"
+                    src="https://www.datocms-assets.com/31538/1624963435-inrae.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={107}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
 
                 {/* <a href="https://www.zamg.ac.at/" target="_blank" rel="noreferrer" className="">
                   <Image unoptimized alt="ZAMG" src="https://www.datocms-assets.com/31538/1625049129-zamg-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={125} className="max-h-24 w-auto object-contain" />
                 </a> */}
 
-                <a href="https://www.iskriva.net/" target="_blank" rel="noreferrer" className="">
-                  <Image unoptimized alt="Iskriva" src="https://www.datocms-assets.com/31538/1630484236-iskriva-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200" width={200} height={122} className="max-h-24 w-auto object-contain" />
+                <a
+                  href="https://www.iskriva.net/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className=""
+                >
+                  <Image
+                    unoptimized
+                    alt="Iskriva"
+                    src="https://www.datocms-assets.com/31538/1630484236-iskriva-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    width={200}
+                    height={122}
+                    className="max-h-24 w-auto object-contain"
+                  />
                 </a>
               </div>
             </>

@@ -7,15 +7,23 @@ import Link from 'next/link'
 import Layout from '@/components/layout'
 import RegionDetail from '@/components/RegionDetail'
 import type { PostData } from '@/types'
-import axios from 'axios'
-
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 // Available drought indices that can be shown in the chart
 const availableIndices = [
-  'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12',
-  'spi-1', 'spi-2', 'spi-3', 'spi-6', 'spi-12',
-  'sspi-10', 'sma', 'vci', 'vhi'
+  'spei-1',
+  'spei-2',
+  'spei-3',
+  'spei-6',
+  'spei-12',
+  'spi-1',
+  'spi-2',
+  'spi-3',
+  'spi-6',
+  'spi-12',
+  'sspi-10',
+  'sma',
+  'vci',
+  'vhi',
 ]
 
 interface RegionDetailPageProps {
@@ -24,7 +32,21 @@ interface RegionDetailPageProps {
   allPosts: PostData[]
 }
 
-export default function RegionDetailPage({ regionId, index, allPosts }: RegionDetailPageProps) {
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export default function RegionDetailPage({
+  regionId,
+  index,
+  allPosts,
+}: RegionDetailPageProps) {
   const router = useRouter()
   const [staticMetaData, setStaticMetaData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -47,19 +69,21 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
         const datatype = index.toUpperCase()
 
         // Fetch metadata for the index using the correct URL pattern
-        const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
-        const metadataResponse = await axios.get(metadataUrl)
-        setStaticMetaData(metadataResponse.data)
+        const metadata = await fetchJson<any>(`/api/nuts/metadata/${datatype}`)
+        setStaticMetaData(metadata)
 
         // Fetch region name from GeoJSON data
         try {
-          const geojsonUrl = `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
-          const geojsonResponse = await axios.get(geojsonUrl)
-          const region = geojsonResponse.data.features.find((feature: any) =>
-            feature.properties.NUTS_ID === regionId
+          const geojson = await fetchJson<any>(`/api/nuts/latest/${datatype}`)
+          const region = geojson.features.find(
+            (feature: any) => feature.properties.NUTS_ID === regionId
           )
           if (region) {
-            setRegionName(region.properties.NUTS_NAME || region.properties.NAME_LATN || regionId)
+            setRegionName(
+              region.properties.NUTS_NAME ||
+                region.properties.NAME_LATN ||
+                regionId
+            )
           } else {
             setRegionName(regionId)
           }
@@ -67,7 +91,6 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
           console.warn('Could not fetch region name from GeoJSON:', geoError)
           setRegionName(regionId)
         }
-
       } catch (err) {
         console.error('Error fetching metadata:', err)
         setError('Failed to load region data')
@@ -89,7 +112,9 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">Loading region details...</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Loading region details...
+            </p>
           </div>
         </div>
       </Layout>
@@ -101,7 +126,9 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
       <Layout posts={allPosts}>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Error</h1>
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
+              Error
+            </h1>
             <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
             <button
               onClick={() => router.push('/')}
@@ -140,7 +167,9 @@ export default function RegionDetailPage({ regionId, index, allPosts }: RegionDe
                   {regionName || regionId}
                 </Link>
                 <span>/</span>
-                <span className="font-medium shrink-0">{index.toUpperCase()}</span>
+                <span className="font-medium shrink-0">
+                  {index.toUpperCase()}
+                </span>
               </div>
             </div>
           </div>
