@@ -13,7 +13,7 @@ async function loadRegionNames(): Promise<Map<string, string>> {
   try {
     const res = await fetch(
       `https://${ADO_DATA_URL}/json/nuts/SPEI-3-latest.geojson`,
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: false } }
     )
     if (res.ok) {
       const data = await res.json()

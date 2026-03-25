@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const res = await fetch(
       `https://${ADO_DATA_URL}/json/nuts/SPEI-1-latest.geojson`,
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: false } }
     )
     if (res.ok) {
       const data = await res.json()

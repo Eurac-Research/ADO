@@ -8,7 +8,7 @@ import Map, {
   ScaleControl,
   NavigationControl,
   MapRef,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import ControlPanelImpacts from '@/components/ControlPanelImpacts'
 import ReportedImpactsIntro from '@/components/ReportedImpactsIntro'
 import Layout from '@/components/layout'
@@ -44,11 +44,13 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 interface ImpactsNuts3ClientProps {
   impactData: any[]
   allPosts: PostData[]
+  nutsMap: any
 }
 
 export default function ImpactsNuts3Client({
   impactData,
   allPosts,
+  nutsMap,
 }: ImpactsNuts3ClientProps) {
   const mapRef = React.useRef<any>(null)
 
@@ -99,7 +101,7 @@ export default function ImpactsNuts3Client({
 
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
-  const [nutsMap, setNutsMap] = useState<any>(null)
+
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
   const [nutsData, setNutsData] = useState(null)
   const [clickInfo, setClickInfo] = useState(null)
@@ -152,20 +154,17 @@ export default function ImpactsNuts3Client({
     const expression: any[] = ['match', ['get', 'NUTS_ID']]
 
     // Calculate color values for each nuts3id
-    if (impactEntries.length > 1) {
-      for (const row of impactEntries) {
-        const amount = row[1] as number
-        const color = uniqolor(amount, {
-          saturation: [50, 75],
-          lightness: [50, 70],
-          differencePoint: 90,
-        })
+    if (impactEntries.length === 0) {
+      return 'rgba(0, 0, 0, 0.1)'
+    }
 
-        // get color by basecolor - darken color by amount of impacts per nutsregion
-        const mycolor = darkenColor('#FFCEC3', amount / 100)
+    for (const row of impactEntries) {
+      const amount = row[1] as number
 
-        expression.push(row[0], mycolor)
-      }
+      // get color by basecolor - darken color by amount of impacts per nutsregion
+      const mycolor = darkenColor('#FFCEC3', amount / 100)
+
+      expression.push(row[0], mycolor)
     }
 
     // Last value is the default, used where there is no data
@@ -684,21 +683,6 @@ export default function ImpactsNuts3Client({
     },
     [featuredId]
   )
-
-  useEffect(() => {
-    /* global fetch */
-    fetch(
-      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts3_simple_4326.geojson'
-    )
-      .then((resp) => resp.json())
-      .then((json) => {
-        // Note: In a real application you would do a validation of JSON data before doing anything with it,
-        // but for demonstration purposes we ingore this part here and just trying to select needed data...
-        const features = json
-        setNutsMap(features)
-      })
-      .catch((err) => console.error('Could not load data', err))
-  }, [])
 
   const onHover = useCallback((event: any) => {
     const {

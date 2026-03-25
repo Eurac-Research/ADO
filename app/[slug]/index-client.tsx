@@ -6,7 +6,7 @@ import Map, {
   Layer,
   ScaleControl,
   NavigationControl,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'

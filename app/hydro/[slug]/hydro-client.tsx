@@ -7,7 +7,7 @@ import Map, {
   Layer,
   ScaleControl,
   NavigationControl,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import ControlPanel from '@/components/ControlPanel'
 import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
@@ -781,7 +781,7 @@ export default function HydroClient({
                 lastDate={day}
                 style={{
                   width: '100%',
-                  height: '100%',
+                  height: '400px',
                   position: 'relative',
                   zIndex: '102',
                   top: '0',

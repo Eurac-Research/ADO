@@ -7,7 +7,7 @@ import Map, {
   Layer,
   ScaleControl,
   NavigationControl,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import Link from 'next/link'
 import ControlPanelImpactsProbsTs from '@/components/ControlPanelImpactsProbsTs'
 import ReportedImpactsIntro from '@/components/ReportedImpactsIntro'
@@ -146,6 +146,7 @@ function ImpactProbabilitiesContent({
   // Build a match expression for coloring the map
   const matchExpression = ['match', ['get', 'NUTS_ID']]
 
+  let hasEntries = false
   for (const row of impactDataByIndicatorValue) {
     // Get the probability value
     const amount = row[probabilityType]
@@ -155,7 +156,15 @@ function ImpactProbabilitiesContent({
     const color = colormap(amount)
 
     // Only provide a color if amount is not null
-    amount && matchExpression.push(row['NUTS_ID'], color)
+    if (amount) {
+      matchExpression.push(row['NUTS_ID'], color)
+      hasEntries = true
+    }
+  }
+
+  // match expression requires at least one label/output pair
+  if (!hasEntries) {
+    matchExpression.push('', 'rgba(255, 255, 255, 1)')
   }
 
   // Default color for regions with no data

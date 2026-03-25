@@ -1,5 +1,8 @@
 import { getAllPosts } from '@/lib/api'
-import { fetchImpactData as fetchImpactDataUtil } from '@/lib/data-fetcher'
+import {
+  fetchImpactData as fetchImpactDataUtil,
+  fetchNutsGeoJSON,
+} from '@/lib/data-fetcher'
 import { Suspense } from 'react'
 import ImpactsNuts3Client from './impacts-nuts3-client'
 import type { PostData } from '@/types'
@@ -18,16 +21,24 @@ export default async function ImpactsNuts3Page() {
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
 
   let impactData: any[] = []
+  let nutsMap = null
 
   try {
-    impactData = await fetchImpactDataUtil()
+    ;[impactData, nutsMap] = await Promise.all([
+      fetchImpactDataUtil(),
+      fetchNutsGeoJSON('nuts3'),
+    ])
   } catch (error) {
     console.error('Error fetching impact data:', error)
   }
 
   return (
     <Suspense fallback={<div>Loading impacts...</div>}>
-      <ImpactsNuts3Client impactData={impactData} allPosts={allPosts} />
+      <ImpactsNuts3Client
+        impactData={impactData}
+        allPosts={allPosts}
+        nutsMap={nutsMap}
+      />
     </Suspense>
   )
 }

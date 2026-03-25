@@ -2,7 +2,6 @@ import { getAllPosts } from '@/lib/api'
 import {
   fetchImpactProbabilities as fetchImpactProbabilitiesUtil,
   fetchNutsGeoJSON,
-  monthlyRevalidationOptions,
 } from '@/lib/data-fetcher'
 import { Suspense } from 'react'
 import ImpactProbabilitiesClient from './impact-probabilities-client'
@@ -33,7 +32,7 @@ export default async function ImpactProbabilitiesPage() {
   try {
     const result = await Promise.all([
       fetchImpactProbabilitiesUtil(),
-      fetchNutsGeoJSON('nuts3', monthlyRevalidationOptions),
+      fetchNutsGeoJSON('nuts3'),
     ])
     impactData = result[0]
     nutsMap = result[1]

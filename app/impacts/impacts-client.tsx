@@ -7,7 +7,7 @@ import Map, {
   ScaleControl,
   NavigationControl,
   MapRef,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import ControlPanelImpacts from '@/components/ControlPanelImpacts'
 import ReportedImpactsIntro from '@/components/ReportedImpactsIntro'
 import Layout from '@/components/layout'
@@ -114,16 +114,17 @@ const nuts2static: NutsRegion[] = [
 interface ImpactsClientProps {
   impactData: ImpactData[]
   allPosts: PostData[]
+  nutsMap: NutsGeoJSON | null
   error?: string
 }
 
 export default function ImpactsClient({
   impactData,
   allPosts,
+  nutsMap,
   error,
 }: ImpactsClientProps) {
   const mapRef = useRef<MapRef>(null)
-  const [nutsMap, setNutsMap] = useState<NutsGeoJSON | null>(null)
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null)
   const [nutsid, setNutsid] = useState<string | null>(null)
   const [nutsName, setNutsName] = useState<string | null>(null)
@@ -186,15 +187,17 @@ export default function ImpactsClient({
 
   // Mapbox layer configuration
   const matchExpression = useMemo((): MatchExpression => {
+    if (impactEntries.length === 0) {
+      return ['match', ['get', 'NUTS_ID'], '', 'rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 0.1)']
+    }
+
     const expression: MatchExpression = ['match', ['get', 'NUTS_ID']]
 
-    if (impactEntries.length > 1) {
-      impactEntries.forEach((row) => {
-        const amount = row[1]
-        const mycolor = darkenColor('#FFCEC3', amount / 100)
-        expression.push(row[0], mycolor)
-      })
-    }
+    impactEntries.forEach((row) => {
+      const amount = row[1]
+      const mycolor = darkenColor('#FFCEC3', amount / 100)
+      expression.push(row[0], mycolor)
+    })
 
     expression.push('rgba(0, 0, 0, 0.1)')
     return expression
@@ -290,18 +293,6 @@ export default function ImpactsClient({
     removeNutsInformation()
     setYear('')
   }, [removeNutsInformation])
-
-  // Load NUTS map data
-  useEffect(() => {
-    fetch(
-      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts2_simple_4326.geojson'
-    )
-      .then((resp) => resp.json())
-      .then((json: NutsGeoJSON) => {
-        setNutsMap(json)
-      })
-      .catch((err) => console.error('Could not load NUTS data', err))
-  }, [])
 
   // Cleanup on unmount
   useEffect(() => {

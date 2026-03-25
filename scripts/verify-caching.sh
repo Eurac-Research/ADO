@@ -13,13 +13,13 @@ echo "Any routes listed above may not be statically generated. Verify if intenti
 
 # Check for fetch calls without caching
 echo "\n=== Checking for fetch calls without caching options ==="
-grep -r --include="*.tsx" --include="*.ts" "fetch(" app lib | grep -v "revalidate" | grep -v "force-cache" | grep -v "monthlyRevalidationOptions"
+grep -r --include="*.tsx" --include="*.ts" "fetch(" app lib | grep -v "revalidate" | grep -v "force-cache" | grep -v "defaultCacheOptions"
 echo "Any fetch calls listed above may not be properly cached. Verify if intentional."
 
-# Check for monthly cache utilization
-echo "\n=== Usage of monthly revalidation option ==="
-grep -r --include="*.tsx" --include="*.ts" "monthlyRevalidationOptions" app lib
-echo "These files use monthly revalidation instead of static caching."
+# Check for static cache utilization
+echo "\n=== Usage of defaultCacheOptions ==="
+grep -r --include="*.tsx" --include="*.ts" "defaultCacheOptions" app lib
+echo "These files use the unified static cache option."
 
 # Check for generateStaticParams in dynamic routes
 echo "\n=== Checking for dynamic routes without generateStaticParams ==="

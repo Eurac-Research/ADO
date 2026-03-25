@@ -450,7 +450,7 @@ function TimeSeries(props: TimeSeriesProps) {
     },
     grid: {
       top: 80,
-      right: 16,
+      right: 55,
       bottom: 80,
       left: 50,
       containLabel: false,

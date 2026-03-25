@@ -5,13 +5,7 @@ import VulnerabilitiesClient from './vulnerabilities-client'
 import type { PostData } from '@/types'
 import type { Metadata } from 'next'
 
-// // Force this page to be dynamic to handle search params properly
-// export const dynamic = 'force-dynamic'
-
-// IMPORTANT: Do not use 'force-static' on this page
-// This page uses search params (?type=farm_size|livestock_density|etc) in the client component
-// Using force-static would cause router initialization issues with "NextRouter was not mounted" errors
-// The server component data is still statically cached with data-fetcher.ts utilities
+export const dynamic = 'force-static'
 
 export const metadata: Metadata = {
   title: 'Vulnerabilities - Alpine Drought Observatory | Eurac Research',

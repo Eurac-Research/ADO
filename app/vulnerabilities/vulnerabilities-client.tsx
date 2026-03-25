@@ -7,7 +7,7 @@ import Map, {
   Layer,
   ScaleControl,
   NavigationControl,
-} from 'react-map-gl'
+} from 'react-map-gl/mapbox'
 import ReportedImpactsIntro from '@/components/ReportedImpactsIntro'
 import Layout from '@/components/layout'
 import { useThemeContext } from '@/context/theme'
@@ -278,13 +278,20 @@ function VulnerabilitiesContent({
   }
 
   // Add color mappings for each NUTS region with data
+  let hasEntries = false
   if (dataToUse) {
     for (const row of dataToUse) {
       const value = row[currentData.row]
       if (value !== undefined && value !== null) {
         matchExpression.push(row.nuts_id, `rgb(${getColor(value)})`)
+        hasEntries = true
       }
     }
+  }
+
+  // match expression requires at least one label/output pair
+  if (!hasEntries) {
+    matchExpression.push('', 'rgba(0, 0, 0, 0.1)')
   }
 
   matchExpression.push('rgba(0, 0, 0, 0.1)') // default color

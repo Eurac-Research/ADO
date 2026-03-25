@@ -5,6 +5,8 @@ import type { Metadata } from 'next'
 
 const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
+export const dynamic = 'force-static'
+
 export const metadata: Metadata = {
   title: 'Regions Overview – Alpine Drought Observatory | Eurac Research',
   description:
@@ -25,7 +27,7 @@ export default async function RegionsPage() {
   try {
     const res = await fetch(
       `https://${ADO_DATA_URL}/json/nuts/SPEI-3-latest.geojson`,
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: false } }
     )
     if (res.ok) {
       const data = await res.json()
