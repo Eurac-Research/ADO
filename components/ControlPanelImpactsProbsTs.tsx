@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import * as React from 'react'
 
 interface ControlPanelImpactsProbsProps {
@@ -7,7 +7,11 @@ interface ControlPanelImpactsProbsProps {
   onChange: (value: string) => void
 }
 
-function ControlPanelImpactsProbsTs({ spei, type, onChange }: ControlPanelImpactsProbsProps) {
+function ControlPanelImpactsProbsTs({
+  spei,
+  type,
+  onChange,
+}: ControlPanelImpactsProbsProps) {
   const selectedSpei = spei || '-4'
   const indexType = type === 'sma' ? 'SMA-1' : 'SPEI-3'
 

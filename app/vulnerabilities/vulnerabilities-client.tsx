@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, Suspense, useEffect, useCallback } from 'react'
+import { useState, useRef, Suspense, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Map, {
   Source,
@@ -11,6 +11,7 @@ import Map, {
 import ReportedImpactsIntro from '@/components/ReportedImpactsIntro'
 import Layout from '@/components/layout'
 import { useThemeContext } from '@/context/theme'
+import { useMounted } from '@/lib/hooks'
 import Link from 'next/link'
 import type { PostData } from '@/types'
 
@@ -37,16 +38,12 @@ interface VulnerabilitiesClientProps {
 function VulnerabilitiesContent({
   vulnerabilityData,
   nutsMap,
-  allPosts
+  allPosts,
 }: VulnerabilitiesClientProps) {
   const mapRef = useRef<any>(null)
   const [theme] = useThemeContext()
   const searchParams = useSearchParams()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useMounted()
 
   const type = searchParams.get('type') || 'farm_size'
 
@@ -89,11 +86,13 @@ function VulnerabilitiesContent({
         [23.3, 75.9, '217, 95, 14'],
       ],
       title: 'Farm size',
-      variableName: 'Average utilised agricultural area per agricultural holding [ha]',
+      variableName:
+        'Average utilised agricultural area per agricultural holding [ha]',
       unit: 'ha',
       desc: 'This factor has been calculated by dividing the total number of holdings with the utilised agricultural area (ha)',
       update: '2013',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/AEI_EF_LU$DEFAULTVIEW/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/AEI_EF_LU$DEFAULTVIEW/default/table',
     },
     livestock_density: {
       row: 'livestock_density',
@@ -110,7 +109,8 @@ function VulnerabilitiesContent({
       unit: 'units/ha',
       desc: 'This factor has been calculated by dividing the total number of livestock units by the hectares of permanent grassland (livestock/ha).',
       update: '2016',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/EF_LSK_MAIN$DEFAULTVIEW/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/EF_LSK_MAIN$DEFAULTVIEW/default/table',
     },
     farm_input_intensity: {
       row: 'percentage',
@@ -123,11 +123,13 @@ function VulnerabilitiesContent({
         [60.6, 83.2, '153, 52, 4'],
       ],
       title: 'High input farming [%]',
-      variableName: 'Percentage of high input utilised agricultural area over total utilised agricultural area',
+      variableName:
+        'Percentage of high input utilised agricultural area over total utilised agricultural area',
       unit: '%',
       desc: 'This dataset shows the hectares and the percentage of utilised agricultural area (UAA) managed by high-input farms. The inputs considered are purchased fertilisers and soil improvers, plant protection products such as pesticides, traps, bird scarers, anti-hail shells, frost protection etc. High intensity level means that the input level is greater than the 66th UAA quantiles.',
       update: '2019',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/AEI_PS_INP__custom_2982600/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/AEI_PS_INP__custom_2982600/default/table',
     },
     farm_input_intensity_ha: {
       row: 'hectares',
@@ -144,7 +146,8 @@ function VulnerabilitiesContent({
       unit: 'ha',
       desc: 'This dataset shows the hectares and the percentage of utilised agricultural area (UAA) managed by high-input farms. The inputs considered are purchased fertilisers and soil improvers, plant protection products such as pesticides, traps, bird scarers, anti-hail shells, frost protection etc. High intensity level means that the input level is greater than the 66th UAA quantiles.',
       update: '2019',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/AEI_PS_INP__custom_2982600/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/AEI_PS_INP__custom_2982600/default/table',
     },
     intensity_farming: {
       row: 'total',
@@ -160,7 +163,8 @@ function VulnerabilitiesContent({
       unit: 't/ha',
       desc: 'This factor is calculated dividing the sum of crop production of cereals, dry pulses and protein (t) by the area of cultivation (ha)',
       update: '2020',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/APRO_CPSHR__custom_2974283/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/APRO_CPSHR__custom_2974283/default/table',
     },
     share_utilised_agric_area: {
       row: 'share_utilised_agri_area',
@@ -173,11 +177,13 @@ function VulnerabilitiesContent({
         [44.5, 50.3, '153, 52, 4'],
       ],
       title: 'Share utilised agricultural area',
-      variableName: 'Percentage of utilised agricultural area over the total NUTS2 area',
+      variableName:
+        'Percentage of utilised agricultural area over the total NUTS2 area',
       unit: '%',
       desc: 'This factor shows the hectares of utilised agricultural areas and the share calculated by dividing the utilised agricultural area by the total area at each NUTS2 region.',
       update: '2016',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_MAIN__custom_2950047/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_MAIN__custom_2950047/default/table',
     },
     share_utilised_agric_area_ha: {
       row: 'utilised_agric_area_ha',
@@ -194,7 +200,8 @@ function VulnerabilitiesContent({
       unit: 'ha',
       desc: 'This factor shows the hectares of utilised agricultural areas and the share calculated by dividing the utilised agricultural area by the total area at each NUTS2 region.',
       update: '2016',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_MAIN__custom_2950047/default/table',
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_MAIN__custom_2950047/default/table',
     },
     share_permanent_grassland: {
       row: 'share_permanent_grassland',
@@ -207,12 +214,14 @@ function VulnerabilitiesContent({
         [77, 99, '153, 52, 4'],
       ],
       title: 'Share permanent grassland',
-      variableName: 'Percentage of permanent grassland over total utlised agricultural area',
+      variableName:
+        'Percentage of permanent grassland over total utlised agricultural area',
       unit: '%',
       desc: 'This factor is calculated by substracting agricultural grassland not in use (ha) to permanent grassland (ha), and then dividing by the total utilised agricultural area.',
       update: '2016',
-      dataset: 'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_PEGRASS__custom_2963027/default/table',
-    }
+      dataset:
+        'https://ec.europa.eu/eurostat/databrowser/view/EF_LUS_PEGRASS__custom_2963027/default/table',
+    },
   }
 
   // Select the appropriate data based on the type parameter
@@ -221,11 +230,17 @@ function VulnerabilitiesContent({
     dataToUse = vulnerabilityData!.farm_size
   } else if (type === 'livestock_density') {
     dataToUse = vulnerabilityData!.livestock_density
-  } else if (type === 'farm_input_intensity' || type === 'farm_input_intensity_ha') {
+  } else if (
+    type === 'farm_input_intensity' ||
+    type === 'farm_input_intensity_ha'
+  ) {
     dataToUse = vulnerabilityData!.farm_input_intensity
   } else if (type === 'share_permanent_grassland') {
     dataToUse = vulnerabilityData!.share_permanent_grassland
-  } else if (type === 'share_utilised_agric_area' || type === 'share_utilised_agric_area_ha') {
+  } else if (
+    type === 'share_utilised_agric_area' ||
+    type === 'share_utilised_agric_area_ha'
+  ) {
     dataToUse = vulnerabilityData!.share_utilised_agric_area
   } else if (type === 'intensity_farming') {
     dataToUse = vulnerabilityData!.intensity_farming
@@ -234,7 +249,8 @@ function VulnerabilitiesContent({
   }
 
   // Select the appropriate data type configuration
-  const currentData = dataTypes[type as keyof typeof dataTypes] || dataTypes.farm_size
+  const currentData =
+    dataTypes[type as keyof typeof dataTypes] || dataTypes.farm_size
 
   // Create match expression for map styling
   const matchExpression = ['match', ['get', 'NUTS_ID']]
@@ -339,7 +355,9 @@ function VulnerabilitiesContent({
       <p>
         Underlying dataset:
         <br />
-        <a href={currentData.dataset} target="_blank" rel="noreferrer">{currentData.dataset}</a>
+        <a href={currentData.dataset} target="_blank" rel="noreferrer">
+          {currentData.dataset}
+        </a>
       </p>
     </>
   )
@@ -385,7 +403,7 @@ function VulnerabilitiesContent({
               data={nutsMap}
               generateId={true}
             >
-              <Layer {...dataLayer as any} beforeId="waterway-shadow" />
+              <Layer {...(dataLayer as any)} beforeId="waterway-shadow" />
             </Source>
           )}
           <ScaleControl
@@ -402,7 +420,8 @@ function VulnerabilitiesContent({
               style={{ left: hoverInfo.x, top: hoverInfo.y }}
             >
               <div style={{ marginBottom: '6px' }}>
-                {hoverInfo.feature.properties.NUTS_NAME} ({hoverInfo.feature.properties.NUTS_ID})
+                {hoverInfo.feature.properties.NUTS_NAME} (
+                {hoverInfo.feature.properties.NUTS_ID})
               </div>
               {getDataByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
                 <>
@@ -411,7 +430,9 @@ function VulnerabilitiesContent({
                   </div>
                   <div style={{ fontWeight: '600' }}>
                     {new Intl.NumberFormat('en-EN').format(
-                      getDataByNutsId(hoverInfo.feature.properties.NUTS_ID)[currentData.row]
+                      getDataByNutsId(hoverInfo.feature.properties.NUTS_ID)[
+                      currentData.row
+                      ]
                     )}
                     {currentData.postfix}
                   </div>
@@ -422,20 +443,25 @@ function VulnerabilitiesContent({
         </Map>
       </div>
 
-      <div className="controlContainer impacts" style={{ opacity: clickInfo ? '0' : '1' }}>
+      <div
+        className="controlContainer impacts"
+        style={{ opacity: clickInfo ? '0' : '1' }}
+      >
         <div className="legend" style={{ maxWidth: 'none' }}>
           <p style={{ fontSize: '12px', marginBottom: '6px' }}>
             Unit: {currentData.postfix}
           </p>
           {currentData?.colorRange?.map((range, index) => (
-            <div className="vulnerabilityLegend" key={index}>                <span
-              style={{
-                width: '20px',
-                height: '20px',
-                display: 'inline-block',
-                background: `rgb(${range[2]})`,
-              }}
-            ></span>
+            <div className="vulnerabilityLegend" key={index}>
+              {' '}
+              <span
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  display: 'inline-block',
+                  background: `rgb(${range[2]})`,
+                }}
+              ></span>
               {new Intl.NumberFormat('en-EN').format(Number(range[0]))} -{' '}
               {new Intl.NumberFormat('en-EN').format(Number(range[1]))}
             </div>
@@ -484,7 +510,9 @@ function VulnerabilitiesContent({
             </Link>
             <Link
               href="/vulnerabilities?type=share_utilised_agric_area_ha"
-              className={type === 'share_utilised_agric_area_ha' ? 'active' : ''}
+              className={
+                type === 'share_utilised_agric_area_ha' ? 'active' : ''
+              }
             >
               uaa [ha]
             </Link>
@@ -495,14 +523,10 @@ function VulnerabilitiesContent({
               Share permanent grassland
             </Link>
           </>
-
         </div>
       </div>
 
-      <ReportedImpactsIntro
-        headline={introHeadline}
-        text={introText}
-      />
+      <ReportedImpactsIntro headline={introHeadline} text={introText} />
 
       {clickInfo && (
         <>
@@ -514,15 +538,21 @@ function VulnerabilitiesContent({
             <h3>{currentData.title}</h3>
             <p>{clickInfo.feature.properties.NUTS_NAME}</p>
             <p>
-              {currentData.variableName}: {' '}
+              {currentData.variableName}:{' '}
               {getDataByNutsId(clickInfo.feature.properties.NUTS_ID)
                 ? `${new Intl.NumberFormat('en-EN').format(
-                  getDataByNutsId(clickInfo.feature.properties.NUTS_ID)[currentData.row]
+                  getDataByNutsId(clickInfo.feature.properties.NUTS_ID)[
+                  currentData.row
+                  ]
                 )}${currentData.postfix}`
                 : 'No data available'}
             </p>
-            <p><strong>Description:</strong> {currentData.desc}</p>
-            <p><strong>Last updated:</strong> {currentData.update}</p>
+            <p>
+              <strong>Description:</strong> {currentData.desc}
+            </p>
+            <p>
+              <strong>Last updated:</strong> {currentData.update}
+            </p>
             <p>
               <strong>Data source:</strong>{' '}
               <a
@@ -541,7 +571,9 @@ function VulnerabilitiesContent({
   )
 }
 
-export default function VulnerabilitiesClient(props: VulnerabilitiesClientProps) {
+export default function VulnerabilitiesClient(
+  props: VulnerabilitiesClientProps
+) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <VulnerabilitiesContent {...props} />

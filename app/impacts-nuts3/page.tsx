@@ -10,36 +10,24 @@ export const dynamic = 'force-static'
 
 export const metadata: Metadata = {
   title: 'Impacts NUTS3 - Alpine Drought Observatory | Eurac Research',
-  description: 'Explore drought impacts across NUTS3 regions in the Alpine Space with interactive maps and detailed regional analysis.',
+  description:
+    'Explore drought impacts across NUTS3 regions in the Alpine Space with interactive maps and detailed regional analysis.',
 }
 
 export default async function ImpactsNuts3Page() {
-  try {
-    const [impactData, allPosts] = await Promise.all([
-      fetchImpactDataUtil(),
-      Promise.resolve(getAllPosts(['title', 'slug']) as PostData[])
-    ])
+  const allPosts = getAllPosts(['title', 'slug']) as PostData[]
 
-    return (
-      <Suspense fallback={<div>Loading impacts...</div>}>
-        <ImpactsNuts3Client
-          impactData={impactData}
-          allPosts={allPosts}
-        />
-      </Suspense>
-    )
+  let impactData: any[] = []
+
+  try {
+    impactData = await fetchImpactDataUtil()
   } catch (error) {
     console.error('Error fetching impact data:', error)
-
-    const allPosts = getAllPosts(['title', 'slug']) as PostData[]
-
-    return (
-      <Suspense fallback={<div>Loading impacts...</div>}>
-        <ImpactsNuts3Client
-          impactData={[]}
-          allPosts={allPosts}
-        />
-      </Suspense>
-    )
   }
+
+  return (
+    <Suspense fallback={<div>Loading impacts...</div>}>
+      <ImpactsNuts3Client impactData={impactData} allPosts={allPosts} />
+    </Suspense>
+  )
 }

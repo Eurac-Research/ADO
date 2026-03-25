@@ -31,7 +31,13 @@ export default async function RegionsPage() {
       const data = await res.json()
       lastDate = data.metadata?.properties?.lastDate ?? null
       regions = data.features.map(
-        (f: { properties: { NUTS_ID: string; NUTS_NAME: string; 'SPEI-3'?: Record<string, number | null> } }) => {
+        (f: {
+          properties: {
+            NUTS_ID: string
+            NUTS_NAME: string
+            'SPEI-3'?: Record<string, number | null>
+          }
+        }) => {
           const ts = f.properties['SPEI-3']
           let value: number | null = null
           if (ts && typeof ts === 'object') {
@@ -39,7 +45,8 @@ export default async function RegionsPage() {
             const dateKey = lastDate ?? Object.keys(ts).sort().pop()
             if (dateKey) {
               const raw = ts[dateKey]
-              value = typeof raw === 'number' && Number.isFinite(raw) ? raw : null
+              value =
+                typeof raw === 'number' && Number.isFinite(raw) ? raw : null
             }
           }
           return {
@@ -54,5 +61,7 @@ export default async function RegionsPage() {
     console.error('Error fetching region data:', error)
   }
 
-  return <RegionsClient regions={regions} allPosts={allPosts} lastDate={lastDate} />
+  return (
+    <RegionsClient regions={regions} allPosts={allPosts} lastDate={lastDate} />
+  )
 }

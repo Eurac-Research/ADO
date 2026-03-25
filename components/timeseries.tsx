@@ -148,7 +148,18 @@ function TimeSeries(props: TimeSeriesProps) {
     datazoomLabelColor: '#999999',
   })
 
-  const { data, indices, index, firstDate, lastDate, compareYears = false, selectedYears = [], compareRegions = false, regionNames = [], comparisonData = {} } = props
+  const {
+    data,
+    indices,
+    index,
+    firstDate,
+    lastDate,
+    compareYears = false,
+    selectedYears = [],
+    compareRegions = false,
+    regionNames = [],
+    comparisonData = {},
+  } = props
 
   const [showTooltip, setShowTooltip] = useState<boolean>(false)
 
@@ -161,13 +172,16 @@ function TimeSeries(props: TimeSeriesProps) {
     if (!data || !compareYears || selectedYears.length === 0) {
       return {
         processedData: data,
-        processedSeries: indices?.map((indexName) => ({
-          type: 'line',
-          showSymbol: false,
-          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
-          connectNulls: false,
-        })) || [],
-        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+        processedSeries:
+          indices?.map((indexName) => ({
+            type: 'line',
+            showSymbol: false,
+            yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+            connectNulls: false,
+          })) || [],
+        processedDimensions: ['date'].concat(
+          indices?.map((idx) => idx.toUpperCase()) || []
+        ),
       }
     }
 
@@ -177,7 +191,10 @@ function TimeSeries(props: TimeSeriesProps) {
     data.forEach((row) => {
       const date = new Date(row.date)
       const year = date.getFullYear()
-      const dayOfYear = Math.floor((date.getTime() - new Date(year, 0, 0).getTime()) / (1000 * 60 * 60 * 24))
+      const dayOfYear = Math.floor(
+        (date.getTime() - new Date(year, 0, 0).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
 
       if (selectedYears.includes(year)) {
         if (!yearData[year]) {
@@ -192,7 +209,7 @@ function TimeSeries(props: TimeSeriesProps) {
       const dayOfYear = i + 1
       const row: any = { date: `Day ${dayOfYear}` }
 
-      selectedYears.forEach(year => {
+      selectedYears.forEach((year) => {
         const yearRow = yearData[year]?.[dayOfYear]
         if (yearRow) {
           // Only include the selected index in comparison mode
@@ -209,22 +226,29 @@ function TimeSeries(props: TimeSeriesProps) {
     })
 
     // Create series for each year of the selected index only
-    const processedSeriesArray = selectedYears.map(year => ({
+    const processedSeriesArray = selectedYears.map((year) => ({
       type: 'line',
       showSymbol: false,
-      yAxisIndex: index.toLowerCase() === 'vci' ? 1 : index.toLowerCase() === 'vhi' ? 1 : 0,
+      yAxisIndex:
+        index.toLowerCase() === 'vci'
+          ? 1
+          : index.toLowerCase() === 'vhi'
+            ? 1
+            : 0,
       connectNulls: false,
       name: `${index} ${year}`,
     }))
 
     // Create dimensions for each year of the selected index only
-    const processedDimensionsArray = selectedYears.map(year => `${index}_${year}`)
+    const processedDimensionsArray = selectedYears.map(
+      (year) => `${index}_${year}`
+    )
     const processedDimensions = ['date'].concat(processedDimensionsArray)
 
     return {
       processedData: processedRows,
       processedSeries: processedSeriesArray,
-      processedDimensions
+      processedDimensions,
     }
   }
 
@@ -237,31 +261,34 @@ function TimeSeries(props: TimeSeriesProps) {
     if (!data || !compareRegions || Object.keys(comparisonData).length === 0) {
       return {
         processedData: data,
-        processedSeries: indices?.map((indexName) => ({
-          type: 'line',
-          showSymbol: false,
-          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
-          connectNulls: false,
-        })) || [],
-        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+        processedSeries:
+          indices?.map((indexName) => ({
+            type: 'line',
+            showSymbol: false,
+            yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+            connectNulls: false,
+          })) || [],
+        processedDimensions: ['date'].concat(
+          indices?.map((idx) => idx.toUpperCase()) || []
+        ),
       }
     }
 
     // Get all unique dates from primary and comparison data
     const allDates = new Set<string>()
-    data.forEach(row => allDates.add(row.date))
-    Object.values(comparisonData).forEach(regionData => {
-      regionData.forEach(row => allDates.add(row.date))
+    data.forEach((row) => allDates.add(row.date))
+    Object.values(comparisonData).forEach((regionData) => {
+      regionData.forEach((row) => allDates.add(row.date))
     })
 
     const sortedDates = Array.from(allDates).sort()
 
     // Create unified dataset with columns for each region-index combination
-    const processedRows = sortedDates.map(date => {
+    const processedRows = sortedDates.map((date) => {
       const row: any = { date }
 
       // Add primary region data (current region)
-      const primaryRow = data.find(d => d.date === date)
+      const primaryRow = data.find((d) => d.date === date)
       if (primaryRow) {
         const primaryColName = `${index}_${regionNames[0] || 'Primary'}`
         row[primaryColName] = primaryRow[index.toUpperCase()]
@@ -269,7 +296,7 @@ function TimeSeries(props: TimeSeriesProps) {
 
       // Add comparison region data
       Object.entries(comparisonData).forEach(([regionId, regionData], i) => {
-        const comparisonRow = regionData.find(d => d.date === date)
+        const comparisonRow = regionData.find((d) => d.date === date)
         if (comparisonRow) {
           const comparisonColName = `${index}_${regionNames[i + 1] || regionId}`
           row[comparisonColName] = comparisonRow[index.toUpperCase()]
@@ -285,35 +312,47 @@ function TimeSeries(props: TimeSeriesProps) {
       {
         type: 'line',
         showSymbol: false,
-        yAxisIndex: index.toLowerCase() === 'vci' ? 1 : index.toLowerCase() === 'vhi' ? 1 : 0,
+        yAxisIndex:
+          index.toLowerCase() === 'vci'
+            ? 1
+            : index.toLowerCase() === 'vhi'
+              ? 1
+              : 0,
         connectNulls: false,
         name: `${index} ${regionNames[0] || 'Primary'}`,
         lineStyle: { type: 'solid' },
-        itemStyle: { color: '#607cba' }
+        itemStyle: { color: '#607cba' },
       },
       // Comparison region series
       ...Object.keys(comparisonData).map((regionId, i) => ({
         type: 'line',
         showSymbol: false,
-        yAxisIndex: index.toLowerCase() === 'vci' ? 1 : index.toLowerCase() === 'vhi' ? 1 : 0,
+        yAxisIndex:
+          index.toLowerCase() === 'vci'
+            ? 1
+            : index.toLowerCase() === 'vhi'
+              ? 1
+              : 0,
         connectNulls: false,
         name: `${index} ${regionNames[i + 1] || regionId}`,
         lineStyle: { type: 'dashed' },
-        itemStyle: { color: i === 0 ? '#b34190' : '#5bcbc1' }
-      }))
+        itemStyle: { color: i === 0 ? '#b34190' : '#5bcbc1' },
+      })),
     ]
 
     // Create dimensions for each region-index combination
     const processedDimensionsArray = [
       `${index}_${regionNames[0] || 'Primary'}`,
-      ...Object.keys(comparisonData).map((regionId, i) => `${index}_${regionNames[i + 1] || regionId}`)
+      ...Object.keys(comparisonData).map(
+        (regionId, i) => `${index}_${regionNames[i + 1] || regionId}`
+      ),
     ]
     const processedDimensions = ['date'].concat(processedDimensionsArray)
 
     return {
       processedData: processedRows,
       processedSeries: processedSeriesArray,
-      processedDimensions
+      processedDimensions,
     }
   }
 
@@ -326,18 +365,22 @@ function TimeSeries(props: TimeSeriesProps) {
     } else {
       return {
         processedData: data,
-        processedSeries: indices?.map((indexName) => ({
-          type: 'line',
-          showSymbol: false,
-          yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
-          connectNulls: false,
-        })) || [],
-        processedDimensions: ['date'].concat(indices?.map(idx => idx.toUpperCase()) || [])
+        processedSeries:
+          indices?.map((indexName) => ({
+            type: 'line',
+            showSymbol: false,
+            yAxisIndex: indexName === 'vci' ? 1 : indexName === 'vhi' ? 1 : 0,
+            connectNulls: false,
+          })) || [],
+        processedDimensions: ['date'].concat(
+          indices?.map((idx) => idx.toUpperCase()) || []
+        ),
       }
     }
   }
 
-  const { processedData, processedSeries, processedDimensions } = getProcessedData()
+  const { processedData, processedSeries, processedDimensions } =
+    getProcessedData()
 
   const series = processedSeries
 
@@ -347,12 +390,12 @@ function TimeSeries(props: TimeSeriesProps) {
   const legendObject: Record<string, boolean> = {}
   if (compareRegions && Object.keys(comparisonData).length > 0) {
     // For region comparison, show all region-index combinations
-    dimensionsArray.forEach(dim => {
+    dimensionsArray.forEach((dim) => {
       legendObject[dim] = true
     })
   } else if (compareYears && selectedYears.length > 0) {
     // For year comparison, show all year-index combinations for selected index
-    selectedYears.forEach(year => {
+    selectedYears.forEach((year) => {
       const key = `${index}_${year}`
       legendObject[key] = true
     })
@@ -367,7 +410,8 @@ function TimeSeries(props: TimeSeriesProps) {
     }
   }
 
-  const [selectedDimensions, setSelectedDimensions] = useState<Record<string, boolean>>(legendObject)
+  const [selectedDimensions, setSelectedDimensions] =
+    useState<Record<string, boolean>>(legendObject)
 
   // Show tooltip after chart loads
   useEffect(() => {
@@ -455,25 +499,27 @@ function TimeSeries(props: TimeSeriesProps) {
     tooltip: {
       trigger: 'axis',
     },
-    dataZoom: compareYears ? {
-      type: 'slider',
-      show: true,
-      startValue: 0,
-      endValue: 366,
-      showDetail: true,
-      handleLabel: {
-        show: true,
-      },
-    } : {
-      type: 'slider',
-      show: true,
-      startValue: firstDate,
-      endValue: lastDate,
-      showDetail: true,
-      handleLabel: {
-        show: true,
-      },
-    },
+    dataZoom: compareYears
+      ? {
+          type: 'slider',
+          show: true,
+          startValue: 0,
+          endValue: 366,
+          showDetail: true,
+          handleLabel: {
+            show: true,
+          },
+        }
+      : {
+          type: 'slider',
+          show: true,
+          startValue: firstDate,
+          endValue: lastDate,
+          showDetail: true,
+          handleLabel: {
+            show: true,
+          },
+        },
     legend: {
       type: 'scroll',
       orient: 'horizontal',
@@ -488,12 +534,17 @@ function TimeSeries(props: TimeSeriesProps) {
     legendselectchanged: (params: any) => {
       // In normal (non-comparison) mode, when a legend item is selected, notify parent
       if (!compareYears && !compareRegions && props.onIndexChange) {
-        const selectedIndex = Object.keys(params.selected).find(key => params.selected[key])
-        if (selectedIndex && selectedIndex.toLowerCase() !== index.toLowerCase()) {
+        const selectedIndex = Object.keys(params.selected).find(
+          (key) => params.selected[key]
+        )
+        if (
+          selectedIndex &&
+          selectedIndex.toLowerCase() !== index.toLowerCase()
+        ) {
           props.onIndexChange(selectedIndex.toLowerCase())
         }
       }
-    }
+    },
   }
 
   return (
@@ -502,7 +553,10 @@ function TimeSeries(props: TimeSeriesProps) {
         <>
           <ReactECharts
             option={options}
-            style={{ height: props.style?.height || '400px', marginTop: '10px' }}
+            style={{
+              height: props.style?.height || '400px',
+              marginTop: '10px',
+            }}
             theme={'mytheme'}
             onEvents={onChartEvents}
           />
@@ -513,10 +567,13 @@ function TimeSeries(props: TimeSeriesProps) {
                 className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded shadow-lg max-w-xs text-center"
                 style={{
                   zIndex: 1000,
-                  animation: 'fadeIn 0.5s'
+                  animation: 'fadeIn 0.5s',
                 }}
               >
-                <p>Try using this slider to zoom in on specific time periods or expand the timespan back to 1979!</p>
+                <p>
+                  Try using this slider to zoom in on specific time periods or
+                  expand the timespan back to 1979!
+                </p>
                 <button
                   onClick={dismissTooltip}
                   className="mt-2 bg-white text-blue-500 px-2 py-1 rounded text-xs font-bold"
@@ -529,10 +586,16 @@ function TimeSeries(props: TimeSeriesProps) {
                 className="absolute bottom-7 left-[88%] transform -translate-x-1/2"
                 style={{
                   zIndex: 999,
-                  animation: 'bounce 1.5s infinite'
+                  animation: 'bounce 1.5s infinite',
                 }}
               >
-                <svg className='w-14 h-14 rotate-[5deg] fill-blue-500' xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 302.816 302.816">
+                <svg
+                  className="w-14 h-14 rotate-[5deg] fill-blue-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="800"
+                  height="800"
+                  viewBox="0 0 302.816 302.816"
+                >
                   <path d="M298.423 152.996c-5.857-5.858-15.354-5.858-21.213 0l-35.137 35.136c-5.871-59.78-50.15-111.403-112.001-123.706-45.526-9.055-92.479 5.005-125.596 37.612-5.903 5.813-5.977 15.31-.165 21.213 5.813 5.903 15.31 5.977 21.212.164 26.029-25.628 62.923-36.679 98.695-29.565 48.865 9.72 83.772 50.677 88.07 97.978l-38.835-38.835c-5.857-5.857-15.355-5.858-21.213.001-5.858 5.858-5.858 15.355 0 21.213l62.485 62.485c2.929 2.929 6.768 4.393 10.606 4.393s7.678-1.464 10.607-4.393l62.483-62.482c5.86-5.858 5.86-15.356.002-21.214z" />
                 </svg>
               </div>

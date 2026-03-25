@@ -8,11 +8,13 @@ import '@/styles/globals.scss'
 
 export const metadata: Metadata = {
   title: 'Alpine Drought Observatory | Eurac Research',
-  description: 'Alpine Drought Observatory - Monitoring drought conditions across the Alpine region',
+  description:
+    'Alpine Drought Observatory - Monitoring drought conditions across the Alpine region',
   metadataBase: new URL('https://ado.eurac.edu'),
   openGraph: {
     title: 'Alpine Drought Observatory | Eurac Research',
-    description: 'Alpine Drought Observatory - Monitoring drought conditions across the Alpine region',
+    description:
+      'Alpine Drought Observatory - Monitoring drought conditions across the Alpine region',
     images: ['/og-image.png'],
   },
   verification: {

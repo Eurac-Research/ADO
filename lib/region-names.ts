@@ -1,7 +1,9 @@
 // In-memory cache for NUTS region names (id → name)
 // Fetched once from GeoJSON and reused for all metadata calls
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const ADO_DATA_URL =
+  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
+  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 let regionNameMap: Map<string, string> | null = null
 let fetchPromise: Promise<Map<string, string>> | null = null

@@ -15,34 +15,29 @@ import Layout from '@/components/layout'
 import { useThemeContext } from '@/context/theme'
 import uniqolor from 'uniqolor'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import type {
-  PostData,
-  HoverInfo,
-  MapLayer,
-  MatchExpression
-} from '@/types'
+import type { PostData, HoverInfo, MapLayer, MatchExpression } from '@/types'
 
 // Replace frostcolor with a simple color darkening function
 const darkenColor = (hexColor: string, amount: number): string => {
   // Convert hex to RGB
-  const hex = hexColor.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
+  const hex = hexColor.replace('#', '')
+  const r = parseInt(hex.substr(0, 2), 16)
+  const g = parseInt(hex.substr(2, 2), 16)
+  const b = parseInt(hex.substr(4, 2), 16)
 
   // Darken by reducing RGB values
-  const newR = Math.max(0, r - Math.floor(amount * 255));
-  const newG = Math.max(0, g - Math.floor(amount * 255));
-  const newB = Math.max(0, b - Math.floor(amount * 255));
+  const newR = Math.max(0, r - Math.floor(amount * 255))
+  const newG = Math.max(0, g - Math.floor(amount * 255))
+  const newB = Math.max(0, b - Math.floor(amount * 255))
 
   // Convert back to hex
   const toHex = (n: number) => {
-    const hex = n.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  };
+    const hex = n.toString(16)
+    return hex.length === 1 ? '0' + hex : hex
+  }
 
-  return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
-};
+  return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`
+}
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
@@ -51,7 +46,10 @@ interface ImpactsNuts3ClientProps {
   allPosts: PostData[]
 }
 
-export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts3ClientProps) {
+export default function ImpactsNuts3Client({
+  impactData,
+  allPosts,
+}: ImpactsNuts3ClientProps) {
   const mapRef = React.useRef<any>(null)
 
   function impactAmountByNutsId(NUTS_ID: string): number | null {
@@ -129,18 +127,25 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
     }
   })
 
-  const impactsByYearForMap = year ? impactDataByYear : impactData
+  const impactsByYearForMap = useMemo(
+    () => (year ? impactDataByYear : impactData),
+    [year, impactDataByYear, impactData]
+  )
 
-  const uniqueImpactsByNutsID = impactsByYearForMap.reduce(
-    (acc: any, o: any) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
-    {}
+  const uniqueImpactsByNutsID = useMemo(
+    () =>
+      impactsByYearForMap.reduce(
+        (acc: any, o: any) => ((acc[o.NUTS3_ID] = (acc[o.NUTS3_ID] || 0) + 1), acc),
+        {}
+      ),
+    [impactsByYearForMap]
   )
 
   // create array
   const impactEntries = Object.entries(uniqueImpactsByNutsID)
 
-  // Create matchExpression inside useMemo to avoid recreation on each render
-  const matchExpression = useMemo(() => {
+  // Create matchExpression to define colors for each vector tile feature
+  const matchExpression = (() => {
     // https://docs.mapbox.com/mapbox-gl-js/example/data-join/
     // Build a GL match expression that defines the color for every vector tile feature
     // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
@@ -167,10 +172,10 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
     expression.push('rgba(0, 0, 0, 0.1)')
 
     return expression
-  }, [impactEntries])
+  })()
 
   // Add layer from the vector tile source to create the choropleth
-  const nutsLayer: MapLayer = useMemo(() => ({
+  const nutsLayer: MapLayer = {
     type: 'fill',
     id: 'geojson',
     paint: {
@@ -190,7 +195,7 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
         '#999',
       ],
     },
-  }), [matchExpression])
+  }
 
   const scaleControlStyle = {}
   const navControlStyle = {
@@ -639,7 +644,107 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
     { id: 328, nuts2id: 'NO0A', name: 'Vestlandet' },
   ]
 
-  const NewComponent = () => (
+  const onClick = useCallback(
+    async (event: any) => {
+      if (!mapRef.current) return
+      const map = mapRef.current.getMap()
+
+      const { features } = event
+      const hoveredFeature = features && features[0]
+      const clickedNutsid = hoveredFeature
+        ? hoveredFeature?.properties?.NUTS_ID
+        : null
+      const clickedNutsName = hoveredFeature
+        ? hoveredFeature?.properties?.NUTS_NAME
+        : null
+      setNutsName(clickedNutsName)
+      setNutsid(clickedNutsid)
+      setYear('')
+
+      if (featuredId === null && hoveredFeature) {
+        map.setFeatureState(
+          { source: 'geojson', id: hoveredFeature.id },
+          { hover: true }
+        )
+      }
+
+      if (featuredId !== null) {
+        map.setFeatureState(
+          { source: 'geojson', id: featuredId },
+          { hover: false }
+        )
+      }
+      if (clickedNutsid !== null) {
+        setFeaturedId(hoveredFeature.id)
+        map.setFeatureState(
+          { source: 'geojson', id: hoveredFeature.id },
+          { hover: true }
+        )
+      }
+    },
+    [featuredId]
+  )
+
+  useEffect(() => {
+    /* global fetch */
+    fetch(
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts3_simple_4326.geojson'
+    )
+      .then((resp) => resp.json())
+      .then((json) => {
+        // Note: In a real application you would do a validation of JSON data before doing anything with it,
+        // but for demonstration purposes we ingore this part here and just trying to select needed data...
+        const features = json
+        setNutsMap(features)
+      })
+      .catch((err) => console.error('Could not load data', err))
+  }, [])
+
+  const onHover = useCallback((event: any) => {
+    const {
+      features,
+      point: { x, y },
+    } = event
+    const hoveredFeature = features && features[0]
+
+    // prettier-ignore
+    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+  }, [])
+
+  const onOut = useCallback((event: any) => {
+    setHoverInfo(null)
+  }, [])
+
+  const removeNutsInformation = useCallback(
+    (event?: any) => {
+      if (!mapRef.current || featuredId === null) return
+      const map = mapRef.current.getMap()
+      map.setFeatureState(
+        { source: 'geojson', id: featuredId },
+        { hover: false }
+      )
+      setNutsid(null)
+      setFeaturedId(null)
+    },
+    [featuredId]
+  )
+
+  const closeImpactsWrapper = useCallback(
+    (event?: any) => {
+      removeNutsInformation()
+      setYear('')
+      if (mapRef.current && featuredId !== null) {
+        const map = mapRef.current.getMap()
+        map.setFeatureState(
+          { source: 'geojson', id: featuredId },
+          { hover: false }
+        )
+      }
+    },
+    [featuredId, removeNutsInformation]
+  )
+
+  const newComponentContent = (
     <div className="impactsWrapper">
       <div className="closeImpactWrapper" onClick={closeImpactsWrapper}>
         close x
@@ -731,7 +836,8 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
                     {item?.NUTS3_ID &&
                       nutsMap?.features
                         ?.filter(
-                          (nut: any) => nut.properties.NUTS_ID === item?.NUTS3_ID
+                          (nut: any) =>
+                            nut.properties.NUTS_ID === item?.NUTS3_ID
                         )
                         .map((nut: any, index: number) => (
                           <p key={index}>
@@ -812,106 +918,6 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
     </div>
   )
 
-  const onClick = useCallback(
-    async (event: any) => {
-      if (!mapRef.current) return
-      const map = mapRef.current.getMap()
-
-      const { features } = event
-      const hoveredFeature = features && features[0]
-      const clickedNutsid = hoveredFeature
-        ? hoveredFeature?.properties?.NUTS_ID
-        : null
-      const clickedNutsName = hoveredFeature
-        ? hoveredFeature?.properties?.NUTS_NAME
-        : null
-      setNutsName(clickedNutsName)
-      setNutsid(clickedNutsid)
-      setYear('')
-
-      if (featuredId === null && hoveredFeature) {
-        map.setFeatureState(
-          { source: 'geojson', id: hoveredFeature.id },
-          { hover: true }
-        )
-      }
-
-      if (featuredId !== null) {
-        map.setFeatureState(
-          { source: 'geojson', id: featuredId },
-          { hover: false }
-        )
-      }
-      if (clickedNutsid !== null) {
-        setFeaturedId(hoveredFeature.id)
-        map.setFeatureState(
-          { source: 'geojson', id: hoveredFeature.id },
-          { hover: true }
-        )
-      }
-    },
-    [featuredId]
-  )
-
-  useEffect(() => {
-    /* global fetch */
-    fetch(
-      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/nuts3_simple_4326.geojson'
-    )
-      .then((resp) => resp.json())
-      .then((json) => {
-        // Note: In a real application you would do a validation of JSON data before doing anything with it,
-        // but for demonstration purposes we ingore this part here and just trying to select needed data...
-        const features = json
-        setNutsMap(features)
-      })
-      .catch((err) => console.error('Could not load data', err)) // eslint-disable-line
-  }, [])
-
-  const onHover = useCallback((event: any) => {
-    const {
-      features,
-      point: { x, y },
-    } = event
-    const hoveredFeature = features && features[0]
-
-    // prettier-ignore
-    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
-  }, [])
-
-  const onOut = useCallback((event: any) => {
-    setHoverInfo(null)
-  }, [])
-
-  const removeNutsInformation = useCallback(
-    (event?: any) => {
-      if (!mapRef.current || featuredId === null) return
-      const map = mapRef.current.getMap()
-      map.setFeatureState(
-        { source: 'geojson', id: featuredId },
-        { hover: false }
-      )
-      setNutsid(null)
-      setFeaturedId(null)
-    },
-    [featuredId]
-  )
-
-  const closeImpactsWrapper = useCallback(
-    (event?: any) => {
-      removeNutsInformation()
-      setYear('')
-      if (mapRef.current && featuredId !== null) {
-        const map = mapRef.current.getMap()
-        map.setFeatureState(
-          { source: 'geojson', id: featuredId },
-          { hover: false }
-        )
-      }
-    },
-    [featuredId, removeNutsInformation]
-  )
-
   const handleYearChange = useCallback((value: string) => {
     setYear(value)
     setNutsid(null)
@@ -952,7 +958,7 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
                   data={nutsMap}
                   generateId={true}
                 >
-                  <Layer {...nutsLayer as any} beforeId="waterway-shadow" />
+                  <Layer {...(nutsLayer as any)} beforeId="waterway-shadow" />
                 </Source>
               </>
             )}
@@ -1016,8 +1022,8 @@ export default function ImpactsNuts3Client({ impactData, allPosts }: ImpactsNuts
           </div>
         )}
 
-        {year && <NewComponent />}
-        {nutsid && <NewComponent />}
+        {year && newComponentContent}
+        {nutsid && newComponentContent}
         {!nutsid && !year && (
           <ReportedImpactsIntro headline={introHeadline} text={introText} />
         )}

@@ -3,8 +3,7 @@
    License: none (public domain)
 */
 
-
-
+@layer base {
 
 html,
 body,
@@ -139,6 +138,8 @@ table {
 
 /* end reset css */
 
+} /* end @layer base */
+
 :root {
   --bg-9-dark: rgba(0, 0, 0, 0.9);
   --bg-light: rgba(255, 255, 255, 0.6);
@@ -183,8 +184,18 @@ body {
   height: 100%;
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
 }
 
 * {
@@ -673,7 +684,9 @@ body {
     justify-content: center;
     align-items: center;
     color: var(--text-light);
-    transition: background-color 300ms ease-in-out, color 300ms;
+    transition:
+      background-color 300ms ease-in-out,
+      color 300ms;
     box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
     backdrop-filter: blur(10px);
     font-weight: 500;
@@ -711,7 +724,9 @@ body {
     justify-content: center;
     align-items: center;
     color: var(--text-light);
-    transition: background-color 300ms ease-in-out, color 300ms;
+    transition:
+      background-color 300ms ease-in-out,
+      color 300ms;
     box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
     backdrop-filter: blur(10px);
     font-weight: 500;
@@ -1353,4 +1368,3 @@ b {
 .mapboxgl-map {
   will-change: transform;
 }
-

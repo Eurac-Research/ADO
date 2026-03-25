@@ -3,14 +3,17 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Drought Monitor - Alpine Drought Observatory | Eurac Research',
-  description: 'Interactive drought monitoring across the Alpine region with multiple drought indices',
+  description:
+    'Interactive drought monitoring across the Alpine region with multiple drought indices',
 }
 
 interface DroughtMonitorPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default async function DroughtMonitorPage({ searchParams }: DroughtMonitorPageProps) {
+export default async function DroughtMonitorPage({
+  searchParams,
+}: DroughtMonitorPageProps) {
   // Await the search params
   const params = await searchParams
 

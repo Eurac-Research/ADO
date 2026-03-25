@@ -10,13 +10,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/regions`, changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE}/impacts`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE}/impacts-nuts3`, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE}/impact-probabilities`, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE}/vulnerabilities`, changeFrequency: 'monthly', priority: 0.6 },
+    {
+      url: `${BASE}/impact-probabilities`,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${BASE}/vulnerabilities`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
     { url: `${BASE}/drought-monitor`, changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE}/hydro/spei-1`, changeFrequency: 'daily', priority: 0.7 },
-    { url: `${BASE}/md/about-the-data`, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${BASE}/md/about-the-project`, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${BASE}/md/terms-and-conditions`, changeFrequency: 'yearly', priority: 0.3 },
+    {
+      url: `${BASE}/md/about-the-data`,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: `${BASE}/md/about-the-project`,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: `${BASE}/md/terms-and-conditions`,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
   ]
 
   // Dynamic region pages

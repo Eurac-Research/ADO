@@ -3,34 +3,36 @@
  * Provides consistent caching behavior across all data fetches
  */
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const ADO_DATA_URL =
+  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
+  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 // Default cache configuration for static data that shouldn't change until next build
 export const defaultCacheOptions: RequestInit = {
   next: { revalidate: false },
-  cache: 'force-cache'
+  cache: 'force-cache',
 }
 
 // Cache configuration for data that should be revalidated monthly (30 days)
 // Useful for semi-static data that changes infrequently but should eventually update
 export const monthlyRevalidationOptions: RequestInit = {
   next: { revalidate: 30 * 24 * 60 * 60 }, // 30 days in seconds
-  cache: 'force-cache'
+  cache: 'force-cache',
 }
 
 /**
  * Example usage of different cache options:
- * 
+ *
  * 1. Default (static until next build):
  *    fetchDroughtIndexData('spi3')
- * 
+ *
  * 2. Monthly revalidation:
  *    fetchDroughtIndexData('spi3', monthlyRevalidationOptions)
- * 
+ *
  * 3. Custom revalidation:
- *    fetchDroughtIndexData('spi3', { 
+ *    fetchDroughtIndexData('spi3', {
  *      next: { revalidate: 60 * 60 }, // 1 hour in seconds
- *      cache: 'force-cache' 
+ *      cache: 'force-cache'
  *    })
  */
 
@@ -47,7 +49,9 @@ export async function fetchDroughtIndexData(
   )
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch drought index data for ${datatype}: ${response.status}`)
+    throw new Error(
+      `Failed to fetch drought index data for ${datatype}: ${response.status}`
+    )
   }
 
   return response.json()
@@ -66,7 +70,9 @@ export async function fetchDroughtIndexMetadata(
   )
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch drought index metadata for ${datatype}: ${response.status}`)
+    throw new Error(
+      `Failed to fetch drought index metadata for ${datatype}: ${response.status}`
+    )
   }
 
   return response.json()
@@ -85,7 +91,9 @@ export async function fetchHydroData(
   )
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch hydro data for ${datatype}: ${response.status}`)
+    throw new Error(
+      `Failed to fetch hydro data for ${datatype}: ${response.status}`
+    )
   }
 
   return response.json()
@@ -104,7 +112,9 @@ export async function fetchHydroMetadata(
   )
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch hydro metadata for ${datatype}: ${response.status}`)
+    throw new Error(
+      `Failed to fetch hydro metadata for ${datatype}: ${response.status}`
+    )
   }
 
   return response.json()
@@ -153,8 +163,14 @@ export async function fetchImpactProbabilities(
   options: RequestInit = monthlyRevalidationOptions
 ) {
   const [dsmResponse, dhResponse] = await Promise.all([
-    fetch('https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/dsm-probs.json', options),
-    fetch('https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/dh-probs.json', options)
+    fetch(
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/dsm-probs.json',
+      options
+    ),
+    fetch(
+      'https://raw.githubusercontent.com/Eurac-Research/ado-data/main/json/impacts/dh-probs.json',
+      options
+    ),
   ])
 
   if (!dsmResponse.ok || !dhResponse.ok) {
@@ -163,7 +179,7 @@ export async function fetchImpactProbabilities(
 
   const [dsmData, dhData] = await Promise.all([
     dsmResponse.json(),
-    dhResponse.json()
+    dhResponse.json(),
   ])
 
   // Combine the data as in the original implementation
@@ -183,7 +199,9 @@ export async function fetchVulnerabilityDataset(
   )
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch vulnerability dataset ${dataset}: ${response.status}`)
+    throw new Error(
+      `Failed to fetch vulnerability dataset ${dataset}: ${response.status}`
+    )
   }
 
   return response.json()
@@ -220,12 +238,14 @@ export async function fetchAllVulnerabilityData(
     'livestock_density',
     'share_permanent_grassland',
     'share_utilised_agric_area',
-    'intensity_farming'
+    'intensity_farming',
   ]
 
   const [vulnerabilityResponses, nutsMapResponse] = await Promise.all([
-    Promise.all(datasets.map(dataset => fetchVulnerabilityDataset(dataset, options))),
-    fetchNutsGeoJSON('nuts2', options)
+    Promise.all(
+      datasets.map((dataset) => fetchVulnerabilityDataset(dataset, options))
+    ),
+    fetchNutsGeoJSON('nuts2', options),
   ])
 
   const vulnerabilityData = {
@@ -234,12 +254,12 @@ export async function fetchAllVulnerabilityData(
     livestock_density: vulnerabilityResponses[2],
     share_permanent_grassland: vulnerabilityResponses[3],
     share_utilised_agric_area: vulnerabilityResponses[4],
-    intensity_farming: vulnerabilityResponses[5]
+    intensity_farming: vulnerabilityResponses[5],
   }
 
   return {
     data: vulnerabilityData,
-    nutsMap: nutsMapResponse
+    nutsMap: nutsMapResponse,
   }
 }
 
@@ -253,7 +273,7 @@ export async function fetchStationTimeseries(
   // Try both formats for timeseries data
   const urls = [
     `https://${ADO_DATA_URL}/json/hydro/timeseries/ID_STATION_${stationId}.json`,
-    `https://${ADO_DATA_URL}/json/hydro/timeseries/${stationId}.json`
+    `https://${ADO_DATA_URL}/json/hydro/timeseries/${stationId}.json`,
   ]
 
   for (const url of urls) {
@@ -281,7 +301,7 @@ export async function fetchStationHtmlReport(
   // Try both formats for HTML reports
   const urls = [
     `https://${ADO_DATA_URL}/html/report_${stationId}.html`,
-    `https://${ADO_DATA_URL}/html/hydro/${stationId}.html`
+    `https://${ADO_DATA_URL}/html/hydro/${stationId}.html`,
   ]
 
   for (const url of urls) {

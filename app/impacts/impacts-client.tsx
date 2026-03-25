@@ -22,7 +22,7 @@ import type {
   ImpactCategory,
   NutsRegion,
   MapLayer,
-  MatchExpression
+  MatchExpression,
 } from '@/types'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -48,6 +48,69 @@ const darkenColor = (hexColor: string, amount: number): string => {
   return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`
 }
 
+// Impact categories
+const impactCategories: ImpactCategory[] = [
+  {
+    id: 1,
+    categoryname: 'Agriculture and livestock farming',
+    color: '#A48C00',
+  },
+  { id: 2, categoryname: 'Forestry', color: '#1A8612' },
+  {
+    id: 3,
+    categoryname: 'Freshwater aquaculture and fisheries',
+    color: '#BAEEFF',
+  },
+  { id: 4, categoryname: 'Energy and industry', color: '#FCD900' },
+  { id: 5, categoryname: 'Waterborne transportation', color: '#8895CB' },
+  { id: 6, categoryname: 'Tourism and recreation', color: '#CF8FC8' },
+  { id: 7, categoryname: 'Public water supply', color: '#6AD7F8' },
+  { id: 8, categoryname: 'Water quality', color: '#2CA1D2' },
+  {
+    id: 9,
+    categoryname: 'Freshwater ecosystems: habitats, plants and wildlife',
+    color: '#CCE73E',
+  },
+  {
+    id: 10,
+    categoryname: 'Terrestrial ecosystems: habitats, plants and wildlife',
+    color: '#80C31B',
+  },
+  { id: 11, categoryname: 'Soil system', color: '#AC6600' },
+  { id: 12, categoryname: 'Wildfires', color: '#ED3333' },
+  { id: 13, categoryname: 'Air quality', color: '#CDE1E6' },
+  {
+    id: 14,
+    categoryname: 'Human health and public safety',
+    color: '#A085C1',
+  },
+  { id: 15, categoryname: 'Conflicts', color: '#FD71BB' },
+]
+
+// NUTS2 static data
+const nuts2static: NutsRegion[] = [
+  { id: 1, nuts2id: 'CZ02', name: 'Střední Čechy' },
+  { id: 2, nuts2id: 'CH01', name: 'Région lémanique' },
+  { id: 3, nuts2id: 'AL01', name: 'Veri' },
+  { id: 4, nuts2id: 'BE24', name: 'Prov. Vlaams-Brabant' },
+  { id: 5, nuts2id: 'BG33', name: 'Североизточен' },
+  { id: 6, nuts2id: 'DE14', name: 'Tübingen' },
+  { id: 7, nuts2id: 'AT31', name: 'Oberösterreich' },
+  { id: 8, nuts2id: 'CZ03', name: 'Jihozápad' },
+  { id: 9, nuts2id: 'CY00', name: 'Κύπρος' },
+  { id: 10, nuts2id: 'CZ01', name: 'Praha' },
+  { id: 11, nuts2id: 'BG34', name: 'Югоизточен' },
+  { id: 12, nuts2id: 'AT11', name: 'Burgenland' },
+  { id: 13, nuts2id: 'AT13', name: 'Wien' },
+  { id: 14, nuts2id: 'AT21', name: 'Kärnten' },
+  { id: 15, nuts2id: 'BE25', name: 'Prov. West-Vlaanderen' },
+  { id: 16, nuts2id: 'CZ06', name: 'Jihovýchod' },
+  { id: 17, nuts2id: 'ES12', name: 'Principado de Asturias' },
+  { id: 18, nuts2id: 'BE34', name: 'Prov. Luxembourg (BE)' },
+  { id: 19, nuts2id: 'ES24', name: 'Aragón' },
+  { id: 20, nuts2id: 'ES30', name: 'Comunidad de Madrid' },
+]
+
 interface ImpactsClientProps {
   impactData: ImpactData[]
   allPosts: PostData[]
@@ -57,7 +120,7 @@ interface ImpactsClientProps {
 export default function ImpactsClient({
   impactData,
   allPosts,
-  error
+  error,
 }: ImpactsClientProps) {
   const mapRef = useRef<MapRef>(null)
   const [nutsMap, setNutsMap] = useState<NutsGeoJSON | null>(null)
@@ -69,52 +132,57 @@ export default function ImpactsClient({
   const [featuredId, setFeaturedId] = useState<number | null>(null)
 
   // Memoized calculations
-  const impactDataByYear = useMemo(() =>
-    impactData.filter((item) => item.Year_start.toString() === year),
+  const impactDataByYear = useMemo(
+    () => impactData.filter((item) => item.Year_start.toString() === year),
     [impactData, year]
   )
 
-  const uniqueYears = useMemo(() =>
-    [...new Set(impactData.map((item) => item.Year_start))].sort(),
+  const uniqueYears = useMemo(
+    () => [...new Set(impactData.map((item) => item.Year_start))].sort(),
     [impactData]
   )
 
-  const yearAndAmount = useMemo((): YearAmount[] =>
-    uniqueYears.map((yearOfImpact) => ({
-      impactYear: yearOfImpact,
-      impactAmount: impactData.filter(
-        (item) => item.Year_start === yearOfImpact
-      ).length,
-    })),
+  const yearAndAmount = useMemo(
+    (): YearAmount[] =>
+      uniqueYears.map((yearOfImpact) => ({
+        impactYear: yearOfImpact,
+        impactAmount: impactData.filter(
+          (item) => item.Year_start === yearOfImpact
+        ).length,
+      })),
     [uniqueYears, impactData]
   )
 
-  const impactsByYearForMap = useMemo(() =>
-    year ? impactDataByYear : impactData,
+  const impactsByYearForMap = useMemo(
+    () => (year ? impactDataByYear : impactData),
     [year, impactDataByYear, impactData]
   )
 
-  const uniqueImpactsByNutsID = useMemo(() =>
-    impactsByYearForMap.reduce(
-      (acc, item) => {
-        acc[item.NUTS2_ID] = (acc[item.NUTS2_ID] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>
-    ),
+  const uniqueImpactsByNutsID = useMemo(
+    () =>
+      impactsByYearForMap.reduce(
+        (acc, item) => {
+          acc[item.NUTS2_ID] = (acc[item.NUTS2_ID] || 0) + 1
+          return acc
+        },
+        {} as Record<string, number>
+      ),
     [impactsByYearForMap]
   )
 
-  const impactEntries = useMemo(() =>
-    Object.entries(uniqueImpactsByNutsID),
+  const impactEntries = useMemo(
+    () => Object.entries(uniqueImpactsByNutsID),
     [uniqueImpactsByNutsID]
   )
 
   // Function to get impact amount by NUTS ID
-  const impactAmountByNutsId = useCallback((nutsId: string): number | null => {
-    const result = impactEntries.find((item) => item[0] === nutsId)
-    return result ? result[1] : null
-  }, [impactEntries])
+  const impactAmountByNutsId = useCallback(
+    (nutsId: string): number | null => {
+      const result = impactEntries.find((item) => item[0] === nutsId)
+      return result ? result[1] : null
+    },
+    [impactEntries]
+  )
 
   // Mapbox layer configuration
   const matchExpression = useMemo((): MatchExpression => {
@@ -132,108 +200,74 @@ export default function ImpactsClient({
     return expression
   }, [impactEntries])
 
-  const nutsLayer: MapLayer = useMemo(() => ({
-    type: 'fill',
-    id: 'geojson',
-    paint: {
-      'fill-color': matchExpression,
-      'fill-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        1,
-        0.6,
-      ],
-      'fill-outline-color': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        '#000',
-        '#999',
-      ],
-    },
-  }), [matchExpression])
-
-  // Impact categories
-  const impactCategories: ImpactCategory[] = [
-    { id: 1, categoryname: 'Agriculture and livestock farming', color: '#A48C00' },
-    { id: 2, categoryname: 'Forestry', color: '#1A8612' },
-    { id: 3, categoryname: 'Freshwater aquaculture and fisheries', color: '#BAEEFF' },
-    { id: 4, categoryname: 'Energy and industry', color: '#FCD900' },
-    { id: 5, categoryname: 'Waterborne transportation', color: '#8895CB' },
-    { id: 6, categoryname: 'Tourism and recreation', color: '#CF8FC8' },
-    { id: 7, categoryname: 'Public water supply', color: '#6AD7F8' },
-    { id: 8, categoryname: 'Water quality', color: '#2CA1D2' },
-    { id: 9, categoryname: 'Freshwater ecosystems: habitats, plants and wildlife', color: '#CCE73E' },
-    { id: 10, categoryname: 'Terrestrial ecosystems: habitats, plants and wildlife', color: '#80C31B' },
-    { id: 11, categoryname: 'Soil system', color: '#AC6600' },
-    { id: 12, categoryname: 'Wildfires', color: '#ED3333' },
-    { id: 13, categoryname: 'Air quality', color: '#CDE1E6' },
-    { id: 14, categoryname: 'Human health and public safety', color: '#A085C1' },
-    { id: 15, categoryname: 'Conflicts', color: '#FD71BB' },
-  ]
-
-  // NUTS2 static data
-  const nuts2static: NutsRegion[] = [
-    { id: 1, nuts2id: 'CZ02', name: 'Střední Čechy' },
-    { id: 2, nuts2id: 'CH01', name: 'Région lémanique' },
-    { id: 3, nuts2id: 'AL01', name: 'Veri' },
-    { id: 4, nuts2id: 'BE24', name: 'Prov. Vlaams-Brabant' },
-    { id: 5, nuts2id: 'BG33', name: 'Североизточен' },
-    { id: 6, nuts2id: 'DE14', name: 'Tübingen' },
-    { id: 7, nuts2id: 'AT31', name: 'Oberösterreich' },
-    { id: 8, nuts2id: 'CZ03', name: 'Jihozápad' },
-    { id: 9, nuts2id: 'CY00', name: 'Κύπρος' },
-    { id: 10, nuts2id: 'CZ01', name: 'Praha' },
-    { id: 11, nuts2id: 'BG34', name: 'Югоизточен' },
-    { id: 12, nuts2id: 'AT11', name: 'Burgenland' },
-    { id: 13, nuts2id: 'AT13', name: 'Wien' },
-    { id: 14, nuts2id: 'AT21', name: 'Kärnten' },
-    { id: 15, nuts2id: 'BE25', name: 'Prov. West-Vlaanderen' },
-    { id: 16, nuts2id: 'CZ06', name: 'Jihovýchod' },
-    { id: 17, nuts2id: 'ES12', name: 'Principado de Asturias' },
-    { id: 18, nuts2id: 'BE34', name: 'Prov. Luxembourg (BE)' },
-    { id: 19, nuts2id: 'ES24', name: 'Aragón' },
-    { id: 20, nuts2id: 'ES30', name: 'Comunidad de Madrid' },
-    // Add more as needed - keeping it shorter for the migration example
-  ]
+  const nutsLayer: MapLayer = useMemo(
+    () => ({
+      type: 'fill',
+      id: 'geojson',
+      paint: {
+        'fill-color': matchExpression,
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          1,
+          0.6,
+        ],
+        'fill-outline-color': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          '#000',
+          '#999',
+        ],
+      },
+    }),
+    [matchExpression]
+  )
 
   // Map event handlers
-  const onClick = useCallback((event: any) => {
-    const map = mapRef.current?.getMap()
-    if (!map) return
+  const onClick = useCallback(
+    (event: any) => {
+      const map = mapRef.current?.getMap()
+      if (!map) return
 
-    const { features } = event
-    const hoveredFeature = features?.[0]
-    const clickedNutsid = hoveredFeature?.properties?.NUTS_ID
-    const clickedNutsName = hoveredFeature?.properties?.NUTS_NAME
+      const { features } = event
+      const hoveredFeature = features?.[0]
+      const clickedNutsid = hoveredFeature?.properties?.NUTS_ID
+      const clickedNutsName = hoveredFeature?.properties?.NUTS_NAME
 
-    setNutsName(clickedNutsName || null)
-    setNutsid(clickedNutsid || null)
-    setYear('')
+      setNutsName(clickedNutsName || null)
+      setNutsid(clickedNutsid || null)
+      setYear('')
 
-    if (featuredId !== null) {
-      map.setFeatureState(
-        { source: 'geojson', id: featuredId },
-        { hover: false }
-      )
-    }
+      if (featuredId !== null) {
+        map.setFeatureState(
+          { source: 'geojson', id: featuredId },
+          { hover: false }
+        )
+      }
 
-    if (clickedNutsid && hoveredFeature) {
-      setFeaturedId(hoveredFeature.id)
-      map.setFeatureState(
-        { source: 'geojson', id: hoveredFeature.id },
-        { hover: true }
-      )
-    }
-  }, [featuredId])
+      if (clickedNutsid && hoveredFeature) {
+        setFeaturedId(hoveredFeature.id)
+        map.setFeatureState(
+          { source: 'geojson', id: hoveredFeature.id },
+          { hover: true }
+        )
+      }
+    },
+    [featuredId]
+  )
 
   const onHover = useCallback((event: any) => {
     const { features, point } = event
     const hoveredFeature = features?.[0]
-    setHoverInfo(hoveredFeature ? {
-      feature: hoveredFeature,
-      x: point.x,
-      y: point.y
-    } : null)
+    setHoverInfo(
+      hoveredFeature
+        ? {
+          feature: hoveredFeature,
+          x: point.x,
+          y: point.y,
+        }
+        : null
+    )
   }, [])
 
   const onOut = useCallback(() => {
@@ -296,8 +330,8 @@ export default function ImpactsClient({
     setNutsid(null)
   }, [])
 
-  // Component for displaying impact details
-  const ImpactsDetailsComponent = () => (
+  // Memoized impact details JSX
+  const impactsDetails = useMemo(() => (
     <div className="impactsWrapper">
       <div className="closeImpactWrapper" onClick={closeImpactsWrapper}>
         close x
@@ -305,7 +339,13 @@ export default function ImpactsClient({
 
       {year && (
         <div className="impactsTitle">
-          <h1 style={{ fontSize: '30px', marginBottom: '10px', marginTop: '10px' }}>
+          <h1
+            style={{
+              fontSize: '30px',
+              marginBottom: '10px',
+              marginTop: '10px',
+            }}
+          >
             {year}
           </h1>
           {yearAndAmount
@@ -313,7 +353,11 @@ export default function ImpactsClient({
             .map((item, index) => (
               <h2
                 key={`${item.impactYear}-${index}`}
-                style={{ fontSize: '18px', marginBottom: '20px', marginTop: '10px' }}
+                style={{
+                  fontSize: '18px',
+                  marginBottom: '20px',
+                  marginTop: '10px',
+                }}
               >
                 {item.impactAmount} impact{item.impactAmount > 1 ? 's' : ''}
               </h2>
@@ -323,10 +367,22 @@ export default function ImpactsClient({
 
       {nutsid && (
         <div className="impactsTitle">
-          <h1 style={{ fontSize: '30px', marginBottom: '10px', marginTop: '10px' }}>
+          <h1
+            style={{
+              fontSize: '30px',
+              marginBottom: '10px',
+              marginTop: '10px',
+            }}
+          >
             {nutsName}
           </h1>
-          <h2 style={{ fontSize: '18px', marginBottom: '20px', marginTop: '10px' }}>
+          <h2
+            style={{
+              fontSize: '18px',
+              marginBottom: '20px',
+              marginTop: '10px',
+            }}
+          >
             {(() => {
               const amount = impactAmountByNutsId(nutsid)
               return amount
@@ -340,74 +396,79 @@ export default function ImpactsClient({
       )}
 
       <div className="impactsContent">
-        {year && impactDataByYear.map((item) => (
-          <div key={item.ID} className="impactsItem">
-            <p>
-              <b>Description</b>
-              <br />
-              {item.Impact_description}
-            </p>
-
-            {impactCategories
-              .filter((cat) => cat.id === item.Impact_category)
-              .map((cat) => (
-                <p key={cat.id}>
-                  <b>Category</b>
-                  <br />
-                  {cat.categoryname}
-                </p>
-              ))}
-
-            {item.NUTS2_ID && nuts2static
-              .filter((nut) => nut.nuts2id === item.NUTS2_ID)
-              .map((nut) => (
-                <p key={nut.id}>
-                  <b>Region</b>{' '}
-                  <span style={{ fontSize: '12px' }}>
-                    (<a
-                      href="https://ec.europa.eu/eurostat/web/nuts/background"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      NUTS-2
-                    </a>)
-                  </span>
-                  <br />
-                  {nut.name}
-                </p>
-              ))}
-          </div>
-        ))}
-
-        {nutsid && impactData
-          .filter((item) => item.NUTS2_ID === nutsid)
-          .reverse()
-          .map((item) => (
+        {year &&
+          impactDataByYear.map((item) => (
             <div key={item.ID} className="impactsItem">
               <p>
-                <b>Description:</b>
+                <b>Description</b>
                 <br />
                 {item.Impact_description}
               </p>
-              <p>
-                <b>Category:</b>
-                <br />
-                {impactCategories
-                  .filter((cat) => cat.id === item.Impact_category)
-                  .map((cat) => (
-                    <span key={cat.id}>{cat.categoryname}</span>
+
+              {impactCategories
+                .filter((cat) => cat.id === item.Impact_category)
+                .map((cat) => (
+                  <p key={cat.id}>
+                    <b>Category</b>
+                    <br />
+                    {cat.categoryname}
+                  </p>
+                ))}
+
+              {item.NUTS2_ID &&
+                nuts2static
+                  .filter((nut) => nut.nuts2id === item.NUTS2_ID)
+                  .map((nut) => (
+                    <p key={nut.id}>
+                      <b>Region</b>{' '}
+                      <span style={{ fontSize: '12px' }}>
+                        (
+                        <a
+                          href="https://ec.europa.eu/eurostat/web/nuts/background"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          NUTS-2
+                        </a>
+                        )
+                      </span>
+                      <br />
+                      {nut.name}
+                    </p>
                   ))}
-              </p>
-              <p>
-                <b>Year:</b>
-                <br />
-                {item.Year_start}
-              </p>
             </div>
           ))}
+
+        {nutsid &&
+          impactData
+            .filter((item) => item.NUTS2_ID === nutsid)
+            .reverse()
+            .map((item) => (
+              <div key={item.ID} className="impactsItem">
+                <p>
+                  <b>Description:</b>
+                  <br />
+                  {item.Impact_description}
+                </p>
+                <p>
+                  <b>Category:</b>
+                  <br />
+                  {impactCategories
+                    .filter((cat) => cat.id === item.Impact_category)
+                    .map((cat) => (
+                      <span key={cat.id}>{cat.categoryname}</span>
+                    ))}
+                </p>
+                <p>
+                  <b>Year:</b>
+                  <br />
+                  {item.Year_start}
+                </p>
+              </div>
+            ))}
       </div>
     </div>
-  )
+  ), [year, nutsid, nutsName, yearAndAmount, impactDataByYear, impactData, impactAmountByNutsId, closeImpactsWrapper])
 
   // Introduction content
   const introHeadline = 'Reported Impacts'
@@ -493,7 +554,7 @@ export default function ImpactsClient({
                 data={nutsMap as any}
                 generateId={true}
               >
-                <Layer {...nutsLayer as any} beforeId="waterway-shadow" />
+                <Layer {...(nutsLayer as any)} beforeId="waterway-shadow" />
               </Source>
             )}
 
@@ -519,7 +580,8 @@ export default function ImpactsClient({
                 <div>NUTS_ID: {hoverInfo.feature.properties.NUTS_ID}</div>
                 {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID) && (
                   <>
-                    amount: {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}
+                    amount:{' '}
+                    {impactAmountByNutsId(hoverInfo.feature.properties.NUTS_ID)}
                   </>
                 )}
               </div>
@@ -528,7 +590,10 @@ export default function ImpactsClient({
         </div>
 
         {!nutsid && (
-          <div className="controlContainer impacts" onClick={removeNutsInformation}>
+          <div
+            className="controlContainer impacts"
+            onClick={removeNutsInformation}
+          >
             <ControlPanelImpacts
               year={year}
               yearRange={uniqueYears}
@@ -554,7 +619,7 @@ export default function ImpactsClient({
           </div>
         )}
 
-        {(year || nutsid) && <ImpactsDetailsComponent />}
+        {(year || nutsid) && impactsDetails}
 
         {!nutsid && !year && (
           <ReportedImpactsIntro headline={introHeadline} text={introText} />

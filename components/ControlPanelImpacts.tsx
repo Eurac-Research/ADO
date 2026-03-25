@@ -8,7 +8,7 @@ import type { ControlPanelImpactsProps } from '@/types'
 function ControlPanelImpacts({
   year,
   yearRange,
-  onChange
+  onChange,
 }: ControlPanelImpactsProps) {
   const selectedYear = year || yearRange[yearRange.length - 1]?.toString()
   const router = useRouter()
@@ -18,17 +18,10 @@ function ControlPanelImpacts({
       <h1>{selectedYear}</h1>
 
       <div className="impactsNutsSwitch">
-        <Link
-          href="/impacts"
-          className="active"
-        >
+        <Link href="/impacts" className="active">
           Nuts 2
         </Link>
-        <Link
-          href="/impacts-nuts3"
-        >
-          Nuts 3
-        </Link>
+        <Link href="/impacts-nuts3">Nuts 3</Link>
       </div>
 
       <div className="timerangeSlider">

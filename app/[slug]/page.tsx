@@ -12,9 +12,20 @@ interface IndexPageProps {
 
 // Available indices for validation
 const indices = [
-  'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12',
-  'spi-1', 'spi-2', 'spi-3', 'spi-6', 'spi-12',
-  'sspi-10', 'sma', 'vci', 'vhi',
+  'spei-1',
+  'spei-2',
+  'spei-3',
+  'spei-6',
+  'spei-12',
+  'spi-1',
+  'spi-2',
+  'spi-3',
+  'spi-6',
+  'spi-12',
+  'sspi-10',
+  'sma',
+  'vci',
+  'vhi',
 ]
 
 export async function generateStaticParams() {

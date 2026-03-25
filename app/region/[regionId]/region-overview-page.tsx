@@ -8,13 +8,26 @@ import RegionDetail from '@/components/RegionDetail'
 import type { PostData } from '@/types'
 import axios from 'axios'
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const ADO_DATA_URL =
+  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
+  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 // Available drought indices that can be shown in the chart
 const availableIndices = [
-  'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12',
-  'spi-1', 'spi-2', 'spi-3', 'spi-6', 'spi-12',
-  'sspi-10', 'sma', 'vci', 'vhi'
+  'spei-1',
+  'spei-2',
+  'spei-3',
+  'spei-6',
+  'spei-12',
+  'spi-1',
+  'spi-2',
+  'spi-3',
+  'spi-6',
+  'spi-12',
+  'sspi-10',
+  'sma',
+  'vci',
+  'vhi',
 ]
 
 interface RegionOverviewPageProps {
@@ -22,7 +35,10 @@ interface RegionOverviewPageProps {
   allPosts: PostData[]
 }
 
-export default function RegionOverviewPage({ regionId, allPosts }: RegionOverviewPageProps) {
+export default function RegionOverviewPage({
+  regionId,
+  allPosts,
+}: RegionOverviewPageProps) {
   const router = useRouter()
   const [regionName, setRegionName] = useState<string>('')
   const [staticMetaData, setStaticMetaData] = useState<any>(null)
@@ -45,12 +61,16 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
         // Fetch region name from GeoJSON
         const geojsonUrl = `https://${ADO_DATA_URL}/json/nuts/SPEI-1-latest.geojson`
         const geojsonResponse = await axios.get(geojsonUrl)
-        const region = geojsonResponse.data.features.find((feature: any) =>
-          feature.properties.NUTS_ID === regionId
+        const region = geojsonResponse.data.features.find(
+          (feature: any) => feature.properties.NUTS_ID === regionId
         )
 
         if (region) {
-          setRegionName(region.properties.NUTS_NAME || region.properties.NAME_LATN || regionId)
+          setRegionName(
+            region.properties.NUTS_NAME ||
+              region.properties.NAME_LATN ||
+              regionId
+          )
         } else {
           setRegionName(regionId)
         }
@@ -60,7 +80,6 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
         const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
         const metadataResponse = await axios.get(metadataUrl)
         setStaticMetaData(metadataResponse.data)
-
       } catch (fetchError) {
         console.error('Error fetching region data:', fetchError)
         setError('Failed to load region data')
@@ -83,7 +102,9 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-center h-96">
-              <div className="text-lg text-gray-600 dark:text-gray-400">Loading region overview...</div>
+              <div className="text-lg text-gray-600 dark:text-gray-400">
+                Loading region overview...
+              </div>
             </div>
           </div>
         </div>
@@ -97,7 +118,9 @@ export default function RegionOverviewPage({ regionId, allPosts }: RegionOvervie
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-4 py-8">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">Error Loading Data</h2>
+              <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+                Error Loading Data
+              </h2>
               <p className="text-red-600 dark:text-red-300">{error}</p>
               <button
                 onClick={handleBackToMap}

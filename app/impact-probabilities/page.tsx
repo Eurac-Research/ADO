@@ -1,5 +1,9 @@
 import { getAllPosts } from '@/lib/api'
-import { fetchImpactProbabilities as fetchImpactProbabilitiesUtil, fetchNutsGeoJSON, monthlyRevalidationOptions } from '@/lib/data-fetcher'
+import {
+  fetchImpactProbabilities as fetchImpactProbabilitiesUtil,
+  fetchNutsGeoJSON,
+  monthlyRevalidationOptions,
+} from '@/lib/data-fetcher'
 import { Suspense } from 'react'
 import ImpactProbabilitiesClient from './impact-probabilities-client'
 import type { PostData } from '@/types'
@@ -23,41 +27,33 @@ export const metadata: Metadata = {
 export default async function ImpactProbabilitiesPage() {
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
 
-  try {
-    const [impactData, nutsMap] = await Promise.all([
-      fetchImpactProbabilitiesUtil(),
-      fetchNutsGeoJSON('nuts3', monthlyRevalidationOptions)
-    ])
+  let impactData: any[] = []
+  let nutsMap: any = null
 
-    return (
-      <Suspense fallback={
-        <div className="loading-container">
-          <p>Loading impact probabilities data...</p>
-        </div>
-      }>
-        <ImpactProbabilitiesClient
-          impactData={impactData}
-          nutsMap={nutsMap}
-          allPosts={allPosts}
-        />
-      </Suspense>
-    )
+  try {
+    const result = await Promise.all([
+      fetchImpactProbabilitiesUtil(),
+      fetchNutsGeoJSON('nuts3', monthlyRevalidationOptions),
+    ])
+    impactData = result[0]
+    nutsMap = result[1]
   } catch (error) {
     console.error('Error fetching impact probabilities:', error)
+  }
 
-    return (
-      <Suspense fallback={
+  return (
+    <Suspense
+      fallback={
         <div className="loading-container">
           <p>Loading impact probabilities data...</p>
         </div>
-      }>
-        <ImpactProbabilitiesClient
-          impactData={[]}
-          nutsMap={null}
-          allPosts={allPosts}
-        // serverError="Failed to load impact probability data. Please try again later."
-        />
-      </Suspense>
-    )
-  }
+      }
+    >
+      <ImpactProbabilitiesClient
+        impactData={impactData}
+        nutsMap={nutsMap}
+        allPosts={allPosts}
+      />
+    </Suspense>
+  )
 }

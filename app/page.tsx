@@ -10,12 +10,25 @@ export const revalidate = false // Cache until next build
 
 // Available indices
 const indices = [
-  'spei-1', 'spei-2', 'spei-3', 'spei-6', 'spei-12',
-  'spi-1', 'spi-2', 'spi-3', 'spi-6', 'spi-12',
-  'sspi-10', 'sma', 'vci', 'vhi',
+  'spei-1',
+  'spei-2',
+  'spei-3',
+  'spei-6',
+  'spei-12',
+  'spi-1',
+  'spi-2',
+  'spi-3',
+  'spi-6',
+  'spi-12',
+  'sspi-10',
+  'sma',
+  'vci',
+  'vhi',
 ]
 
-const ADO_DATA_URL = process.env.NEXT_PUBLIC_ADO_DATA_URL || 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const ADO_DATA_URL =
+  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
+  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 interface InitialData {
   features: any[]
@@ -25,30 +38,43 @@ interface InitialData {
 }
 
 // Pre-fetch initial data including base geometry server-side
-async function fetchInitialIndexData(index: string): Promise<InitialData | null> {
+async function fetchInitialIndexData(
+  index: string
+): Promise<InitialData | null> {
   const datatype = index.toUpperCase()
 
   try {
-    const [featuresResponse, metadataResponse, baseGeometryResponse] = await Promise.all([
-      fetch(`https://${ADO_DATA_URL}/json/nuts/${datatype}-latest-features.json`, {
-        next: { revalidate: false } // Cache until next build
-      }),
-      fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
-        next: { revalidate: false } // Cache until next build
-      }),
-      fetch(`https://${ADO_DATA_URL}/json/impacts/nuts3_simple_4326.geojson`, {
-        next: { revalidate: false } // Cache until next build - this is the big win!
-      })
-    ])
+    const [featuresResponse, metadataResponse, baseGeometryResponse] =
+      await Promise.all([
+        fetch(
+          `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest-features.json`,
+          {
+            next: { revalidate: false }, // Cache until next build
+          }
+        ),
+        fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
+          next: { revalidate: false }, // Cache until next build
+        }),
+        fetch(
+          `https://${ADO_DATA_URL}/json/impacts/nuts3_simple_4326.geojson`,
+          {
+            next: { revalidate: false }, // Cache until next build - this is the big win!
+          }
+        ),
+      ])
 
-    if (!featuresResponse.ok || !metadataResponse.ok || !baseGeometryResponse.ok) {
+    if (
+      !featuresResponse.ok ||
+      !metadataResponse.ok ||
+      !baseGeometryResponse.ok
+    ) {
       return null
     }
 
     const [features, staticMetaData, baseGeometry] = await Promise.all([
       featuresResponse.json(),
       metadataResponse.json(),
-      baseGeometryResponse.json()
+      baseGeometryResponse.json(),
     ])
 
     // Handle the new structure where features are nested under a 'features' property
@@ -59,7 +85,7 @@ async function fetchInitialIndexData(index: string): Promise<InitialData | null>
       features: actualFeatures,
       staticMetaData,
       baseGeometry,
-      extractedMetadata
+      extractedMetadata,
     }
   } catch (error) {
     return null
@@ -72,7 +98,8 @@ export async function generateMetadata(): Promise<Metadata> {
     const metadata = await fetchDroughtIndexMetadata('SPEI-1')
     return {
       title: `${metadata.long_name} - Alpine Drought Observatory | Eurac Research`,
-      description: 'The Alpine Drought Observatory (ADO) provides a tool for an easy overview of the current drought situation and past drought situations in the last 40 years.',
+      description:
+        'The Alpine Drought Observatory (ADO) provides a tool for an easy overview of the current drought situation and past drought situations in the last 40 years.',
     }
   } catch (error) {
     // Fallback metadata if fetch fails
@@ -80,7 +107,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: 'Alpine Drought Observatory | Eurac Research',
-    description: 'Interactive drought monitoring across the Alpine region with multiple drought indices',
+    description:
+      'Interactive drought monitoring across the Alpine region with multiple drought indices',
   }
 }
 

@@ -15,10 +15,10 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
       <div
         className={
           !pathname.includes('impact') &&
-            !pathname.includes('hydro') &&
-            !pathname.includes('/md') &&
-            !pathname.includes('/vulnerabilities') &&
-            !pathname.includes('/regions')
+          !pathname.includes('hydro') &&
+          !pathname.includes('/md') &&
+          !pathname.includes('/vulnerabilities') &&
+          !pathname.includes('/regions')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -41,8 +41,8 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
       <div
         className={
           pathname === '/impact-probabilities' ||
-            pathname === '/impact-probabilities' ||
-            pathname.includes('/vulnerabilities')
+          pathname === '/impact-probabilities' ||
+          pathname.includes('/vulnerabilities')
             ? 'sideBarItem active'
             : 'sideBarItem'
         }
@@ -53,7 +53,7 @@ function SideBar({ posts, sideBarPositionRelative }: SideBarProps) {
         <div
           className={
             pathname === '/impact-probabilities' ||
-              pathname === '/impact-probabilities'
+            pathname === '/impact-probabilities'
               ? 'sideBarItemSub active'
               : 'sideBarItemSub'
           }

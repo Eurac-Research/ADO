@@ -11,7 +11,6 @@ function ControlPanel(props: ControlPanelProps) {
 
   // Debug logging for day changes
   useEffect(() => {
-
     // Update the internal day tracking
     const newDayValue = parseInt(format(new Date(day), 'X')) / 60 / 60 / 24
     currentDayRef.current = newDayValue
@@ -46,14 +45,18 @@ function ControlPanel(props: ControlPanelProps) {
     currentFirstDayRef.current = value // Initialize ref too
     return value
   })
-  const [currentOriginalFirstDayTimestamp, setCurrentOriginalFirstDayTimestamp] = useState<number>(() => {
+  const [
+    currentOriginalFirstDayTimestamp,
+    setCurrentOriginalFirstDayTimestamp,
+  ] = useState<number>(() => {
     return parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
   })
-  const [currentLastDayTimestamp, setCurrentLastDayTimestamp] = useState<number>(() => {
-    const value = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
-    currentLastDayRef.current = value // Initialize ref too
-    return value
-  })
+  const [currentLastDayTimestamp, setCurrentLastDayTimestamp] =
+    useState<number>(() => {
+      const value = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
+      currentLastDayRef.current = value // Initialize ref too
+      return value
+    })
 
   const onClose = useCallback(() => {
     setOverlay(false)
@@ -77,25 +80,25 @@ function ControlPanel(props: ControlPanelProps) {
     const lastDay = currentLastDayRef.current
 
     // Initialize current day from props
-    currentDayRef.current = parseInt(format(new Date(props.day), 'X')) / 60 / 60 / 24
+    // eslint-disable-next-line react-hooks/immutability
+    currentDayRef.current =
+      parseInt(format(new Date(props.day), 'X')) / 60 / 60 / 24
     const currentDay = currentDayRef.current
-
 
     // If we're already at the last day, start from the beginning
     if (currentDay >= lastDay) {
       currentDayRef.current = firstDay // Update internal tracking
+      // eslint-disable-next-line react-hooks/immutability
       isAutoPlayChangeRef.current = true
       props.onChange(firstDay.toString())
     }
 
     setIsPlaying(true)
     playIntervalRef.current = setInterval(() => {
-
       // Use the internal current day tracking instead of props
       const currentDay = currentDayRef.current
       const firstDay = currentFirstDayRef.current
       const lastDay = currentLastDayRef.current
-
 
       // If we've reached the end, loop back to beginning
       if (currentDay >= lastDay) {
@@ -131,8 +134,10 @@ function ControlPanel(props: ControlPanelProps) {
 
   // Effect to handle timespan changes and prop changes (when index changes)
   useEffect(() => {
-    const newOriginalFirstDayTimestamp = parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
-    const newLastDayTimestamp = parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
+    const newOriginalFirstDayTimestamp =
+      parseInt(format(new Date(firstDay), 'X')) / 60 / 60 / 24
+    const newLastDayTimestamp =
+      parseInt(format(new Date(lastDay), 'X')) / 60 / 60 / 24
 
     // Update state with new values
     setCurrentOriginalFirstDayTimestamp(newOriginalFirstDayTimestamp)
@@ -193,6 +198,7 @@ function ControlPanel(props: ControlPanelProps) {
     if (isPlaying && !isAutoPlayChangeRef.current) {
       stopAutoPlay()
     }
+    // eslint-disable-next-line react-hooks/immutability
     isAutoPlayChangeRef.current = false // Reset flag
     props.onChange(value.toString())
   }
@@ -202,6 +208,7 @@ function ControlPanel(props: ControlPanelProps) {
     if (isPlaying && !isAutoPlayChangeRef.current) {
       stopAutoPlay()
     }
+    // eslint-disable-next-line react-hooks/immutability
     isAutoPlayChangeRef.current = false // Reset flag
     props.onChange(value)
   }
@@ -221,22 +228,27 @@ function ControlPanel(props: ControlPanelProps) {
           <span className="getMoreInfoIcon">i</span>
         </h2>
 
-
-        <div className='flex flex-wrap gap-6'>
-
-
+        <div className="flex flex-wrap gap-6">
           {CategoryIcon && (
             <>
-              <CategoryIcon aria-hidden="true" className="h-8 w-8 md:h-14 md:w-14 mt-4 dark:stroke-white" />
+              <CategoryIcon
+                aria-hidden="true"
+                className="h-8 w-8 md:h-14 md:w-14 mt-4 dark:stroke-white"
+              />
               {indexCategory?.shortName && (
-                <span className="sr-only">{indexCategory.shortName} index icon</span>
+                <span className="sr-only">
+                  {indexCategory.shortName} index icon
+                </span>
               )}
             </>
-
           )}
           <div>
             {!props.hideDaySwitchTabs && (
-              <div className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4" role="group" aria-label="Time range selection">
+              <div
+                className="timeSpanButtons flex gap-1 md:gap-3 text-[10px] md:text-xs mb-4"
+                role="group"
+                aria-label="Time range selection"
+              >
                 <button
                   onClick={() => handleTimeSpanChange(30)}
                   className={`px-3 py-1 rounded ${timeSpan === 30 ? 'bg-blue-500 text-white font-bold' : 'bg-gray-200'}`}
@@ -259,26 +271,29 @@ function ControlPanel(props: ControlPanelProps) {
                   aria-pressed={timeSpan === null}
                   aria-label={`Show all ${Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days`}
                 >
-                  Last {Math.round(currentLastDayTimestamp - currentOriginalFirstDayTimestamp)} days
+                  Last{' '}
+                  {Math.round(
+                    currentLastDayTimestamp - currentOriginalFirstDayTimestamp
+                  )}{' '}
+                  days
                 </button>
               </div>
-
             )}
 
-            <h1 id="selected-date" aria-live="polite">{day}</h1>
+            <h1 id="selected-date" aria-live="polite">
+              {day}
+            </h1>
           </div>
         </div>
 
-
-        <div className='flex flex-col md:flex-row items-start justify-start gap-4 mb-4'>
+        <div className="flex flex-col md:flex-row items-start justify-start gap-4 mb-4">
           {/* Auto-play controls */}
           <div className="auto-play-controls flex items-center gap-2 mb-4">
-
             <button
               onClick={toggleAutoPlay}
               className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors focus:outline-none ${isPlaying
-                ? 'bg-blue-500 border-blue-500 text-white hover:bg-blue-500'
-                : 'bg-transparent border-blue-500 hover:bg-blue-50'
+                  ? 'bg-blue-500 border-blue-500 text-white hover:bg-blue-500'
+                  : 'bg-transparent border-blue-500 hover:bg-blue-50'
                 }`}
               aria-label={isPlaying ? 'Pause auto-play' : 'Start auto-play'}
               title={isPlaying ? 'Pause auto-play' : 'Start auto-play'}
@@ -292,15 +307,19 @@ function ControlPanel(props: ControlPanelProps) {
               ) : (
                 // Play icon (triangle)
                 // <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[15px] border-l-transparent border-r-transparent border-b-blue-500"></div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className='fill-blue-500 w-8 h-8'>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="fill-blue-500 w-8 h-8"
+                >
                   <path d="M8 5v14l11-7z" />
                 </svg>
-
               )}
             </button>
 
             <div className="flex  items-center gap-2 text-sm">
-
               <select
                 value={playSpeed}
                 onChange={(e) => setPlaySpeed(Number(e.target.value))}
@@ -324,13 +343,18 @@ function ControlPanel(props: ControlPanelProps) {
           </div>
 
           {/* timerangeSlider */}
-          <div key={'day'} className="timerangeSlider" role="group" aria-label="Day selection controls">
+          <div
+            key={'day'}
+            className="timerangeSlider"
+            role="group"
+            aria-label="Day selection controls"
+          >
             {dayFromTimestamp > currentFirstDay ? (
               <button
                 title="Previous day"
                 type="button"
                 onClick={() => handleButtonClick(dayFromTimestamp - 1)}
-                className='p-2'
+                className="p-2"
                 aria-label="Go to previous day"
                 aria-controls="selected-date"
               >
@@ -339,10 +363,12 @@ function ControlPanel(props: ControlPanelProps) {
             ) : (
               <button
                 disabled={true}
-                className='p-2'
+                className="p-2"
                 aria-label="Previous day (not available)"
                 aria-disabled="true"
-              >&lt;</button>
+              >
+                &lt;
+              </button>
             )}
 
             <input
@@ -372,7 +398,7 @@ function ControlPanel(props: ControlPanelProps) {
                 title="Next day"
                 type="button"
                 onClick={() => handleButtonClick(dayFromTimestamp + 1)}
-                className='p-2'
+                className="p-2"
                 aria-label="Go to next day"
                 aria-controls="selected-date"
               >
@@ -381,15 +407,16 @@ function ControlPanel(props: ControlPanelProps) {
             ) : (
               <button
                 disabled={true}
-                className='p-2'
+                className="p-2"
                 aria-label="Next day (not available)"
                 aria-disabled="true"
-              >&gt;</button>
+              >
+                &gt;
+              </button>
             )}
           </div>
-
         </div>
-      </div >
+      </div>
 
       {overlay && (
         <>
@@ -404,22 +431,31 @@ function ControlPanel(props: ControlPanelProps) {
             <p style={{ marginBottom: '1rem' }}>{metadata?.abstract}</p>
             {metadata?.factsheet && (
               <p style={{ marginBottom: '1rem' }}>
-                <a href={metadata?.factsheet} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                <a
+                  href={metadata?.factsheet}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
                   Download {metadata?.short_name} Factsheet
                 </a>
               </p>
             )}
             {metadata?.doi && (
               <p>
-                <a href={metadata?.doi} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                <a
+                  href={metadata?.doi}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
                   {metadata?.doi}
                 </a>
               </p>
             )}
           </div>
         </>
-      )
-      }
+      )}
     </>
   )
 }

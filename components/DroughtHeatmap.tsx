@@ -9,24 +9,118 @@ const MIN_DAYS_THRESHOLD = 20
 type IndexFamily = 'drought' | 'vegetation'
 type ColorScale = 'drought' | 'snowpack' | 'vegetation'
 
-const HEATMAP_INDICES: { key: string; label: string; fullName: string; family: IndexFamily; colorScale: ColorScale }[] = [
-  { key: 'SPEI-1', label: 'SPEI-1', fullName: 'Standardized Precipitation Evapotranspiration Index - 1 month', family: 'drought', colorScale: 'drought' },
-  { key: 'SPEI-2', label: 'SPEI-2', fullName: 'Standardized Precipitation Evapotranspiration Index - 2 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPEI-3', label: 'SPEI-3', fullName: 'Standardized Precipitation Evapotranspiration Index - 3 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPEI-6', label: 'SPEI-6', fullName: 'Standardized Precipitation Evapotranspiration Index - 6 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPEI-12', label: 'SPEI-12', fullName: 'Standardized Precipitation Evapotranspiration Index - 12 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPI-1', label: 'SPI-1', fullName: 'Standardized Precipitation Index - 1 month', family: 'drought', colorScale: 'drought' },
-  { key: 'SPI-2', label: 'SPI-2', fullName: 'Standardized Precipitation Index - 2 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPI-3', label: 'SPI-3', fullName: 'Standardized Precipitation Index - 3 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPI-6', label: 'SPI-6', fullName: 'Standardized Precipitation Index - 6 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SPI-12', label: 'SPI-12', fullName: 'Standardized Precipitation Index - 12 months', family: 'drought', colorScale: 'drought' },
-  { key: 'SSPI-10', label: 'SSPI-10', fullName: 'Standardized Snowpack Index - 10', family: 'drought', colorScale: 'snowpack' },
-  { key: 'SMA', label: 'SMA', fullName: 'Soil Moisture Anomaly', family: 'drought', colorScale: 'drought' },
-  { key: 'VCI', label: 'VCI', fullName: 'Vegetation Condition Index', family: 'vegetation', colorScale: 'vegetation' },
-  { key: 'VHI', label: 'VHI', fullName: 'Vegetation Health Index', family: 'vegetation', colorScale: 'vegetation' },
+const HEATMAP_INDICES: {
+  key: string
+  label: string
+  fullName: string
+  family: IndexFamily
+  colorScale: ColorScale
+}[] = [
+  {
+    key: 'SPEI-1',
+    label: 'SPEI-1',
+    fullName: 'Standardized Precipitation Evapotranspiration Index - 1 month',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPEI-2',
+    label: 'SPEI-2',
+    fullName: 'Standardized Precipitation Evapotranspiration Index - 2 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPEI-3',
+    label: 'SPEI-3',
+    fullName: 'Standardized Precipitation Evapotranspiration Index - 3 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPEI-6',
+    label: 'SPEI-6',
+    fullName: 'Standardized Precipitation Evapotranspiration Index - 6 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPEI-12',
+    label: 'SPEI-12',
+    fullName: 'Standardized Precipitation Evapotranspiration Index - 12 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPI-1',
+    label: 'SPI-1',
+    fullName: 'Standardized Precipitation Index - 1 month',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPI-2',
+    label: 'SPI-2',
+    fullName: 'Standardized Precipitation Index - 2 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPI-3',
+    label: 'SPI-3',
+    fullName: 'Standardized Precipitation Index - 3 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPI-6',
+    label: 'SPI-6',
+    fullName: 'Standardized Precipitation Index - 6 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SPI-12',
+    label: 'SPI-12',
+    fullName: 'Standardized Precipitation Index - 12 months',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'SSPI-10',
+    label: 'SSPI-10',
+    fullName: 'Standardized Snowpack Index - 10',
+    family: 'drought',
+    colorScale: 'snowpack',
+  },
+  {
+    key: 'SMA',
+    label: 'SMA',
+    fullName: 'Soil Moisture Anomaly',
+    family: 'drought',
+    colorScale: 'drought',
+  },
+  {
+    key: 'VCI',
+    label: 'VCI',
+    fullName: 'Vegetation Condition Index',
+    family: 'vegetation',
+    colorScale: 'vegetation',
+  },
+  {
+    key: 'VHI',
+    label: 'VHI',
+    fullName: 'Vegetation Health Index',
+    family: 'vegetation',
+    colorScale: 'vegetation',
+  },
 ]
 
-function getThreshold(family: IndexFamily): { value: number; label: string; shortLabel: string } {
+function getThreshold(family: IndexFamily): {
+  value: number
+  label: string
+  shortLabel: string
+} {
   if (family === 'vegetation') {
     return { value: 25, label: 'Days < 25', shortLabel: '% < 25' }
   }
@@ -42,8 +136,18 @@ const BASE_METRICS: { key: MetricKey; label: string; shortLabel: string }[] = [
 ]
 
 const MONTH_LABELS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ]
 
 interface Agg {
@@ -63,7 +167,9 @@ function computeMedian(sorted: number[]): number {
 }
 
 function getISOWeek(date: Date): number {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+  const d = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  )
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
@@ -77,7 +183,13 @@ function buildBuckets(
   const buckets = new Map<string, number[]>()
   for (const row of data) {
     const val = row[indexKey]
-    if (val === null || val === undefined || val === '' || typeof val === 'string') continue
+    if (
+      val === null ||
+      val === undefined ||
+      val === '' ||
+      typeof val === 'string'
+    )
+      continue
     const num = Number(val)
     if (!Number.isFinite(num)) continue
     const d = new Date(row.date)
@@ -120,7 +232,11 @@ function aggregate(
   indexKey: string,
   threshold: number
 ): Map<string, Agg> {
-  const buckets = buildBuckets(data, indexKey, (d) => `${d.getUTCFullYear()}-${d.getUTCMonth()}`)
+  const buckets = buildBuckets(
+    data,
+    indexKey,
+    (d) => `${d.getUTCFullYear()}-${d.getUTCMonth()}`
+  )
   return bucketsToAgg(buckets, threshold, MIN_DAYS_THRESHOLD)
 }
 
@@ -144,14 +260,20 @@ function aggregateWeekly(
 }
 
 function getReadableTextColor(color: string): string {
-  let r = 0, g = 0, b = 0
+  let r = 0,
+    g = 0,
+    b = 0
   if (color.startsWith('#')) {
     r = parseInt(color.slice(1, 3), 16)
     g = parseInt(color.slice(3, 5), 16)
     b = parseInt(color.slice(5, 7), 16)
   } else {
     const m = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/)
-    if (m) { r = +m[1]; g = +m[2]; b = +m[3] }
+    if (m) {
+      r = +m[1]
+      g = +m[2]
+      b = +m[3]
+    }
   }
   const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
   return lum > 0.55 ? '#57534e' : color
@@ -276,7 +398,9 @@ function renderSparkline(values: number[], family: IndexFamily): string {
     y: toY(v),
   }))
 
-  const linePoints = coords.map((c) => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ')
+  const linePoints = coords
+    .map((c) => `${c.x.toFixed(1)},${c.y.toFixed(1)}`)
+    .join(' ')
 
   // Area fill: line path closed down to zero line (drought) or bottom (vegetation)
   const baseY = family === 'drought' ? zeroY : h
@@ -293,8 +417,10 @@ function renderSparkline(values: number[], family: IndexFamily): string {
   // Gradient fill for visual depth
   const gradId = `sg${Math.random().toString(36).slice(2, 7)}`
   const lineColor = family === 'drought' ? '#78716c' : '#57534e'
-  const fillTop = family === 'drought' ? 'rgba(168,162,158,0.25)' : 'rgba(134,239,172,0.25)'
-  const fillBot = family === 'drought' ? 'rgba(168,162,158,0.03)' : 'rgba(134,239,172,0.03)'
+  const fillTop =
+    family === 'drought' ? 'rgba(168,162,158,0.25)' : 'rgba(134,239,172,0.25)'
+  const fillBot =
+    family === 'drought' ? 'rgba(168,162,158,0.03)' : 'rgba(134,239,172,0.03)'
 
   return `<svg width="${w}" height="${h}" style="display:block;margin:6px 0" viewBox="0 0 ${w} ${h}">
     <defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${fillTop}"/><stop offset="100%" stop-color="${fillBot}"/></linearGradient></defs>
@@ -365,15 +491,15 @@ function buildVisualMapConfig(
       max: 2,
       inRange: {
         color: [
-          '#ec0b00',  // -2.0  Highly less than normal
-          '#ed453d',  // -1.5  Much less than normal
-          '#ee7f7a',  // -1.0  Less than normal
-          '#efb7b5',  // -0.5  (interpolated)
-          '#efefef',  //  0.0  Near normal
-          '#e2ecee',  // +0.5  (interpolated)
-          '#d5e9ed',  // +1.0  More than normal
-          '#c8e5ec',  // +1.5  Much more than normal
-          '#bbe2ea',  // +2.0  Highly more than normal
+          '#ec0b00', // -2.0  Highly less than normal
+          '#ed453d', // -1.5  Much less than normal
+          '#ee7f7a', // -1.0  Less than normal
+          '#efb7b5', // -0.5  (interpolated)
+          '#efefef', //  0.0  Near normal
+          '#e2ecee', // +0.5  (interpolated)
+          '#d5e9ed', // +1.0  More than normal
+          '#c8e5ec', // +1.5  Much more than normal
+          '#bbe2ea', // +2.0  Highly more than normal
         ],
       },
       text: ['More (+2)', 'Less (-2)'],
@@ -393,20 +519,19 @@ function buildVisualMapConfig(
     max: 2,
     inRange: {
       color: [
-        '#d7191c',  // -2.0  Extremely dry
-        '#fdae61',  // -1.5  Very dry
-        '#ffffbf',  // -1.0  Moderately dry
-        '#ffffdf',  // -0.5  (interpolated)
-        '#ffffff',  //  0.0  Normal
-        '#faccfb',  // +0.5  (interpolated)
-        '#f599f6',  // +1.0  Moderately wet
-        '#b467dd',  // +1.5  Very wet
-        '#450099',  // +2.0  Extremely wet
+        '#d7191c', // -2.0  Extremely dry
+        '#fdae61', // -1.5  Very dry
+        '#ffffbf', // -1.0  Moderately dry
+        '#ffffdf', // -0.5  (interpolated)
+        '#ffffff', //  0.0  Normal
+        '#faccfb', // +0.5  (interpolated)
+        '#f599f6', // +1.0  Moderately wet
+        '#b467dd', // +1.5  Very wet
+        '#450099', // +2.0  Extremely wet
       ],
       colorSaturation: [0.7, 0.5],
       //colorLightness: [1, 0],
       colorAlpha: [0.9, 0.6],
-
     },
     text: ['Wet (+2)', 'Dry (-2)'],
     itemWidth: 14,
@@ -419,7 +544,10 @@ interface DroughtHeatmapProps {
   regionName?: string
 }
 
-export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps) {
+export default function DroughtHeatmap({
+  data,
+  regionName,
+}: DroughtHeatmapProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [selectedMetric, setSelectedMetric] = useState<MetricKey>('median')
   const [zoomedYear, setZoomedYear] = useState<number | null>(null)
@@ -430,7 +558,12 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
       HEATMAP_INDICES.filter((idx) =>
         data.some((row) => {
           const val = row[idx.key]
-          return val !== null && val !== undefined && val !== '' && Number.isFinite(Number(val))
+          return (
+            val !== null &&
+            val !== undefined &&
+            val !== '' &&
+            Number.isFinite(Number(val))
+          )
         })
       ),
     [data]
@@ -444,13 +577,20 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
   const metrics = useMemo(
     () => [
       ...BASE_METRICS,
-      { key: 'ratioBelow' as MetricKey, label: thresholdConfig.label, shortLabel: thresholdConfig.shortLabel },
+      {
+        key: 'ratioBelow' as MetricKey,
+        label: thresholdConfig.label,
+        shortLabel: thresholdConfig.shortLabel,
+      },
     ],
     [thresholdConfig]
   )
 
   const aggregated = useMemo(
-    () => currentIndex ? aggregate(data, currentIndex.key, thresholdConfig.value) : new Map<string, Agg>(),
+    () =>
+      currentIndex
+        ? aggregate(data, currentIndex.key, thresholdConfig.value)
+        : new Map<string, Agg>(),
     [data, currentIndex, thresholdConfig.value]
   )
 
@@ -481,7 +621,11 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
   }, [aggregated, years, selectedMetric])
 
   const visualMapConfig = useMemo(
-    () => buildVisualMapConfig(selectedMetric, currentIndex?.colorScale ?? 'drought'),
+    () =>
+      buildVisualMapConfig(
+        selectedMetric,
+        currentIndex?.colorScale ?? 'drought'
+      ),
     [selectedMetric, currentIndex?.colorScale]
   )
 
@@ -492,11 +636,13 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
       const monthLabel = MONTH_LABELS[monthIdx]
       const agg = aggregated.get(`${year}-${monthIdx}`)
 
-      if (!agg) return `<strong>${monthLabel} ${year}</strong><br/><span style="color:#a8a29e">No data</span>`
+      if (!agg)
+        return `<strong>${monthLabel} ${year}</strong><br/><span style="color:#a8a29e">No data</span>`
 
       const currentVal = agg[selectedMetric]
       const cs = currentIndex?.colorScale ?? 'drought'
-      const color = params.color || getColorForValue(currentVal, cs, selectedMetric)
+      const color =
+        params.color || getColorForValue(currentVal, cs, selectedMetric)
       const category = getCategoryLabel(currentVal, cs, selectedMetric)
       const fmt = (v: number) => v.toFixed(2)
       const sparkline = renderSparkline(agg.dailyValues, family)
@@ -505,10 +651,22 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
       const activeLabel = activeMetric?.label || selectedMetric
 
       const metricRows = [
-        { label: 'Mean', value: fmt(agg.mean), active: selectedMetric === 'mean' },
-        { label: 'Median', value: fmt(agg.median), active: selectedMetric === 'median' },
+        {
+          label: 'Mean',
+          value: fmt(agg.mean),
+          active: selectedMetric === 'mean',
+        },
+        {
+          label: 'Median',
+          value: fmt(agg.median),
+          active: selectedMetric === 'median',
+        },
         { label: 'Min', value: fmt(agg.min), active: selectedMetric === 'min' },
-        { label: thresholdConfig.label, value: `${agg.ratioBelow.toFixed(1)}%`, active: selectedMetric === 'ratioBelow' },
+        {
+          label: thresholdConfig.label,
+          value: `${agg.ratioBelow.toFixed(1)}%`,
+          active: selectedMetric === 'ratioBelow',
+        },
       ]
 
       const rows = metricRows
@@ -530,7 +688,15 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
         <div style="font-size:10px;color:#a8a29e;margin-top:6px;text-align:center">Click to zoom into weeks</div>
       </div>`
     },
-    [aggregated, family, currentIndex?.colorScale, metrics, selectedMetric, thresholdConfig.label, years]
+    [
+      aggregated,
+      family,
+      currentIndex?.colorScale,
+      metrics,
+      selectedMetric,
+      thresholdConfig.label,
+      years,
+    ]
   )
 
   const option = useMemo(
@@ -541,7 +707,8 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
         borderColor: '#e7e5e4',
         textStyle: { color: '#1c1917', fontSize: 12 },
         padding: [8, 10],
-        extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
+        extraCssText:
+          'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
       },
       grid: {
         top: 8,
@@ -600,17 +767,27 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
       <div className="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-            {isInDailyZoom ? `${zoomedYear} – Daily detail` : zoomedYear ? `${zoomedYear} – Weekly detail` : 'Monthly drought matrix'}{regionName ? ` – ${regionName}` : ''}
+            {isInDailyZoom
+              ? `${zoomedYear} – Daily detail`
+              : zoomedYear
+                ? `${zoomedYear} – Weekly detail`
+                : 'Monthly drought matrix'}
+            {regionName ? ` – ${regionName}` : ''}
           </h3>
           <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 truncate">
-            {isInDailyZoom ? 'Raw daily values' : metrics.find((m) => m.key === selectedMetric)?.shortLabel} {currentIndex.fullName}
+            {isInDailyZoom
+              ? 'Raw daily values'
+              : metrics.find((m) => m.key === selectedMetric)?.shortLabel}{' '}
+            {currentIndex.fullName}
           </p>
           {!isInDailyZoom && (
             <p className="mt-1 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 max-w-3xl">
               {zoomedYear
                 ? 'Each cell summarises pre-computed daily index values per calendar week (e.g. mean, median, minimum or share of days below threshold).'
-                : 'Each cell summarises pre-computed daily index values per calendar month (e.g. mean, median, minimum or share of days below threshold).'}
-              {' '}Indices such as SPEI and SPI are standardised values expressing the deviation from long-term normal conditions (ref.&nbsp;period 1981–2020).
+                : 'Each cell summarises pre-computed daily index values per calendar month (e.g. mean, median, minimum or share of days below threshold).'}{' '}
+              Indices such as SPEI and SPI are standardised values expressing
+              the deviation from long-term normal conditions (ref.&nbsp;period
+              1981–2020).
               <span className="italic block">
                 {zoomedYear
                   ? ' Weekly values are derived from daily index values and serve as visual aggregation — they are not independently calibrated weekly indices.'
@@ -628,14 +805,22 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
             className="sm:hidden rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
           >
             {availableIndices.map((idx, i) => (
-              <option key={idx.key} value={i}>{idx.label}</option>
+              <option key={idx.key} value={i}>
+                {idx.label}
+              </option>
             ))}
           </select>
 
           {/* Desktop: grouped buttons */}
           <div className="hidden sm:flex flex-wrap items-center gap-1">
             {(() => {
-              const groups: { prefix: string; indices: { idx: typeof availableIndices[number]; originalIndex: number }[] }[] = []
+              const groups: {
+                prefix: string
+                indices: {
+                  idx: (typeof availableIndices)[number]
+                  originalIndex: number
+                }[]
+              }[] = []
               availableIndices.forEach((idx, i) => {
                 const match = idx.key.match(/^([A-Z]+)(?:-\d+)?$/)
                 const prefix = match ? match[1] : idx.key
@@ -647,16 +832,20 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
                 group.indices.push({ idx, originalIndex: i })
               })
               return groups.map((group) => (
-                <div key={group.prefix} className="flex rounded-md border border-gray-300 bg-gray-100 p-0.5 dark:border-gray-600 dark:bg-gray-900">
+                <div
+                  key={group.prefix}
+                  className="flex rounded-md border border-gray-300 bg-gray-100 p-0.5 dark:border-gray-600 dark:bg-gray-900"
+                >
                   {group.indices.map(({ idx, originalIndex }) => (
                     <button
                       key={idx.key}
                       type="button"
                       onClick={() => setSelectedIndex(originalIndex)}
-                      className={`rounded px-2 py-1 text-xs font-medium transition ${originalIndex === selectedIndex
-                        ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
-                        : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
-                        }`}
+                      className={`rounded px-2 py-1 text-xs font-medium transition ${
+                        originalIndex === selectedIndex
+                          ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
+                          : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
+                      }`}
                     >
                       {idx.label}
                     </button>
@@ -673,10 +862,11 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
                   key={m.key}
                   type="button"
                   onClick={() => setSelectedMetric(m.key)}
-                  className={`rounded px-2 py-1 text-xs font-medium transition ${selectedMetric === m.key
-                    ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
-                    : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
-                    }`}
+                  className={`rounded px-2 py-1 text-xs font-medium transition ${
+                    selectedMetric === m.key
+                      ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
+                      : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
+                  }`}
                 >
                   {m.shortLabel}
                 </button>
@@ -713,7 +903,10 @@ export default function DroughtHeatmap({ data, regionName }: DroughtHeatmapProps
           selectedMetric={selectedMetric}
           thresholdLabel={thresholdConfig.label}
           metrics={metrics}
-          onBack={() => { setZoomedYear(null); setIsInDailyZoom(false) }}
+          onBack={() => {
+            setZoomedYear(null)
+            setIsInDailyZoom(false)
+          }}
           onDailyZoomChange={setIsInDailyZoom}
         />
       )}
@@ -770,7 +963,11 @@ function WeeklyZoom({
     const items: [number, number, number | null][] = []
     for (let w = 1; w <= maxWeek; w++) {
       const agg = weeklyAgg.get(w)
-      items.push([w - 1, 0, agg ? Number(agg[selectedMetric].toFixed(2)) : null])
+      items.push([
+        w - 1,
+        0,
+        agg ? Number(agg[selectedMetric].toFixed(2)) : null,
+      ])
     }
     return items
   }, [weeklyAgg, maxWeek, selectedMetric])
@@ -785,20 +982,34 @@ function WeeklyZoom({
       const weekIdx = params.data[0]
       const weekNum = weekIdx + 1
       const agg = weeklyAgg.get(weekNum)
-      if (!agg) return `<strong>W${weekNum}</strong><br/><span style="color:#a8a29e">No data</span>`
+      if (!agg)
+        return `<strong>W${weekNum}</strong><br/><span style="color:#a8a29e">No data</span>`
 
       const currentVal = agg[selectedMetric]
-      const color = params.color || getColorForValue(currentVal, colorScale, selectedMetric)
+      const color =
+        params.color || getColorForValue(currentVal, colorScale, selectedMetric)
       const category = getCategoryLabel(currentVal, colorScale, selectedMetric)
       const fmt = (v: number) => v.toFixed(2)
       const sparkline = renderSparkline(agg.dailyValues, family)
       const activeMetric = metrics.find((m) => m.key === selectedMetric)
 
       const metricRows = [
-        { label: 'Median', value: fmt(agg.median), active: selectedMetric === 'median' },
-        { label: 'Mean', value: fmt(agg.mean), active: selectedMetric === 'mean' },
+        {
+          label: 'Median',
+          value: fmt(agg.median),
+          active: selectedMetric === 'median',
+        },
+        {
+          label: 'Mean',
+          value: fmt(agg.mean),
+          active: selectedMetric === 'mean',
+        },
         { label: 'Min', value: fmt(agg.min), active: selectedMetric === 'min' },
-        { label: thresholdLabel, value: `${agg.ratioBelow.toFixed(1)}%`, active: selectedMetric === 'ratioBelow' },
+        {
+          label: thresholdLabel,
+          value: `${agg.ratioBelow.toFixed(1)}%`,
+          active: selectedMetric === 'ratioBelow',
+        },
       ]
 
       const rows = metricRows
@@ -820,7 +1031,15 @@ function WeeklyZoom({
         <div style="font-size:10px;color:#a8a29e;margin-top:6px;text-align:center">Click to zoom into days</div>
       </div>`
     },
-    [weeklyAgg, colorScale, family, selectedMetric, metrics, thresholdLabel, year]
+    [
+      weeklyAgg,
+      colorScale,
+      family,
+      selectedMetric,
+      metrics,
+      thresholdLabel,
+      year,
+    ]
   )
 
   const option = useMemo(
@@ -831,7 +1050,8 @@ function WeeklyZoom({
         borderColor: '#e7e5e4',
         textStyle: { color: '#1c1917', fontSize: 12 },
         padding: [8, 10],
-        extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
+        extraCssText:
+          'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
         appendToBody: true,
       },
       grid: { top: 8, right: 4, bottom: 48, left: 4 },
@@ -894,7 +1114,10 @@ function WeeklyZoom({
         {zoomedWeek && (
           <button
             type="button"
-            onClick={() => { setZoomedWeek(null); onDailyZoomChange(false) }}
+            onClick={() => {
+              setZoomedWeek(null)
+              onDailyZoomChange(false)
+            }}
             className="rounded px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-100"
           >
             ← Back to weekly
@@ -961,7 +1184,13 @@ function DailyZoom({
     const days: { date: string; label: string; value: number }[] = []
     for (const row of data) {
       const val = row[indexKey]
-      if (val === null || val === undefined || val === '' || typeof val === 'string') continue
+      if (
+        val === null ||
+        val === undefined ||
+        val === '' ||
+        typeof val === 'string'
+      )
+        continue
       const num = Number(val)
       if (!Number.isFinite(num)) continue
       const d = new Date(row.date)
@@ -980,13 +1209,16 @@ function DailyZoom({
   }, [data, indexKey, year, week])
 
   const heatmapData = useMemo(() => {
-    return dailyData.map((d, i) => [i, 0, Number(d.value.toFixed(2))] as [number, number, number])
+    return dailyData.map(
+      (d, i) => [i, 0, Number(d.value.toFixed(2))] as [number, number, number]
+    )
   }, [dailyData])
 
   const dayLabels = useMemo(() => dailyData.map((d) => d.label), [dailyData])
 
   // Daily values are raw index values, never ratioBelow — always use 'median' scale
-  const dailyMetric: MetricKey = selectedMetric === 'ratioBelow' ? 'median' : selectedMetric
+  const dailyMetric: MetricKey =
+    selectedMetric === 'ratioBelow' ? 'median' : selectedMetric
 
   const visualMapConfig = useMemo(
     () => buildVisualMapConfig(dailyMetric, colorScale),
@@ -999,7 +1231,8 @@ function DailyZoom({
       const day = dailyData[dayIdx]
       if (!day) return ''
 
-      const color = params.color || getColorForValue(day.value, colorScale, dailyMetric)
+      const color =
+        params.color || getColorForValue(day.value, colorScale, dailyMetric)
       const category = getCategoryLabel(day.value, colorScale, dailyMetric)
       const fmt = (v: number) => v.toFixed(2)
 
@@ -1023,7 +1256,8 @@ function DailyZoom({
         borderColor: '#e7e5e4',
         textStyle: { color: '#1c1917', fontSize: 12 },
         padding: [8, 10],
-        extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
+        extraCssText:
+          'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
         appendToBody: true,
       },
       grid: { top: 8, right: 4, bottom: 48, left: 4 },

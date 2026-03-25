@@ -80,10 +80,9 @@ export default function RegionsClient({
       if (countryFilter !== 'all' && cc !== countryFilter) continue
       const matches = q
         ? list.filter(
-          (r) =>
-            r.name.toLowerCase().includes(q) ||
-            r.id.toLowerCase().includes(q)
-        )
+            (r) =>
+              r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
+          )
         : list
       if (matches.length > 0) result.set(cc, matches)
     }
@@ -102,7 +101,8 @@ export default function RegionsClient({
           Alpine Regions Overview
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mb-2">
-          {regions.length} NUTS-3 regions across {COUNTRY_ORDER.length} countries.
+          {regions.length} NUTS-3 regions across {COUNTRY_ORDER.length}{' '}
+          countries.
         </p>
         {lastDate && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
@@ -195,7 +195,10 @@ export default function RegionsClient({
                     </div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 text-right tabular-nums whitespace-nowrap">
                       {r.value !== null ? r.value.toFixed(2) : '–'}
-                      <span className="hidden group-hover:inline"> · {getCategoryForSPEI(r.value)}</span>
+                      <span className="hidden group-hover:inline">
+                        {' '}
+                        · {getCategoryForSPEI(r.value)}
+                      </span>
                     </span>
                   </Link>
                 ))}

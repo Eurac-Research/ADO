@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react'
 import type { ReportedImpactsIntroProps } from '@/types'
 
-export default function ReportedImpactsIntro({ 
-  headline, 
-  text 
+export default function ReportedImpactsIntro({
+  headline,
+  text,
 }: ReportedImpactsIntroProps) {
   const [introOpen, setIntroOpen] = useState(true)
-  
+
   const onClose = useCallback(() => {
     setIntroOpen(false)
   }, [])

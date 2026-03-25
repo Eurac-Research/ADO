@@ -30,7 +30,12 @@
   margin: 0 auto;
   padding: 45px;
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     margin-top: 24px;
     margin-bottom: 16px;
     font-weight: 600;
@@ -78,7 +83,8 @@
     margin: 0 0 16px 0;
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin-top: 0;
     margin-bottom: 16px;
     padding-left: 2em;

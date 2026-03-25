@@ -11,7 +11,10 @@ export function getPostSlugs(): string[] {
   return fs.readdirSync(postsDirectory)
 }
 
-export function getPostBySlug(slug: string, fields: PostField[] = []): Partial<PostData> {
+export function getPostBySlug(
+  slug: string,
+  fields: PostField[] = []
+): Partial<PostData> {
   const realSlug = slug.replace(/\.md$/, '')
 
   const fullPath = join(postsDirectory, `${realSlug}.md`)
@@ -39,7 +42,6 @@ export function getPostBySlug(slug: string, fields: PostField[] = []): Partial<P
 
 export function getAllPosts(fields: PostField[] = []): Partial<PostData>[] {
   const slugs = getPostSlugs()
-  const posts = slugs
-    .map((slug) => getPostBySlug(slug, fields))
+  const posts = slugs.map((slug) => getPostBySlug(slug, fields))
   return posts
 }

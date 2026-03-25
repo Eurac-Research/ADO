@@ -211,5 +211,3 @@ export interface TimeSeriesProps {
   }
   onIndexChange?: (newIndex: string) => void
 }
-
-

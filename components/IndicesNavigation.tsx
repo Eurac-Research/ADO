@@ -289,7 +289,11 @@ export default function IndicesNavigation({
                             title={title}
                             description={description}
                             href={onIndexChange ? undefined : buildHref(index)}
-                            onClick={onIndexChange ? () => navigateToIndex(index) : undefined}
+                            onClick={
+                              onIndexChange
+                                ? () => navigateToIndex(index)
+                                : undefined
+                            }
                             onMouseEnter={() => onIndexHover?.(index)}
                             isActive={isActive}
                           />
@@ -385,12 +389,14 @@ function describeIndex(index: string) {
     },
     vhi: { title: 'VHI', description: 'Vegetation Health Index' },
     vci: { title: 'VCI', description: 'Vegetation Condition Index' },
-    ndvi: { title: 'NDVI', description: 'Normalised Difference Vegetation Index' },
+    ndvi: {
+      title: 'NDVI',
+      description: 'Normalised Difference Vegetation Index',
+    },
     evi: { title: 'EVI', description: 'Enhanced Vegetation Index' },
     fapar: {
       title: 'FAPAR',
-      description:
-        'Fraction of Absorbed Photosynthetically Active Radiation',
+      description: 'Fraction of Absorbed Photosynthetically Active Radiation',
     },
     lai: { title: 'LAI', description: 'Leaf Area Index' },
     vegetation: {
@@ -434,14 +440,16 @@ const ListItem = React.forwardRef<HTMLLIElement, ListItemProps>(
         <div className="text-sm font-semibold text-gray-900 dark:text-white">
           {title}
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          {description}
+        </p>
       </div>
     )
 
     const baseClasses = cn(
       'block select-none space-y-1 rounded-xl border border-transparent p-3 text-left text-gray-900 transition hover:bg-[#f2f6ff] dark:text-gray-100 dark:hover:bg-slate-800/70',
       isActive &&
-      'border-[#acc4ff] bg-[#e5edff] text-[#1d4ed8] shadow-inner dark:border-blue-500/60 dark:bg-blue-900/30 dark:text-blue-100'
+        'border-[#acc4ff] bg-[#e5edff] text-[#1d4ed8] shadow-inner dark:border-blue-500/60 dark:bg-blue-900/30 dark:text-blue-100'
     )
 
     if (onClick) {
@@ -462,7 +470,11 @@ const ListItem = React.forwardRef<HTMLLIElement, ListItemProps>(
     return (
       <li ref={ref}>
         <NavigationMenuLink asChild>
-          <Link href={href || '/'} className={baseClasses} onMouseEnter={onMouseEnter}>
+          <Link
+            href={href || '/'}
+            className={baseClasses}
+            onMouseEnter={onMouseEnter}
+          >
             {content}
           </Link>
         </NavigationMenuLink>
