@@ -542,20 +542,25 @@ function buildVisualMapConfig(
 interface DroughtHeatmapProps {
   data: TimeSeriesData[]
   regionName?: string
+  activeIndex?: string
 }
 
 export default function DroughtHeatmap({
   data,
   regionName,
+  activeIndex,
 }: DroughtHeatmapProps) {
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [selectedMetric, setSelectedMetric] = useState<MetricKey>('median')
   const [zoomedYear, setZoomedYear] = useState<number | null>(null)
   const [isInDailyZoom, setIsInDailyZoom] = useState(false)
 
+  const normalizedActiveIndex = activeIndex?.toUpperCase().trim()
+
   const availableIndices = useMemo(
     () =>
       HEATMAP_INDICES.filter((idx) =>
+        idx.key === normalizedActiveIndex ||
         data.some((row) => {
           const val = row[idx.key]
           return (
@@ -566,10 +571,25 @@ export default function DroughtHeatmap({
           )
         })
       ),
-    [data]
+    [data, normalizedActiveIndex]
   )
 
-  const currentIndex = availableIndices[selectedIndex] || availableIndices[0]
+  const defaultIndex = useMemo(() => {
+    if (normalizedActiveIndex) {
+      const match = availableIndices.findIndex(
+        (idx) => idx.key === normalizedActiveIndex
+      )
+      if (match >= 0) return match
+    }
+    return 0
+  }, [normalizedActiveIndex, availableIndices])
+
+  const resolvedIndex =
+    selectedIndex !== null && selectedIndex < availableIndices.length
+      ? selectedIndex
+      : defaultIndex
+
+  const currentIndex = availableIndices[resolvedIndex] || availableIndices[0]
 
   const family = currentIndex?.family ?? 'drought'
   const thresholdConfig = getThreshold(family)
@@ -800,7 +820,7 @@ export default function DroughtHeatmap({
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {/* Mobile: select dropdown */}
           <select
-            value={selectedIndex}
+            value={resolvedIndex}
             onChange={(e) => setSelectedIndex(Number(e.target.value))}
             className="sm:hidden rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
           >
@@ -842,9 +862,9 @@ export default function DroughtHeatmap({
                       type="button"
                       onClick={() => setSelectedIndex(originalIndex)}
                       className={`rounded px-2 py-1 text-xs font-medium transition ${
-                        originalIndex === selectedIndex
-                          ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
-                          : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
+                        originalIndex === resolvedIndex
+                        ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-200 dark:text-gray-900'
+                        : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
                       }`}
                     >
                       {idx.label}

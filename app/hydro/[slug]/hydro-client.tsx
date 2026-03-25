@@ -13,7 +13,6 @@ import { updatePercentiles } from '@/components/utils'
 import Layout from '@/components/layout'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
 import { format } from 'date-format-parse'
-import axios from 'axios'
 import { useThemeContext } from '@/context/theme'
 import { stationCache } from '@/lib/station-cache'
 import type { PostData } from '@/types'
@@ -28,9 +27,26 @@ const TimeSeries = dynamic(() => import('@/components/timeseries'), {
 })
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-const ADO_DATA_URL =
-  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
-  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+async function fetchText(url: string): Promise<string> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.text()
+}
 
 interface HydroClientProps {
   datatype: string
@@ -349,28 +365,11 @@ export default function HydroClient({
 
     const fetchData = async () => {
       try {
-        // Try both formats for HTML reports, prioritizing the legacy format
-        const urls = [
-          `https://${ADO_DATA_URL}/html/report_${stationId}.html`,
-          `https://${ADO_DATA_URL}/html/hydro/${stationId}.html`,
-        ]
-
-        for (const url of urls) {
-          try {
-            const result = await axios(url)
-            if (result.data) {
-              // Cache the result
-              stationCache.setHtml(stationId, result.data)
-              setHtmlData(result.data)
-              return
-            }
-          } catch (error) {
-            // Failed to fetch from this URL, try next
-          }
-        }
-
-        console.error('Error: Could not fetch HTML data from any URL')
-        setHtmlData(null)
+        const html = await fetchText(
+          `/api/html-report/${encodeURIComponent(stationId)}`
+        )
+        stationCache.setHtml(stationId, html)
+        setHtmlData(html)
       } catch (error) {
         console.error('Error fetching HTML data:', error)
         setHtmlData(null)
@@ -393,30 +392,11 @@ export default function HydroClient({
       setIsError(false)
       setIsLoading(true)
       try {
-        // Try both formats for timeseries data, prioritizing the legacy format with ID_STATION_ prefix
-        const urls = [
-          `https://${ADO_DATA_URL}/json/hydro/timeseries/ID_STATION_${stationId}.json`,
-          `https://${ADO_DATA_URL}/json/hydro/timeseries/${stationId}.json`,
-        ]
-
-        for (const url of urls) {
-          try {
-            const result = await axios(url)
-            if (result.data) {
-              // console.log('Timeseries data loaded from:', url)
-              // Cache the result
-              stationCache.setTimeseries(stationId, result.data)
-              setTimeseriesData(result.data)
-              setIsLoading(false)
-              return
-            }
-          } catch (error) {
-            // Failed to fetch from this URL, try next
-          }
-        }
-
-        console.error('Error: Could not fetch timeseries data from any URL')
-        setIsError(true)
+        const timeseries = await fetchJson<any>(
+          `/api/timeseries/${encodeURIComponent(stationId)}`
+        )
+        stationCache.setTimeseries(stationId, timeseries)
+        setTimeseriesData(timeseries)
       } catch (error) {
         console.error('Error fetching timeseries data:', error)
         setIsError(true)

@@ -1,12 +1,12 @@
 import { getAllPosts } from '@/lib/api'
 import { fetchDroughtIndexMetadata } from '@/lib/data-fetcher'
 import DroughtMonitorClient from './drought-monitor/drought-monitor-client'
+import DeferredWelcomeModal from '@/components/DeferredWelcomeModal'
 import type { PostData } from '@/types'
 import type { Metadata } from 'next'
 
-// Force static generation
-export const dynamic = 'force-static'
-export const revalidate = false // Cache until next build
+// Keep data fetches immutable between deploys.
+export const revalidate = false
 
 // Available indices
 const indices = [
@@ -26,9 +26,17 @@ const indices = [
   'vhi',
 ]
 
+const DEFAULT_INDEX = 'spei-1'
+
 const ADO_DATA_URL =
   process.env.NEXT_PUBLIC_ADO_DATA_URL ||
   'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+
+interface RootPageProps {
+  searchParams?: Promise<{
+    index?: string | string[]
+  }>
+}
 
 interface InitialData {
   features: any[]
@@ -92,38 +100,84 @@ async function fetchInitialIndexData(
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  // Pre-fetch metadata for the default index to generate better metadata
-  try {
-    const metadata = await fetchDroughtIndexMetadata('SPEI-1')
-    return {
-      title: `${metadata.long_name} - Alpine Drought Observatory | Eurac Research`,
-      description:
-        'The Alpine Drought Observatory (ADO) provides a tool for an easy overview of the current drought situation and past drought situations in the last 40 years.',
-    }
-  } catch (error) {
-    // Fallback metadata if fetch fails
-  }
+function resolveIndexParam(indexParam?: string | string[]): string {
+  const raw = Array.isArray(indexParam) ? indexParam[0] : indexParam
+  if (!raw) return DEFAULT_INDEX
 
-  return {
-    title: 'Alpine Drought Observatory | Eurac Research',
-    description:
-      'Interactive drought monitoring across the Alpine region with multiple drought indices',
+  const normalized = raw.toLowerCase()
+  return indices.includes(normalized) ? normalized : DEFAULT_INDEX
+}
+
+async function generateMetadataWithIndex({
+  searchParams,
+}: RootPageProps): Promise<Metadata> {
+  const params = await searchParams
+  const selectedIndex = resolveIndexParam(params?.index)
+  const selectedIndexUpper = selectedIndex.toUpperCase()
+  const canonical =
+    selectedIndex === DEFAULT_INDEX ? '/' : `/?index=${selectedIndex}`
+
+  try {
+    const metadata = await fetchDroughtIndexMetadata(selectedIndexUpper)
+    const title = `${metadata.long_name} - Alpine Drought Observatory | Eurac Research`
+    const description =
+      metadata.abstract ||
+      `Explore current and historical drought conditions for ${selectedIndexUpper} in the Alpine region.`
+
+    return {
+      title,
+      description,
+      alternates: {
+        canonical,
+      },
+      openGraph: {
+        title,
+        description,
+        images: ['/og-image.png'],
+        url: canonical,
+      },
+    }
+  } catch {
+    const title = `${selectedIndexUpper} - Alpine Drought Observatory | Eurac Research`
+    const description = `Explore current and historical drought conditions for ${selectedIndexUpper} in the Alpine region.`
+
+    return {
+      title,
+      description,
+      alternates: {
+        canonical,
+      },
+      openGraph: {
+        title,
+        description,
+        images: ['/og-image.png'],
+        url: canonical,
+      },
+    }
   }
+}
+
+export async function generateMetadata({
+  searchParams,
+}: RootPageProps): Promise<Metadata> {
+  return generateMetadataWithIndex({ searchParams })
 }
 
 export default async function RootPage() {
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
 
   // Pre-fetch only the initial index for instant first load
-  const initialData = await fetchInitialIndexData('spei-1')
+  const initialData = await fetchInitialIndexData(DEFAULT_INDEX)
 
   return (
-    <DroughtMonitorClient
-      allPosts={allPosts}
-      indices={indices}
-      initialIndex="spei-1"
-      initialData={initialData}
-    />
+    <>
+      <DeferredWelcomeModal />
+      <DroughtMonitorClient
+        allPosts={allPosts}
+        indices={indices}
+        initialIndex={DEFAULT_INDEX}
+        initialData={initialData}
+      />
+    </>
   )
 }

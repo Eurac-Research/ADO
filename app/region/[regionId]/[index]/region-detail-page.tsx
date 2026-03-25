@@ -7,11 +7,6 @@ import Link from 'next/link'
 import Layout from '@/components/layout'
 import RegionDetail from '@/components/RegionDetail'
 import type { PostData } from '@/types'
-import axios from 'axios'
-
-const ADO_DATA_URL =
-  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
-  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 // Available drought indices that can be shown in the chart
 const availableIndices = [
@@ -35,6 +30,16 @@ interface RegionDetailPageProps {
   regionId: string
   index: string
   allPosts: PostData[]
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.json()
 }
 
 export default function RegionDetailPage({
@@ -64,15 +69,13 @@ export default function RegionDetailPage({
         const datatype = index.toUpperCase()
 
         // Fetch metadata for the index using the correct URL pattern
-        const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`
-        const metadataResponse = await axios.get(metadataUrl)
-        setStaticMetaData(metadataResponse.data)
+        const metadata = await fetchJson<any>(`/api/nuts/metadata/${datatype}`)
+        setStaticMetaData(metadata)
 
         // Fetch region name from GeoJSON data
         try {
-          const geojsonUrl = `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest.geojson`
-          const geojsonResponse = await axios.get(geojsonUrl)
-          const region = geojsonResponse.data.features.find(
+          const geojson = await fetchJson<any>(`/api/nuts/latest/${datatype}`)
+          const region = geojson.features.find(
             (feature: any) => feature.properties.NUTS_ID === regionId
           )
           if (region) {

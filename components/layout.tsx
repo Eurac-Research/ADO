@@ -1,8 +1,19 @@
-import SideBar from './SideBar'
-import Header from '../components/Header'
+'use client'
+
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import Header from './Header'
 import { useThemeContext } from '../context/theme'
-import CookieConsent from 'react-cookie-consent'
 import type { LayoutProps } from '@/types'
+
+const SideBar = dynamic(() => import('./SideBar'), {
+  loading: () => null,
+})
+
+const CookieConsentBanner = dynamic(() => import('./CookieConsentBanner'), {
+  ssr: false,
+  loading: () => null,
+})
 
 interface LayoutComponentProps extends LayoutProps {
   headerMode?: number
@@ -14,6 +25,13 @@ export default function Layout({
   headerMode = 0,
 }: LayoutComponentProps) {
   const [theme, setTheme] = useThemeContext()
+  const [showCookieConsent, setShowCookieConsent] = useState(false)
+
+  useEffect(() => {
+    // Defer non-critical cookie banner to reduce initial hydration work.
+    const timer = window.setTimeout(() => setShowCookieConsent(true), 1500)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   return (
     <div className={theme}>
@@ -49,27 +67,9 @@ export default function Layout({
           </svg>
         )}
       </div>
-      <CookieConsent
-        location="bottom"
-        buttonText="OK"
-        cookieName="cookieConsentAccepted"
-        style={{ background: '#222', left: 'auto', right: '0', zIndex: 40 }}
-        buttonStyle={{
-          background: '#36a036',
-          color: '#fff',
-          padding: '6px 12px',
-          fontWeight: 'bold',
-          fontSize: '14px',
-        }}
-        expires={150}
-      >
-        In order to give you a better service this site uses cookies.
-        Additionally third party cookies are used. By continuing to browse the
-        site you are agreeing to our use of cookies.{' '}
-        <a href="https://privacy.eurac.edu" className="privacyLink">
-          Privacy Policy
-        </a>
-      </CookieConsent>
+      {showCookieConsent && (
+        <CookieConsentBanner />
+      )}
     </div>
   )
 }

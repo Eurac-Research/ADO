@@ -2,7 +2,6 @@ import { ReactNode } from 'react'
 import { ThemeProvider } from '@/context/theme'
 import PlausibleProvider from 'next-plausible'
 import type { Metadata } from 'next'
-import WelcomeModal from '@/components/WelcomeModal'
 import '@/styles/global.css'
 import '@/styles/globals.scss'
 
@@ -32,7 +31,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <PlausibleProvider domain="ado.eurac.edu">
           <ThemeProvider>
-            <WelcomeModal />
             {children}
           </ThemeProvider>
         </PlausibleProvider>

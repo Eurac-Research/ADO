@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation'
 import Layout from '@/components/layout'
 import TimeSeriesLegend from '@/components/timeSeriesLegend'
 import dynamic from 'next/dynamic'
-import axios from 'axios'
 import type { RegionInfo, PostData } from '@/types'
 
 // Dynamic import for TimeSeries to prevent SSR issues
@@ -21,10 +20,6 @@ const DroughtHeatmap = dynamic(() => import('@/components/DroughtHeatmap'), {
   loading: () => <p>Loading heatmap...</p>,
   ssr: false,
 })
-
-const ADO_DATA_URL =
-  process.env.NEXT_PUBLIC_ADO_DATA_URL ||
-  'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 
 const COUNTRY_NAMES: Record<string, string> = {
   AT: 'Austria',
@@ -79,6 +74,16 @@ async function fetchTimeseriesJson(url: string): Promise<unknown> {
 
   const rawPayload = await response.text()
   return JSON.parse(sanitizeTimeseriesJson(rawPayload))
+}
+
+async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(url, options)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  }
+
+  return response.json()
 }
 
 function isTimeSeriesArray(value: unknown): value is TimeSeriesData[] {
@@ -169,17 +174,17 @@ export default function RegionDetail({
 
         // Fetch metadata if not provided
         if (!initialStaticMetaData) {
-          const metadataUrl = `https://${ADO_DATA_URL}/json/nuts/metadata/${datatypeUpper}.json`
-          const metadataResponse = await axios.get(metadataUrl)
-          setStaticMetaData(metadataResponse.data)
+          const metadataUrl = `/api/nuts/metadata/${datatypeUpper}`
+          const metadata = await fetchJson<any>(metadataUrl)
+          setStaticMetaData(metadata)
         }
 
         // Fetch region name if not provided
         if (!initialNutsName) {
           try {
-            const geojsonUrl = `https://${ADO_DATA_URL}/json/nuts/${datatypeUpper}-latest.geojson`
-            const geojsonResponse = await axios.get(geojsonUrl)
-            const region = geojsonResponse.data.features.find(
+            const geojsonUrl = `/api/nuts/latest/${datatypeUpper}`
+            const geojson = await fetchJson<any>(geojsonUrl)
+            const region = geojson.features.find(
               (feature: any) => feature.properties.NUTS_ID === nutsId
             )
             if (region) {
@@ -280,10 +285,7 @@ export default function RegionDetail({
   // Function to extract available regions from GeoJSON
   const fetchAvailableRegions = useCallback(async () => {
     try {
-      const response = await fetch(
-        `https://${ADO_DATA_URL}/json/nuts/${datatype.toUpperCase()}-latest.geojson`
-      )
-      const geojson = await response.json()
+      const geojson = await fetchJson<any>(`/api/nuts/latest/${datatype}`)
 
       const regions: RegionInfo[] = geojson.features
         .map((feature: any) => ({
@@ -303,7 +305,7 @@ export default function RegionDetail({
   const fetchComparisonRegionData = useCallback(async (regionId: string) => {
     setIsLoadingComparison(true)
     try {
-      const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${regionId}.json`
+      const url = `/api/nuts/timeseries/${encodeURIComponent(regionId)}`
       const data = await fetchTimeseriesJson(url)
       setComparisonRegionData(isTimeSeriesArray(data) ? data : null)
     } catch (error) {
@@ -321,7 +323,7 @@ export default function RegionDetail({
       setIsError(false)
       setIsLoading(true)
       try {
-        const url = `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${nutsId}.json`
+        const url = `/api/nuts/timeseries/${encodeURIComponent(nutsId)}`
         const data = await fetchTimeseriesJson(url)
 
         if (!isTimeSeriesArray(data)) {
@@ -504,8 +506,9 @@ export default function RegionDetail({
               Data Loading Error
             </h3>
             <p className="text-red-700 dark:text-red-400 text-sm">
-              Failed to load data for region {nutsId}. The file {ADO_DATA_URL}
-              /json/timeseries/NUTS3_{nutsId}.json may not be available.
+              Failed to load data for region {nutsId}. The endpoint
+              {' /api/nuts/timeseries/'}
+              {nutsId} may not be available.
             </p>
           </div>
         )}
@@ -758,7 +761,11 @@ export default function RegionDetail({
         {/* Drought Heatmap */}
         {!isLoading && !isError && nutsData && (
           <div className="mb-8">
-            <DroughtHeatmap data={nutsData} regionName={nutsName} />
+            <DroughtHeatmap
+              data={nutsData}
+              regionName={nutsName}
+              activeIndex={datatype}
+            />
           </div>
         )}
 

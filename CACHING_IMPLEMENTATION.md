@@ -2,158 +2,118 @@
 
 ## Overview
 
-The Alpine Drought Observatory (ADO) uses a **fully static, deploy-hook-driven** architecture on Next.js 16. All pages are pre-rendered at build time and all external data is fetched during the build. There is no runtime revalidation — data freshness is tied entirely to rebuilds triggered by the upstream data repository.
+ADO uses a **hybrid static + runtime API** setup on Next.js 16:
 
-## Architecture
+- Most pages are pre-rendered at build time.
+- Data freshness is primarily deployment-driven (`ado-data` update -> workflow -> Vercel rebuild).
+- Some runtime API routes are intentionally dynamic (`/api/*`, region/station detail interactions).
 
-```
+This project currently uses the **previous caching model** (`fetch` cache options / route config). `cacheComponents` is not enabled in `next.config.js`.
+
+## Data Flow
+
+```txt
 ado-data repo (GitHub)
-  │
-  │  push to main
-  ▼
-GitHub Action (main.yml)
-  ├─ Copies markdown content
-  ├─ Extracts & minifies GeoJSON features
-  └─ POST → Vercel deploy hook
-          │
-          ▼
-      Vercel Build
-  ├─ Fetches all data from ado-data (GitHub raw)
-  ├─ Pre-renders all static pages
-  └─ Deploys to edge CDN
+  -> push to main
+  -> GitHub Action (extract/minify/copy markdown)
+  -> POST to Vercel deploy hook
+  -> ADO build on Vercel
+  -> static artifacts + server code deployed
 ```
-
-All data flows through a single pipeline: **data commit → GitHub Action → Vercel rebuild**. No data is fetched at runtime on the server.
 
 ## Cache Configuration
 
-### Unified Cache Options (`lib/data-fetcher.ts`)
+### Shared server fetch defaults (`lib/data-fetcher.ts`)
 
-All server-side fetches use a single cache configuration:
-
-```tsx
+```ts
 export const defaultCacheOptions: RequestInit = {
   next: { revalidate: false },
   cache: 'force-cache',
 }
 ```
 
-- `revalidate: false` — never revalidate; cached until the next build
-- `cache: 'force-cache'` — always use the cache if available
+Interpretation:
 
-Every fetch function in `data-fetcher.ts` defaults to `defaultCacheOptions`. There is no per-function or per-route revalidation — all data is treated as build-time static.
+- `revalidate: false`: cache entries are indefinite unless evicted/redeployed.
+- `cache: 'force-cache'`: server fetches prefer the Next Data Cache.
 
-### Route Configuration
+### API response cache profiles (`lib/http-cache.ts`)
 
-All content pages use `force-static` to guarantee static generation:
+API routes now set explicit `Cache-Control` headers by data volatility:
 
-| Route | Config | Data Source |
-|---|---|---|
-| `/` | `force-static` | SPEI-1 GeoJSON + metadata |
-| `/[slug]` | `generateStaticParams` | Drought index GeoJSON |
-| `/hydro/[slug]` | `generateStaticParams` | Hydro station GeoJSON |
-| `/drought-monitor` | `force-dynamic` | Client-side index switching |
-| `/impacts` | `force-static` | EDIIALPS + NUTS2 GeoJSON |
-| `/impacts-nuts3` | `force-static` | EDIIALPS + NUTS3 GeoJSON |
-| `/impact-probabilities` | `force-static` | Impact probs + NUTS3 GeoJSON |
-| `/regions` | `force-static` | SPEI-3 regional GeoJSON |
-| `/vulnerabilities` | `force-static` | 6 vulnerability datasets + NUTS2 GeoJSON |
-| `/region/[regionId]` | dynamic | Station data per region |
-| `/md/[slug]` | `generateStaticParams` | Local markdown files |
+- `LOW_CHURN`: metadata-like responses (`s-maxage=7d`)
+- `DAILY_CHURN`: daily-updated map layers (`s-maxage=24h`)
+- `INTERACTIVE`: region/station detail payloads (`s-maxage=24h`)
+- `NO_STORE`: all error responses (404/500) to avoid stale-error caching
 
-### Dynamic Routes
+### Important: cache unification is partial
 
-`/drought-monitor` is `force-dynamic` because users switch between drought indices at runtime. The initial SPEI-1 data is passed as a server prop; subsequent indices are fetched client-side and cached in React state (`Map<string, CachedData>`) for instant switching.
+Many server-side fetches go through `lib/data-fetcher.ts`, but not all fetches in the repository do. Some pages and utilities still call `fetch` directly with route-specific options.
 
-`/region/[regionId]` and `/region/[regionId]/[index]` are server-rendered on demand since region/index combinations are too numerous to pre-render.
+## Route Behavior (Current)
 
-## Data Fetching Patterns
+| Route | Current behavior |
+|---|---|
+| `/` | `force-static`, build-time data fetch |
+| `/[slug]` | static params + redirect behavior |
+| `/hydro/[slug]` | static params + build-time fetch for base hydro data |
+| `/impacts`, `/impacts-nuts3`, `/impact-probabilities`, `/regions`, `/vulnerabilities` | static build output |
+| `/md/[slug]` | static params from local markdown |
+| `/drought-monitor` | request-time redirect based on `searchParams` |
+| `/region/[regionId]`, `/region/[regionId]/[index]` | runtime-rendered routes with client-side interactive fetches |
+| `/api/*` routes | runtime handlers used as same-origin data proxies |
 
-### Server-Side (Build Time)
+## Same-Origin API Layer
 
-All heavy data fetching happens in server components at build time:
+Region and hydro clients are routed through same-origin APIs:
 
-```tsx
-// app/impacts/page.tsx
-export const dynamic = 'force-static'
+- `/api/timeseries/[stationId]`
+- `/api/html-report/[stationId]`
+- `/api/nuts/metadata/[datatype]`
+- `/api/nuts/latest/[datatype]`
+- `/api/nuts/timeseries/[regionId]`
 
-export default async function ImpactsPage() {
-  const [impactData, nutsMap] = await Promise.all([
-    fetchImpactDataUtil(),
-    fetchNutsGeoJSON('nuts2'),
-  ])
+Cache profile mapping:
 
-  return <ImpactsClient impactData={impactData} nutsMap={nutsMap} ... />
-}
-```
+- `/api/nuts/metadata/[datatype]` -> `LOW_CHURN`
+- `/api/nuts/latest/[datatype]` -> `DAILY_CHURN`
+- `/api/nuts/timeseries/[regionId]` -> `INTERACTIVE`
+- `/api/timeseries/[stationId]` -> `INTERACTIVE`
+- `/api/html-report/[stationId]` -> `INTERACTIVE`
 
-GeoJSON data (NUTS2, NUTS3) is fetched server-side and passed as props to client components. This avoids client-side waterfall fetches and ensures all data is included in the static HTML payload.
+This removes direct browser calls to `raw.githubusercontent.com` in:
 
-### Client-Side (Runtime)
+- `components/RegionDetail.tsx`
+- `app/hydro/[slug]/hydro-client.tsx`
 
-Client-side fetches are limited to:
+## Runtime Client Fetches
 
-- **Drought monitor index switching** — fetching alternative indices when the user selects them
-- **Timeseries data** — per-station chart data loaded on demand via API routes
-- **HTML reports** — per-station reports loaded on demand via API routes
-
-### API Routes
-
-Two API routes serve as proxies for station-specific data:
-
-- `/api/timeseries/[stationId]` — proxies timeseries JSON from ado-data
-- `/api/html-report/[stationId]` — proxies HTML reports from ado-data
-
-These are dynamic (`ƒ`) routes since station IDs are selected at runtime.
+Client-side runtime fetches are still used for interactivity (region detail panels, hydro station overlays, index switching), but they now use same-origin API routes in core map/detail flows.
 
 ## Cache Layers
 
-| Layer | Scope | TTL | Purpose |
+| Layer | Scope | TTL / lifetime | Notes |
 |---|---|---|---|
-| Vercel Build Cache | All static pages + data | Until next deploy | Serves pre-rendered pages from edge CDN |
-| Next.js Data Cache | `fetch()` responses during build | Until next deploy | Deduplicates identical fetches across pages |
-| Browser HTTP Cache | Client-side fetches | Browser-controlled | Reduces repeat requests for index data |
-| React State Cache | Drought indices in memory | Until page refresh | Instant switching between loaded indices |
+| Static prerender output | Static routes | Until next deploy | Main delivery path for static pages |
+| Next Data Cache | Server `fetch()` with cache options | Indefinite (`revalidate: false`) unless evicted/redeployed | Used heavily via `data-fetcher` |
+| API route runtime responses | `/api/*` handlers | Handler/fetch-option dependent | Used for interactive detail fetches |
+| Browser memory/state | Client components | Until navigation/refresh | e.g. in-memory station cache / React state |
 
-## Cache Invalidation
+## Invalidation Model
 
-Cache invalidation is **deployment-based only**:
+Primary invalidation remains **deployment-based**:
 
-1. New data is pushed to `ado-data` repo
-2. GitHub Action triggers Vercel deploy hook
-3. Vercel runs a full rebuild, fetching fresh data
-4. New static pages replace old ones at the edge
+1. Update `ado-data`
+2. Workflow triggers Vercel rebuild
+3. New deployment ships fresh static output and server code
 
-There is no time-based revalidation. This means data is always consistent within a deployment and there are no stale-while-revalidate edge cases.
+There is currently no broad time-based revalidation policy across the app.
 
 ## Verification
 
-Run `scripts/verify-caching.sh` to check:
+Use `scripts/verify-caching.sh` for targeted checks:
 
-- Routes missing `force-static`
-- Fetch calls missing cache options
-- Dynamic routes missing `generateStaticParams`
-- Client components with direct fetch calls
-
-## Build Output
-
-```
-Route (app)
-┌ ○ /                          Static
-├ ● /[slug]                    SSG (generateStaticParams)
-├ ƒ /api/html-report/[id]     Dynamic
-├ ƒ /api/timeseries/[id]      Dynamic
-├ ƒ /drought-monitor           Dynamic
-├ ● /hydro/[slug]              SSG (generateStaticParams)
-├ ○ /impact-probabilities      Static
-├ ○ /impacts                   Static
-├ ○ /impacts-nuts3             Static
-├ ● /md/[slug]                 SSG (generateStaticParams)
-├ ƒ /region/[regionId]         Dynamic
-├ ƒ /region/[regionId]/[index] Dynamic
-├ ○ /regions                   Static
-├ ○ /vulnerabilities           Static
-└ ○ /sitemap.xml               Static
-```
-
-`○` = fully static, `●` = static with params, `ƒ` = server-rendered on demand
+- `RegionDetail` uses `/api/nuts/*` and does not call raw GitHub directly.
+- Hydro client uses `/api/timeseries/*` and `/api/html-report/*`.
+- `defaultCacheOptions` exists and is consumed by API/server code.
+- Optional build-manifest context if `.next/prerender-manifest.json` is present.
