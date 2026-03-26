@@ -2,11 +2,34 @@ import type { MetadataRoute } from 'next'
 
 const ADO_DATA_URL = 'raw.githubusercontent.com/Eurac-Research/ado-data/main'
 const BASE = 'https://ado.eurac.edu'
+const INDEX_SLUGS = [
+  'spei-1',
+  'spei-2',
+  'spei-3',
+  'spei-6',
+  'spei-12',
+  'spi-1',
+  'spi-2',
+  'spi-3',
+  'spi-6',
+  'spi-12',
+  'sspi-10',
+  'sma',
+  'vci',
+  'vhi',
+]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const indexPages: MetadataRoute.Sitemap = INDEX_SLUGS.map((slug) => ({
+    url: `${BASE}/${slug}`,
+    changeFrequency: 'daily',
+    priority: 0.9,
+  }))
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE, changeFrequency: 'daily', priority: 1.0 },
+    ...indexPages,
     { url: `${BASE}/regions`, changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE}/impacts`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE}/impacts-nuts3`, changeFrequency: 'weekly', priority: 0.7 },
