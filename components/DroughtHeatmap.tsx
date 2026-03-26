@@ -539,6 +539,31 @@ function buildVisualMapConfig(
   }
 }
 
+function buildDownloadToolbox(name: string): Record<string, unknown> {
+  return {
+    right: 4,
+    top: 2,
+    itemSize: 14,
+    iconStyle: {
+      borderColor: '#78716c',
+    },
+    emphasis: {
+      iconStyle: {
+        borderColor: '#1c1917',
+      },
+    },
+    feature: {
+      saveAsImage: {
+        title: 'Download image',
+        name,
+        type: 'png',
+        pixelRatio: 2,
+        backgroundColor: '#ffffff',
+      },
+    },
+  }
+}
+
 interface DroughtHeatmapProps {
   data: TimeSeriesData[]
   regionName?: string
@@ -731,7 +756,7 @@ export default function DroughtHeatmap({
           'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
       },
       grid: {
-        top: 8,
+        top: 26,
         right: 4,
         bottom: 48,
         left: 36,
@@ -753,6 +778,9 @@ export default function DroughtHeatmap({
         axisLine: { show: false },
         axisLabel: { fontSize: 10, color: '#78716c' },
       },
+      toolbox: buildDownloadToolbox(
+        `drought-heatmap-monthly-${currentIndex?.key?.toLowerCase() || 'index'}`
+      ),
       visualMap: visualMapConfig,
       series: [
         {
@@ -775,10 +803,10 @@ export default function DroughtHeatmap({
         },
       ],
     }),
-    [heatmapData, tooltipFormatter, visualMapConfig, years]
+    [currentIndex?.key, heatmapData, tooltipFormatter, visualMapConfig, years]
   )
 
-  const chartHeight = Math.max(220, years.length * 22 + 64)
+  const chartHeight = Math.max(236, years.length * 22 + 82)
 
   if (!currentIndex) return null
 
@@ -1074,7 +1102,7 @@ function WeeklyZoom({
           'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
         appendToBody: true,
       },
-      grid: { top: 8, right: 4, bottom: 48, left: 4 },
+      grid: { top: 26, right: 4, bottom: 48, left: 4 },
       xAxis: {
         type: 'category',
         data: weekLabels,
@@ -1096,6 +1124,7 @@ function WeeklyZoom({
         axisLine: { show: false },
         axisLabel: { show: false },
       },
+      toolbox: buildDownloadToolbox(`drought-heatmap-weekly-${year}`),
       visualMap: visualMapConfig,
       series: [
         {
@@ -1149,7 +1178,7 @@ function WeeklyZoom({
         <div>
           <ReactECharts
             option={option}
-            style={{ width: '100%', minWidth: '400px', height: '100px' }}
+            style={{ width: '100%', minWidth: '400px', height: '118px' }}
             notMerge
             onEvents={{
               click: (params: any) => {
@@ -1280,7 +1309,7 @@ function DailyZoom({
           'box-shadow:0 4px 16px rgba(0,0,0,0.10);border-radius:6px;',
         appendToBody: true,
       },
-      grid: { top: 8, right: 4, bottom: 48, left: 4 },
+      grid: { top: 26, right: 4, bottom: 48, left: 4 },
       xAxis: {
         type: 'category',
         data: dayLabels,
@@ -1298,6 +1327,7 @@ function DailyZoom({
         axisLine: { show: false },
         axisLabel: { show: false },
       },
+      toolbox: buildDownloadToolbox(`drought-heatmap-daily-${year}-w${week}`),
       visualMap: visualMapConfig,
       series: [
         {
@@ -1318,7 +1348,7 @@ function DailyZoom({
         },
       ],
     }),
-    [heatmapData, tooltipFormatter, visualMapConfig, dayLabels, week]
+    [heatmapData, tooltipFormatter, visualMapConfig, dayLabels, week, year]
   )
 
   if (dailyData.length === 0) {
@@ -1333,7 +1363,7 @@ function DailyZoom({
     <div>
       <ReactECharts
         option={option}
-        style={{ width: '100%', height: '100px' }}
+        style={{ width: '100%', height: '118px' }}
         notMerge
       />
     </div>
