@@ -5,8 +5,8 @@ import DeferredWelcomeModal from '@/components/DeferredWelcomeModal'
 import type { PostData } from '@/types'
 import type { Metadata } from 'next'
 
-// Keep data fetches immutable between deploys.
-export const revalidate = false
+// Revalidate server-rendered shell data every hour.
+export const revalidate = 3600
 
 // Available indices
 const indices = [
@@ -31,6 +31,7 @@ const DEFAULT_INDEX = 'spei-1'
 const ADO_DATA_URL =
   process.env.NEXT_PUBLIC_ADO_DATA_URL ||
   'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const DATA_REVALIDATE_SECONDS = 3600
 
 interface RootPageProps {
   searchParams?: Promise<{
@@ -57,7 +58,7 @@ async function fetchInitialIndexData(
         fetch(
           `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest-features.json`,
           {
-            next: { revalidate: false }, // Cache until next build
+            next: { revalidate: DATA_REVALIDATE_SECONDS },
           }
         ),
         fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
@@ -66,7 +67,7 @@ async function fetchInitialIndexData(
         fetch(
           `https://${ADO_DATA_URL}/json/impacts/nuts3_simple_4326.geojson`,
           {
-            next: { revalidate: false }, // Cache until next build - this is the big win!
+            next: { revalidate: false }, // Cache until next build
           }
         ),
       ])

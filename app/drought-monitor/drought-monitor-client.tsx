@@ -21,6 +21,7 @@ interface DroughtMonitorClientProps {
 const ADO_DATA_URL =
   process.env.NEXT_PUBLIC_ADO_DATA_URL ||
   'raw.githubusercontent.com/Eurac-Research/ado-data/main'
+const DATA_REVALIDATE_SECONDS = 3600
 
 function DroughtMonitorContent({
   allPosts,
@@ -77,11 +78,11 @@ function DroughtMonitorContent({
         fetch(
           `https://${ADO_DATA_URL}/json/nuts/${datatype}-latest-features.json`,
           {
-            cache: 'force-cache',
+            next: { revalidate: DATA_REVALIDATE_SECONDS },
           }
         ),
         fetch(`https://${ADO_DATA_URL}/json/nuts/metadata/${datatype}.json`, {
-          cache: 'force-cache',
+          next: { revalidate: DATA_REVALIDATE_SECONDS },
         }),
       ])
 
