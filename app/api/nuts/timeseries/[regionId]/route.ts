@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { defaultCacheOptions } from '@/lib/data-fetcher'
+import { defaultCacheOptions, parseNonFiniteJson } from '@/lib/data-fetcher'
 import { CACHE_CONTROL } from '@/lib/http-cache'
 
 const ADO_DATA_URL =
@@ -35,7 +35,7 @@ export async function GET(
     const rawPayload = await response.text()
 
     if (format === 'csv') {
-      const rows = JSON.parse(rawPayload) as Array<Record<string, unknown>>
+      const rows = parseNonFiniteJson(rawPayload) as Array<Record<string, unknown>>
       const headers = Array.from(
         new Set(rows.flatMap((row) => Object.keys(row)))
       )

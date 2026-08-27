@@ -14,6 +14,15 @@ export const defaultCacheOptions: RequestInit = {
   cache: 'force-cache',
 }
 
+export function parseNonFiniteJson(rawPayload: string): unknown {
+  return JSON.parse(
+    rawPayload.replace(
+      /(^|[\[{:,]\s*)(-?Infinity|NaN)(?=\s*[,}\]])/g,
+      '$1null'
+    )
+  )
+}
+
 /**
  * Fetch drought index data (GeoJSON)
  */
@@ -74,7 +83,8 @@ export async function fetchRegionTimeseries(
     )
   }
 
-  return response.json() as Promise<Array<{ date?: string }>>
+  const rawPayload = await response.text()
+  return parseNonFiniteJson(rawPayload) as Array<{ date?: string }>
 }
 
 /**
