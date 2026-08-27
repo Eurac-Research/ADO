@@ -115,6 +115,7 @@ export default function RegionDetail({
   const countryCode = nutsId.slice(0, 2).toUpperCase()
   const countryName = COUNTRY_NAMES[countryCode] || countryCode
   const nutsLevel = Math.max(0, nutsId.length - 2)
+  const [activeDatatype, setActiveDatatype] = useState(datatype)
 
   // State for fetched data
   const [nutsName, setNutsName] = useState<string>(initialNutsName || nutsId)
@@ -149,18 +150,28 @@ export default function RegionDetail({
   // Handle index change from TimeSeries component
   const handleIndexChange = useCallback(
     (newIndex: string) => {
+      const normalizedIndex = newIndex.toLowerCase()
       if (mode === 'page') {
         // Update URL for page mode
-        router.push(`/region/${nutsId}/${newIndex}`, { scroll: false })
+        router.push(`/region/${nutsId}/${normalizedIndex.toUpperCase()}`, {
+          scroll: false,
+        })
+      } else if (normalizedIndex !== activeDatatype.toLowerCase()) {
+        setActiveDatatype(normalizedIndex)
+        setStaticMetaData(null)
+        setMetaError(null)
       }
-      // Modal mode doesn't need URL updates
     },
-    [mode, nutsId, router]
+    [activeDatatype, mode, nutsId, router]
   )
 
   // Fetch metadata and region name if not provided
   useEffect(() => {
-    if (initialStaticMetaData && initialNutsName) {
+    if (
+      initialStaticMetaData &&
+      initialNutsName &&
+      activeDatatype.toLowerCase() === datatype.toLowerCase()
+    ) {
       // Already have all data, no need to fetch
       return
     }
@@ -170,10 +181,13 @@ export default function RegionDetail({
       setMetaError(null)
 
       try {
-        const datatypeUpper = datatype.toUpperCase()
+        const datatypeUpper = activeDatatype.toUpperCase()
 
         // Fetch metadata if not provided
-        if (!initialStaticMetaData) {
+        if (
+          !initialStaticMetaData ||
+          activeDatatype.toLowerCase() !== datatype.toLowerCase()
+        ) {
           const metadataUrl = `/api/nuts/metadata/${datatypeUpper}`
           const metadata = await fetchJson<any>(metadataUrl)
           setStaticMetaData(metadata)
@@ -207,7 +221,13 @@ export default function RegionDetail({
     }
 
     fetchMetadata()
-  }, [nutsId, datatype, initialStaticMetaData, initialNutsName])
+  }, [
+    activeDatatype,
+    datatype,
+    initialNutsName,
+    initialStaticMetaData,
+    nutsId,
+  ])
 
   const handleBackToMap = useCallback(() => {
     if (onClose) {
@@ -243,12 +263,12 @@ export default function RegionDetail({
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `${nutsId}_${datatype}_timeseries.csv`)
+    link.setAttribute('download', `${nutsId}_${activeDatatype}_timeseries.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }, [nutsData, nutsId, datatype, indices])
+  }, [nutsData, nutsId, activeDatatype, indices])
 
   // Function to download data as JSON
   const downloadJSON = useCallback(() => {
@@ -259,7 +279,7 @@ export default function RegionDetail({
         region: {
           nutsId,
           nutsName,
-          datatype,
+          datatype: activeDatatype,
         },
         metadata: staticMetaData,
         data: nutsData,
@@ -275,17 +295,17 @@ export default function RegionDetail({
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `${nutsId}_${datatype}_timeseries.json`)
+    link.setAttribute('download', `${nutsId}_${activeDatatype}_timeseries.json`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }, [nutsData, nutsId, nutsName, datatype, staticMetaData])
+  }, [nutsData, nutsId, nutsName, activeDatatype, staticMetaData])
 
   // Function to extract available regions from GeoJSON
   const fetchAvailableRegions = useCallback(async () => {
     try {
-      const geojson = await fetchJson<any>(`/api/nuts/latest/${datatype}`)
+      const geojson = await fetchJson<any>(`/api/nuts/latest/${activeDatatype}`)
 
       const regions: RegionInfo[] = geojson.features
         .map((feature: any) => ({
@@ -299,7 +319,7 @@ export default function RegionDetail({
     } catch (error) {
       console.error('Error fetching available regions:', error)
     }
-  }, [datatype, nutsId])
+  }, [activeDatatype, nutsId])
 
   // Function to fetch comparison region data
   const fetchComparisonRegionData = useCallback(async (regionId: string) => {
@@ -467,7 +487,7 @@ export default function RegionDetail({
               {nutsName}
             </h1>
             <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-300 mb-1 break-words">
-              {datatype} - {staticMetaData?.long_name}
+              {activeDatatype} - {staticMetaData?.long_name}
             </p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Region ID: {nutsId}
@@ -477,7 +497,7 @@ export default function RegionDetail({
           <div className="flex items-center gap-2">
             {mode === 'modal' && (
               <Link
-                href={`/region/${nutsId}/${datatype}`}
+                href={`/region/${nutsId}/${activeDatatype.toUpperCase()}`}
                 className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
                 title="Open in full page"
               >
@@ -531,7 +551,22 @@ export default function RegionDetail({
                 Historical Data & Analysis
               </h2>
 
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <span className="sr-only">Select drought index</span>
+                  <select
+                    value={activeDatatype.toLowerCase()}
+                    onChange={(event) => handleIndexChange(event.target.value)}
+                    aria-label="Select drought index"
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 font-medium text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                  >
+                    {indices.map((index) => (
+                      <option key={index} value={index.toLowerCase()}>
+                        {index.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
                   onClick={() => {
                     if (!compareYears) {
@@ -716,7 +751,7 @@ export default function RegionDetail({
               key={`timeseries-${compareYears ? 'year' : ''}-${compareRegions ? 'region' : ''}-${selectedComparisonRegion || ''}-${selectedYears.join(',')}`}
               data={nutsData}
               indices={indices}
-              index={datatype}
+              index={activeDatatype}
               metadata={staticMetaData}
               firstDate={format(
                 new Date(
@@ -764,7 +799,7 @@ export default function RegionDetail({
             <DroughtHeatmap
               data={nutsData}
               regionName={nutsName}
-              activeIndex={datatype}
+              activeIndex={activeDatatype}
             />
           </div>
         )}
@@ -799,7 +834,7 @@ export default function RegionDetail({
                 <dt className="text-blue-700 dark:text-blue-300">
                   Current Index:
                 </dt>
-                <dd className="text-blue-900 dark:text-blue-100">{datatype}</dd>
+                <dd className="text-blue-900 dark:text-blue-100">{activeDatatype}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-blue-700 dark:text-blue-300">
@@ -934,7 +969,7 @@ export default function RegionDetail({
                   </Link>
                   <span>/</span>
                   <span className="font-medium shrink-0">
-                    {datatype.toUpperCase()}
+                    {activeDatatype.toUpperCase()}
                   </span>
                 </div>
               </div>
