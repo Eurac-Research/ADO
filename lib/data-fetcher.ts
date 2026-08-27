@@ -57,6 +57,27 @@ export async function fetchDroughtIndexMetadata(
 }
 
 /**
+ * Fetch the regional time series used by the region detail pages.
+ */
+export async function fetchRegionTimeseries(
+  regionId: string,
+  options: RequestInit = defaultCacheOptions
+) {
+  const response = await fetch(
+    `https://${ADO_DATA_URL}/json/nuts/timeseries/NUTS3_${regionId.toUpperCase()}.json`,
+    options
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch timeseries for ${regionId}: ${response.status}`
+    )
+  }
+
+  return response.json() as Promise<Array<{ date?: string }>>
+}
+
+/**
  * Fetch hydro data (GeoJSON)
  */
 export async function fetchHydroData(

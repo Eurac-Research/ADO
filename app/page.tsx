@@ -4,6 +4,10 @@ import DroughtMonitorClient from './drought-monitor/drought-monitor-client'
 import DeferredWelcomeModal from '@/components/DeferredWelcomeModal'
 import type { PostData } from '@/types'
 import type { Metadata } from 'next'
+import {
+  getIndexDatasetJsonLd,
+  serializeJsonLd,
+} from '@/lib/region-dataset'
 
 // Revalidate server-rendered shell data every hour.
 export const revalidate = 3600
@@ -164,19 +168,33 @@ export async function generateMetadata({
   return generateMetadataWithIndex({ searchParams })
 }
 
-export default async function RootPage() {
+export default async function RootPage({ searchParams }: RootPageProps) {
   const allPosts = getAllPosts(['title', 'slug']) as PostData[]
+  const params = await searchParams
+  const selectedIndex = resolveIndexParam(params?.index)
 
-  // Pre-fetch only the initial index for instant first load
-  const initialData = await fetchInitialIndexData(DEFAULT_INDEX)
+  // Pre-fetch the selected index for instant first load and SEO metadata.
+  const initialData = await fetchInitialIndexData(selectedIndex)
+  const jsonLd = getIndexDatasetJsonLd({
+    index: selectedIndex,
+    metadata: initialData?.staticMetaData,
+    timeCoverage: {
+      startDate: initialData?.extractedMetadata?.properties?.firstDate,
+      endDate: initialData?.extractedMetadata?.properties?.lastDate,
+    },
+  })
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
       <DeferredWelcomeModal />
       <DroughtMonitorClient
         allPosts={allPosts}
         indices={indices}
-        initialIndex={DEFAULT_INDEX}
+        initialIndex={selectedIndex}
         initialData={initialData}
       />
     </>
