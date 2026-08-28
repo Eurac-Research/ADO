@@ -36,8 +36,8 @@ export default function MarkdownContent({
           dark:prose-h6:text-gray-400
           prose-p:leading-relaxed prose-p:text-gray-700 prose-p:mb-4 prose-p:mt-0
           dark:prose-p:text-gray-300
-          prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
-          dark:prose-a:text-blue-400 dark:hover:prose-a:text-blue-300
+          prose-a:text-blue-600 prose-a:no-underline 
+          dark:prose-a:text-blue-400 
           prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:bg-gray-50
           prose-blockquote:pl-4 prose-blockquote:py-2 prose-blockquote:text-gray-600 prose-blockquote:my-4
           dark:prose-blockquote:bg-gray-800 dark:prose-blockquote:text-gray-300
@@ -70,7 +70,7 @@ export default function MarkdownContent({
           </h1>
 
           <div
-            className="markdown-content bg-white dark:bg-gray-900"
+            className="markdown-content bg-white dark:bg-gray-900 [&_a:hover]:underline "
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
@@ -273,7 +273,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="Regione Piemonte"
-                    src="https://www.datocms-assets.com/31538/1624965085-regionepiemontelogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1765965962-regione_piemonte.png?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={200}
                     height={79}
                     className="max-h-24 w-auto object-contain"
@@ -289,7 +289,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="ARSO"
-                    src="https://www.datocms-assets.com/31538/1624964035-arsologo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697816819-arso_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={200}
                     height={62}
                     className="max-h-24 w-auto object-contain"
@@ -305,7 +305,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="WSL"
-                    src="https://www.datocms-assets.com/31538/1624969001-wsllogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697816836-wsl_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={157}
                     height={150}
                     className="max-h-24 w-auto object-contain"
@@ -321,7 +321,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="Land Oberösterreich"
-                    src="https://www.datocms-assets.com/31538/1624968920-landoberosterreichlogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697817127-land-oberosterreich_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={199}
                     height={140}
                     className="max-h-24 w-auto object-contain"
@@ -337,7 +337,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="University of Freiburg"
-                    src="https://www.datocms-assets.com/31538/1624964892-unifreiburglogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697817088-university-freiburg_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={161}
                     height={150}
                     className="max-h-24 w-auto object-contain"
@@ -353,7 +353,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="ANBI"
-                    src="https://www.datocms-assets.com/31538/1624963431-anbilogo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697816884-anbi_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={200}
                     height={98}
                     className="max-h-24 w-auto object-contain"
@@ -369,7 +369,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="INRAE"
-                    src="https://www.datocms-assets.com/31538/1624963435-inrae.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697816989-inrae_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={200}
                     height={107}
                     className="max-h-24 w-auto object-contain"
@@ -389,7 +389,7 @@ export default function MarkdownContent({
                   <Image
                     unoptimized
                     alt="Iskriva"
-                    src="https://www.datocms-assets.com/31538/1630484236-iskriva-logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
+                    src="https://www.datocms-assets.com/31538/1697817034-iskriva_logo.jpg?auto=format&fit=clip&fm=png&h=150&w=200"
                     width={200}
                     height={122}
                     className="max-h-24 w-auto object-contain"
